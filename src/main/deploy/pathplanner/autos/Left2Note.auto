@@ -1,0 +1,69 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.73,
+      "y": 6.45
+    },
+    "rotation": 60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "TiltCollectorToCollectPosCmd"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ShootSubwooferSpeakerCmd"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LeftSide"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "AutoIntakeNoteCmd"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootFARSubwooferSpeakerLEFTCmd"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShooterTiltToCollectorPos"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
