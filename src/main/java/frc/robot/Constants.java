@@ -106,6 +106,10 @@ public final class Constants {
     public static final double kTeleDriveMaxSpeed = 7.5 / 4.0;
     public static final double kTeleDriveMaxAngularSpeed = 3;
 
+    // https://www.youtube.com/watch?v=vhxiKpVB_jA
+    // kS: voltage needed to overcome static friction
+    // kV: voltage needed to run at constant velocity
+    // kA: voltage needed to accelerate
     public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.2, 2.5, 0.0);
   }
 }
