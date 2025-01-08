@@ -40,11 +40,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    autoChooser = AutoBuilder.buildAutoChooser();
     allianceChooser.addOption("RED", true);
     allianceChooser.setDefaultOption("BLUE", false);
 
-    SmartDashboard.putData("Auto Chooser", autoChooser);
     SmartDashboard.putData("Alliance Chooser", allianceChooser);
 
     // Send axes & buttons from joystick to SwerveJoystickCommand,
@@ -95,6 +93,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    return new InstantCommand();
   }
 }

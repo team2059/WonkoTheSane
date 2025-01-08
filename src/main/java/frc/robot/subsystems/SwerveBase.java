@@ -74,7 +74,7 @@ public class SwerveBase extends SubsystemBase {
     // drive motor inversions: offsets mess with these sometimes
     frontLeft.setMotorInversion(frontLeft.getDriveMotor(), true);
     frontRight.setMotorInversion(frontRight.getDriveMotor(), false);
-    backLeft.setMotorInversion(backLeft.getDriveMotor(), false);
+    backLeft.setMotorInversion(backLeft.getDriveMotor(), true);
     backRight.setMotorInversion(backRight.getDriveMotor(), false);
 
     // rotation motor inversions: all or nothing situation
@@ -120,10 +120,10 @@ public class SwerveBase extends SubsystemBase {
 
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = {
-      new SwerveModulePosition(-frontLeft.getCurrentDistanceMetersPerSecond(), frontLeft.getRotationEncoderPosition()),
-      new SwerveModulePosition(-frontRight.getCurrentDistanceMetersPerSecond(), frontRight.getRotationEncoderPosition()),
-      new SwerveModulePosition(-backLeft.getCurrentDistanceMetersPerSecond(), backLeft.getRotationEncoderPosition()),
-      new SwerveModulePosition(-backRight.getCurrentDistanceMetersPerSecond(), backRight.getRotationEncoderPosition())
+      new SwerveModulePosition(frontLeft.getCurrentDistanceMetersPerSecond(), frontLeft.getCANcoderRad()),
+      new SwerveModulePosition(frontRight.getCurrentDistanceMetersPerSecond(), frontRight.getCANcoderRad()),
+      new SwerveModulePosition(backLeft.getCurrentDistanceMetersPerSecond(), backLeft.getCANcoderRad()),
+      new SwerveModulePosition(backRight.getCurrentDistanceMetersPerSecond(), backRight.getCANcoderRad())
     };
 
     return positions;
@@ -234,11 +234,11 @@ public class SwerveBase extends SubsystemBase {
     // This method will be called once per scheduler run
     odometry.update(getHeading(), getModulePositions());
 
-    SmartDashboard.putNumber("NavX Angle", navX.getAngle());
+    Logger.recordOutput("NavX Angle (Degrees)", -navX.getAngle());
     
     Logger.recordOutput("Real States", getStates());
     Logger.recordOutput("Pose", getPose());
 
-    SmartDashboard.putBoolean("FIELD-RELATIVE?", fieldRelativeStatus);
+    Logger.recordOutput("FIELD-RELATIVE?", fieldRelativeStatus);
   }
 }

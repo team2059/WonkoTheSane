@@ -226,12 +226,12 @@ public class SwerveModule extends SubsystemBase {
     // Actually applies a SwerveModuleState, but uses scaling rather than PID for the drive motor
     public void setDesiredStates(SwerveModuleState state) {
         // Optimize finds the closest angle to the target
-        state = optimize(state, getRotationEncoderPosition());
+        state = optimize(state, getCANcoderRad());
 
         driveMotor.set(state.speedMetersPerSecond / SwerveConstants.maxVelocity);
 
         // use PID for turning to avoid overshooting
-        rotationMotor.set(rotationPidController.calculate(getRotationEncoderPosition().getRadians(), state.angle.getRadians()));
+        rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
     }
 
     /**
@@ -248,11 +248,11 @@ public class SwerveModule extends SubsystemBase {
         }
 
         // Create optimized state to work with
-        SwerveModuleState optimizedState = optimize(desiredState, getIntegratedAngle());
+        SwerveModuleState optimizedState = optimize(desiredState, getCANcoderRad());
 
         // Set outputs (PID for rotation, FF for drive)
         rotationMotor.set(rotationPidController.calculate(
-            getIntegratedAngle().getRadians(), // current angle
+            getCANcoderRad().getRadians(), // current angle
             optimizedState.angle.getRadians() // target angle
         ));
         driveMotor.setVoltage(SwerveConstants.driveFF.calculate(

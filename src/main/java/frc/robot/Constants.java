@@ -77,25 +77,25 @@ public final class Constants {
     // Swerve Modules: CAN IDs and offsets for the CANcoders.
       // CANcoder offsets provided by Tuner X are scaled 0-1, must convert to radians
     // front left
-    public static final int frontLeftDriveMotorId = 7;
-    public static final int frontLeftRotationMotorId = 8;
-    public static final int frontLeftCanCoderId = 12;
-    public static final double frontLeftOffsetRad = 0.287842 * 2 * Math.PI;
+    public static final int frontLeftDriveMotorId = 1;
+    public static final int frontLeftRotationMotorId = 2;
+    public static final int frontLeftCanCoderId = 11;
+    public static final double frontLeftOffsetRad = 0.862061 * 2 * Math.PI;
     // front right
-    public static final int frontRightDriveMotorId = 5;
-    public static final int frontRightRotationMotorId = 6;
-    public static final int frontRightCanCoderId = 11;
-    public static final double frontRightOffsetRad = 0.617676 * 2 * Math.PI;
+    public static final int frontRightDriveMotorId = 8;
+    public static final int frontRightRotationMotorId = 7;
+    public static final int frontRightCanCoderId = 12;
+    public static final double frontRightOffsetRad = 0.017578 * 2 * Math.PI;
     // back left
-    public static final int backLeftDriveMotorId = 3;
-    public static final int backLeftRotationMotorId = 4;
-    public static final int backLeftCanCoderId = 13;
-    public static final double backLeftOffsetRad = 0.899658 * 2 * Math.PI;
+    public static final int backLeftDriveMotorId = 5;
+    public static final int backLeftRotationMotorId = 6;
+    public static final int backLeftCanCoderId = 14;
+    public static final double backLeftOffsetRad = 0.244141 * 2 * Math.PI;
     // back right
-    public static final int backRightDriveMotorId = 1;
-    public static final int backRightRotationMotorId = 2;
-    public static final int backRightCanCoderId = 14;
-    public static final double backRightOffsetRad = 0.496826 * 2 * Math.PI;
+    public static final int backRightDriveMotorId = 4;
+    public static final int backRightRotationMotorId = 3;
+    public static final int backRightCanCoderId = 13;
+    public static final double backRightOffsetRad = 0.490234 * 2 * Math.PI;
 
     public static final double maxVelocity = 4.5; // meters/sec
     public static final double maxAcceleration = 10; // meters/sec^2
