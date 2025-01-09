@@ -6,6 +6,10 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -89,7 +94,7 @@ public class SwerveBase extends SubsystemBase {
     backLeft.resetEncoders();
     backRight.resetEncoders();
 
-    // configureAutoBuilder();
+    configureAutoBuilder();
   }
 
   public Pose2d getPose() {
@@ -201,33 +206,38 @@ public class SwerveBase extends SubsystemBase {
     }
   }
 
-  // public void configureAutoBuilder() {
-  //   AutoBuilder.configureHolonomic(
-  //     this::getPose, // robot pose supplier
-  //     this::resetOdometry, // method to reset odometry (will be called if auto has a starting pose)
-  //     this::getRobotRelativeSpeeds, // ChassisSpeeds supplier (must be robot relative)
-  //     this::driveRobotRelative, // method that will drive the robot given robot relative ChassisSpeeds
-  //     new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-  //       new PIDConstants(0, 0, 0), // Translation PID constants
-  //       new PIDConstants(0, 0, 0), // Rotation PID constants
-  //       SwerveConstants.maxVelocity, // Max module speed in m/s
-  //       SwerveConstants.driveBaseRadius, // drive base radius in meters, distance from robot center to furthest module
-  //       new ReplanningConfig()// Default path replanning config, see the API for options
-  //     ),
-  //     () -> {
-  //       // Boolean supplier that controls when the path will be mirrored for the red alliance
-  //       // This will flip the path being followed to the red side of the field.
-  //       // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+  public void configureAutoBuilder() {
+    // Fetch RobotConfig from GUI settings
+    RobotConfig config;
+    try {
+      config = RobotConfig.fromGUISettings();
 
-  //       var alliance = DriverStation.getAlliance();
-  //       if (alliance.isPresent()) {
-  //         return alliance.get() == DriverStation.Alliance.Red;
-  //       }
-  //       return false;
-  //     },
-  //     this
-  //   );
-  // }
+      // Configure AutoBuilder
+      AutoBuilder.configure(
+        this::getPose, // Robot pose supplier
+        this::resetOdometry, // Method to reset odometry
+        this::getRobotRelativeSpeeds, // ChassisSpeeds supplier, MUST be robot relative 
+        (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds 
+        new PPHolonomicDriveController(
+          new PIDConstants(1.0, 0, 0), // Translation PID constants 
+          new PIDConstants(2.0, 0, 0.05)), // Rotation PID constants
+        config, // Robot configuration
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field
+          // The origin will remain on the blue side
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        }, 
+        this // reference to this subsystem to set requirements
+      );
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
   @Override
   public void periodic() {

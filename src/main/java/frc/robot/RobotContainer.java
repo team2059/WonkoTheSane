@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.TeleopSwerveCmd;
 import frc.robot.subsystems.SwerveBase;
@@ -43,12 +45,14 @@ public class RobotContainer {
     allianceChooser.addOption("RED", true);
     allianceChooser.setDefaultOption("BLUE", false);
 
-    SmartDashboard.putData("Alliance Chooser", allianceChooser);
+    // you can also specify a default auto... AutoBuilder.buildAutoChooser("MyAuto");
+    autoChooser = AutoBuilder.buildAutoChooser();
 
-    // Send axes & buttons from joystick to SwerveJoystickCommand,
+    SmartDashboard.putData("Alliance Chooser", allianceChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // Send axes & buttons from joystick to TeleopSwerveCmd,
       // which will govern the SwerveSubsystem
-    
-    // FOR A LOGITECH FLIGHT CONTROLLER (EXTREME 3D)...
     swerveSubsystem.setDefaultCommand(new TeleopSwerveCmd(
       swerveSubsystem, 
       () -> logitech.getRawAxis(1), // forwardX
@@ -56,15 +60,6 @@ public class RobotContainer {
       () -> logitech.getRawAxis(2), // rotation
       () -> logitech.getRawAxis(3) // slider
     ));
-
-    // FOR AN XBOX CONTROLLER...
-    // swerveSubsystem.setDefaultCommand(new TeleopXboxSwerveCmd(
-    //   swerveSubsystem, 
-    //   () -> xboxController.getLeftY(),
-    //   () -> xboxController.getLeftX(), 
-    //   () -> xboxController.getRightX(),
-    //   () -> xboxController.getPOV()
-    // ));
 
     configureBindings();
   }
@@ -93,6 +88,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new InstantCommand();
+    return autoChooser.getSelected();
   }
 }
