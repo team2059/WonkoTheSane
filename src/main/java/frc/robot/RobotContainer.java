@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import org.littletonrobotics.junction.Logger;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.TeleopSwerveCmd;
@@ -29,7 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-  SendableChooser<Boolean> allianceChooser = new SendableChooser<>();
+  /* SENDABLES */
   SendableChooser<Command> autoChooser;
 
   /* SUBSYSTEMS */
@@ -42,17 +41,13 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    allianceChooser.addOption("RED", true);
-    allianceChooser.setDefaultOption("BLUE", false);
-
     // you can also specify a default auto... AutoBuilder.buildAutoChooser("MyAuto");
-    autoChooser = AutoBuilder.buildAutoChooser();
+    autoChooser = AutoBuilder.buildAutoChooser("New Auto");
 
-    SmartDashboard.putData("Alliance Chooser", allianceChooser);
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-
-    // Send axes & buttons from joystick to TeleopSwerveCmd,
-      // which will govern the SwerveSubsystem
+    /*
+     * Send axes and buttons from joystick to TeleopSwerveCmd,
+     * which will govern the SwerveSubsystem
+     */
     swerveSubsystem.setDefaultCommand(new TeleopSwerveCmd(
       swerveSubsystem, 
       () -> logitech.getRawAxis(1), // forwardX
@@ -75,11 +70,13 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    /* WINDOW: RESET NAVX HEADING */
+    /* BUTTON 5: RESET NAVX HEADING */
     new JoystickButton(logitech, 5)
       .whileTrue(new InstantCommand(() -> swerveSubsystem.getNavX().zeroYaw()));
 
+    /* BUTTON 3: SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
     new JoystickButton(logitech, 3).whileTrue(new InstantCommand(() -> swerveSubsystem.setFieldRelativity()));
+
   }
   
   /**

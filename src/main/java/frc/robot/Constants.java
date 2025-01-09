@@ -19,8 +19,6 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static class OperatorConstants {
-    public static final int JoystickPort = 1;
-    public static final int XboxControllerPort = 0;
     public static final int LogitechControllerPort = 0;
 
     // Axes
@@ -31,29 +29,21 @@ public final class Constants {
 
     // Buttons
     public static final int JoystickRobotRelative = 12;
-    public static final int JoystickLoadNote = 11;
-    public static final int JoystickShootNote = 10;
-  }
-
-  public static class ShooterConstants {
-    public static final int topDriveMotorId = 16;
-    public static final int bottomDriveMotorId = 17;
-    public static final int indexerMotorId = 15;
   }
 
   public static class SwerveConstants {
     // flipped because originally there was too much slipping
-    public static final double trackWidth = Units.inchesToMeters(24.5);
-    public static final double wheelBase = Units.inchesToMeters(18.5);
+    public static final double trackWidth = Units.inchesToMeters(24.5); // distance between front wheels (like train track)
+    public static final double wheelBase = Units.inchesToMeters(18.5); // distance from center of wheels on side
 
     public static final double wheelDiameter = Units.inchesToMeters(4.0 / 1.0);
 
-    // Kinematics gets each module relative to center. X is forward/backward and Y is left/right, left is positive
+    // Kinematics gets each module relative to center. X is left/right and Y is forward/backward
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-      new Translation2d(trackWidth / 2.0, wheelBase / 2.0), // front left 
-      new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), // front right
-      new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), // back left
-      new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) // back right
+      new Translation2d(trackWidth / 2.0, wheelBase / 2.0), // front right (+,+)
+      new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), // back right (+,-)
+      new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), // front left (-,+)
+      new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) // back left (-,-)
     );
 
     public static final double kPTurning = 0.25;
@@ -61,7 +51,9 @@ public final class Constants {
     public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
     public static final double rotationGearRatio = (150.0 / 7.0);
 
+    /* ================== */
     /* CONVERSION FACTORS */
+    /* ================== */
 
     // Given Motor Rotations, convert to Meters traveled
     public static final double driveEncoderPositionConversionFactor = (Math.PI * Units.inchesToMeters(wheelDiameter)) / (driveGearRatio);
