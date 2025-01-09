@@ -64,8 +64,6 @@ public final class Constants {
     // Given Motor Rotations, convert to Radians/second
     public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60;
 
-    public static final double driveBaseRadius = Units.inchesToMeters(18.5);
-
     // Swerve Modules: CAN IDs and offsets for the CANcoders.
       // CANcoder offsets provided by Tuner X are scaled 0-1, must convert to radians
     // front left
@@ -98,7 +96,6 @@ public final class Constants {
     public static final double kTeleDriveMaxSpeed = 7.5 / 4.0;
     public static final double kTeleDriveMaxAngularSpeed = 3;
 
-    // https://www.youtube.com/watch?v=vhxiKpVB_jA
     // kS: voltage needed to overcome static friction
     // kV: voltage needed to run at constant velocity
     // kA: voltage needed to accelerate
