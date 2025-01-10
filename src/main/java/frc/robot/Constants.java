@@ -33,8 +33,8 @@ public final class Constants {
 
   public static class SwerveConstants {
     // flipped because originally there was too much slipping
-    public static final double trackWidth = Units.inchesToMeters(24.5); // distance between front wheels (like train track)
-    public static final double wheelBase = Units.inchesToMeters(18.5); // distance from center of wheels on side
+    public static final double wheelBase = Units.inchesToMeters(24.5); // distance between front wheels (like train track)
+    public static final double trackWidth = Units.inchesToMeters(18.5); // distance from center of wheels on side
 
     public static final double wheelDiameter = Units.inchesToMeters(4.0 / 1.0);
 
@@ -57,12 +57,12 @@ public final class Constants {
 
     // Given Motor Rotations, convert to Meters traveled
     public static final double driveEncoderPositionConversionFactor = (Math.PI * Units.inchesToMeters(wheelDiameter)) / (driveGearRatio);
-    // Given Motor Rotations, convert to Meters/second
+    // Given Motor RPM, convert to Meters/second
     public static final double driveEncoderVelocityConversionFactor = driveEncoderPositionConversionFactor / 60.0;
     // Given Motor Rotations, convert to Radians
     public static final double rotationEncoderPositionConversionFactor = (14.0 * Math.PI) / 150.0;
-    // Given Motor Rotations, convert to Radians/second
-    public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60;
+    // Given Motor RPM, convert to Radians/second
+    public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60.0;
 
     // Swerve Modules: CAN IDs and offsets for the CANcoders.
       // CANcoder offsets provided by Tuner X are scaled 0-1, must convert to radians

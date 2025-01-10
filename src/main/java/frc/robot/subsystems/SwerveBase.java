@@ -268,10 +268,10 @@ public class SwerveBase extends SubsystemBase {
         this::getPose, // Robot pose supplier
         this::resetOdometry, // Method to reset odometry
         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier, MUST be robot relative 
-        (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds 
+        (speeds) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds 
         new PPHolonomicDriveController(
-          new PIDConstants(5.0, 0, 0), // Translation PID constants 
-          new PIDConstants(5.0, 0, 0)), // Rotation PID constants
+          new PIDConstants(15, 4, 0.1), // Translation PID constants 
+          new PIDConstants(0, 0, 0)), // Rotation PID constants
         config, // Robot configuration
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
