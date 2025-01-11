@@ -93,6 +93,7 @@ public class SwerveBase extends SubsystemBase {
     backLeft.resetEncoders();
     backRight.resetEncoders();
 
+    // Configure auto builder last
     configureAutoBuilder();
   }
 

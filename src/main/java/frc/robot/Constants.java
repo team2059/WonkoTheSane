@@ -19,20 +19,31 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static class OperatorConstants {
+
+    /* ===== */
+    /* PORTS */
+    /* ===== */
+
     public static final int LogitechControllerPort = 0;
 
-    // Axes
+    /* ==== */
+    /* AXES */
+    /* ==== */
+
     public static final int JoystickTranslationAxis = 1;
     public static final int JoystickStrafeAxis = 0;
     public static final int JoystickRotationAxis = 2;
     public static final int JoystickSliderAxis = 3;
 
-    // Buttons
+    /* ======= */
+    /* BUTTONS */
+    /* ======= */
+
     public static final int JoystickRobotRelative = 12;
   }
 
   public static class SwerveConstants {
-    // flipped because originally there was too much slipping
+
     public static final double wheelBase = Units.inchesToMeters(24.5); // distance between front wheels (like train track)
     public static final double trackWidth = Units.inchesToMeters(18.5); // distance from center of wheels on side
 
@@ -46,7 +57,9 @@ public final class Constants {
       new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) // back left (-,-)
     );
 
-    public static final double kPTurning = 0.25;
+    /* =========== */
+    /* GEAR RATIOS */
+    /* =========== */
 
     public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
     public static final double rotationGearRatio = (150.0 / 7.0);
@@ -64,8 +77,16 @@ public final class Constants {
     // Given Motor RPM, convert to Radians/second
     public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60.0;
 
-    // Swerve Modules: CAN IDs and offsets for the CANcoders.
-      // CANcoder offsets provided by Tuner X are scaled 0-1, must convert to radians
+    /* ============== */
+    /* SWERVE MODULES */
+    /* ============== */
+
+    /*
+     * CAN IDs: found and set via REV hardware client
+     * CANcoder Offsets: found in Phoenix Tuner X as "Absolute position"
+     *  after manually straightening wheel (converted to radians here)
+     */
+
     // front left
     public static final int frontLeftDriveMotorId = 1;
     public static final int frontLeftRotationMotorId = 2;
@@ -87,15 +108,24 @@ public final class Constants {
     public static final int backRightCanCoderId = 13;
     public static final double backRightOffsetRad = 0.490234 * 2 * Math.PI;
 
+    /* ======== */
+    /* MAXIMUMS */
+    /* ======== */
+
+    // Global maximums
     public static final double maxVelocity = 4.5; // meters/sec
     public static final double maxAcceleration = 10; // meters/sec^2
     public static final double maxAngularVelocity = 2 * Math.PI; // rad/sec
     public static final double maxAngularAcceleration = 4 * Math.PI; // rad/sec^2
-
-    // Teleop swerve max speeds
+    // Teleop max speeds
     public static final double kTeleDriveMaxSpeed = 7.5 / 4.0;
     public static final double kTeleDriveMaxAngularSpeed = 3;
 
+    /* =============================== */
+    /* SWERVE MODULE CONTROL CONSTANTS */
+    /* =============================== */
+    
+    public static final double kPRotation = 0.25;
     // kS: voltage needed to overcome static friction
     // kV: voltage needed to run at constant velocity
     // kA: voltage needed to accelerate

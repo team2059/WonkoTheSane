@@ -57,12 +57,12 @@ public class SwerveModule extends SubsystemBase {
         );
 
         // Instantiate rotation PID controller, for smoother and more accurate rotation
-        rotationPidController = new PIDController(SwerveConstants.kPTurning, 0, 0);
+        rotationPidController = new PIDController(SwerveConstants.kPRotation, 0, 0);
 
         // tells pidcontroller that -pi is the same as +pi, can calculate shorter path to setpoint from either sign
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
 
-        // Instantiate new CANcoder and respective offset, set configuration
+        // Instantiate new CANcoder and respective offset
         canCoder = new CANcoder(canCoderId);
         offset = new Rotation2d(canCoderOffsetRadians);
 
@@ -74,8 +74,19 @@ public class SwerveModule extends SubsystemBase {
         rotationEncoder = rotationMotor.getEncoder();
     }
 
+    /**
+     * Configure a Spark motor controller. 
+     * In 2025, REV made changes requiring use 
+     * of a Spark[Max/Flex]Config object
+     * 
+     * @param spark The Spark to configure
+     * @param inverted Boolean motor inversion value
+     * @param idleMode IdleMode.kBrake or IdleMode.kCoast
+     * @param positionConversionFactor MotorRotations x [This factor] = units
+     * @param velocityConversionFactor MotorRotations x [This factor] = units/sec
+     */
     private void configureSpark(
-        SparkMax max, 
+        SparkMax spark, 
         boolean inverted, 
         IdleMode idleMode,
         double positionConversionFactor,
@@ -91,24 +102,25 @@ public class SwerveModule extends SubsystemBase {
         .positionConversionFactor(positionConversionFactor)
         .velocityConversionFactor(velocityConversionFactor);
 
-      max.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     /**
-     * Configure cancoder
+     * Configure cancoder to operate with necessary behavior
+     * [0,1) wrap range, CCW+ direction
      */
     private void configureCanCoder() {
         // Create the new configuration
-        CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
+        CANcoderConfiguration config = new CANcoderConfiguration();
 
         // Makes the range of the sensor 0-1 so that radians can be calculated
-        canCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
+        config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
 
         // Makes turning ccw positive
-        canCoderConfig.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         // Apply cancoder configuration
-        canCoder.getConfigurator().apply(canCoderConfig);
+        canCoder.getConfigurator().apply(config);
     }
 
     /**
@@ -126,7 +138,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * @return Rotation2d of current rotation encoder position
+     * @return Rotation2d of current rotation encoder position (radians), range 0-2pi
      */
     public Rotation2d getRotationEncoderPosition() {
         double unsignedAngle = rotationEncoder.getPosition() % (2 * Math.PI);
@@ -134,13 +146,6 @@ public class SwerveModule extends SubsystemBase {
         if (unsignedAngle < 0) unsignedAngle += 2 * Math.PI;
 
         return new Rotation2d(unsignedAngle);
-    }
-
-    /**
-     * @return CANcoder object
-     */
-    public CANcoder getCANcoder() {
-        return canCoder;
     }
 
     /**
@@ -172,8 +177,15 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
+     * @return CANcoder object
+     */
+    public CANcoder getCANcoder() {
+        return canCoder;
+    }
+
+    /**
      * Set a Spark motor to be inverted.
-     * @param motor SparkMax to be inverted
+     * @param motor Spark to be inverted
      * @param inverted boolean containing inversion value
      */
     public void setMotorInversion(SparkMax motor, boolean inverted) {
@@ -194,7 +206,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * Reset Spark builtin encoders:
+     * Reset Spark builtin encoders.
      * DriveEncoder = 0, RotationEncoder = cancoder offset
      */
     public void resetEncoders() {
@@ -261,14 +273,16 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * Set the desired state of a swerve module (no PID or Feedforward)
+     * Set desired SwerveModuleState.
+     * Drive: open-loop, Rotation: closed-loop
      * 
      * @param state desired SwerveModuleState
      */
     public void setDesiredState(SwerveModuleState state) {
-        // Optimize finds the closest angle to the target
+        // Find the closest equivalent angle to target
         state = optimize(state, getCANcoderRad());
 
+        // Set drive motor speed to the ratio of target speed to max speed
         driveMotor.set(state.speedMetersPerSecond / SwerveConstants.maxVelocity);
 
         // use PID for turning to avoid overshooting
@@ -276,8 +290,8 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * Set the desired state of a swerve module,
-     * using PID and feedforward to control the output
+     * Set desired SwerveModuleState.
+     * Drive: FF, Rotation: PID
      * 
      * @param desiredState desired SwerveModuleState
      */
@@ -296,9 +310,9 @@ public class SwerveModule extends SubsystemBase {
             getCANcoderRad().getRadians(), // current angle
             optimizedState.angle.getRadians() // target angle
         ));
-        driveMotor.setVoltage(SwerveConstants.driveFF.calculate(
-            optimizedState.speedMetersPerSecond // target speed
-        ));
+        driveMotor.setVoltage(
+          SwerveConstants.driveFF.calculate(optimizedState.speedMetersPerSecond)
+        );
     }
 
     /**
@@ -306,20 +320,6 @@ public class SwerveModule extends SubsystemBase {
      */
     public double getCurrentDistanceMeters() {
         return driveEncoder.getPosition() * (SwerveConstants.wheelDiameter / 2.0);
-    }
-
-    /**
-     * @return Rotation2d of rotation motor angle
-     */
-    public Rotation2d getIntegratedAngle() {
-
-        double unsignedAngle = rotationEncoder.getPosition() % (2 * Math.PI);
-    
-        if (unsignedAngle < 0)
-          unsignedAngle += 2 * Math.PI;
-    
-        return new Rotation2d(unsignedAngle);
-    
     }
 
     /**

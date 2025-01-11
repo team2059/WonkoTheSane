@@ -40,12 +40,12 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    // you can also specify a default auto... AutoBuilder.buildAutoChooser("MyAuto");
+    // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
 
     /*
      * Send axes and buttons from joystick to TeleopSwerveCmd,
-     * which will govern the SwerveSubsystem
+     * which will govern the SwerveSubsystem during teleop
      */
     swerveSubsystem.setDefaultCommand(new TeleopSwerveCmd(
       swerveSubsystem, 
