@@ -7,12 +7,14 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.TeleopSwerveCmd;
+import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.SwerveBase;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -32,6 +34,7 @@ public class RobotContainer {
 
   /* SUBSYSTEMS */
   private static final SwerveBase swerveSubsystem = new SwerveBase();
+  private static final CoralIntake coralIntake = new CoralIntake();
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.LogitechControllerPort);
@@ -42,6 +45,7 @@ public class RobotContainer {
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
+    SmartDashboard.putData(autoChooser);
 
     /*
      * Send axes and buttons from joystick to TeleopSwerveCmd,
@@ -70,12 +74,23 @@ public class RobotContainer {
   private void configureBindings() {
 
     /* BUTTON 5: RESET NAVX HEADING */
-    new JoystickButton(logitech, 5)
+    new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
       .whileTrue(new InstantCommand(() -> swerveSubsystem.getNavX().zeroYaw()));
 
     /* BUTTON 3: SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
-    new JoystickButton(logitech, 3).whileTrue(new InstantCommand(() -> swerveSubsystem.setFieldRelativity()));
+    new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
+      .whileTrue(new InstantCommand(() -> swerveSubsystem.setFieldRelativity()));
 
+    /* INTAKE CORAL */
+    new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
+      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.1)))
+      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+
+    /* RELEASE CORAL */
+    new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
+      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
+      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+    
   }
   
   /**
