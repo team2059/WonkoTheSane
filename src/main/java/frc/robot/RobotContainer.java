@@ -9,6 +9,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.TeleopSwerveCmd;
 import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.SwerveBase;
+import frc.robot.subsystems.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -34,6 +35,7 @@ public class RobotContainer {
 
   /* SUBSYSTEMS */
   private static final SwerveBase swerveSubsystem = new SwerveBase();
+  private static final Vision vision = new Vision();
   private static final CoralIntake coralIntake = new CoralIntake();
 
   /* CONTROLLERS */

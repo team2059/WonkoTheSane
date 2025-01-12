@@ -41,8 +41,8 @@ public final class Constants {
 
     public static final int JoystickResetHeading = 5;
     public static final int JoystickRobotRelative = 3;
-    public static final int JoystickIntakeCoral = 6;
-    public static final int JoystickReleaseCoral = 7;
+    public static final int JoystickIntakeCoral = 4;
+    public static final int JoystickReleaseCoral = 6;
   }
 
   public static class SwerveConstants {
@@ -135,7 +135,11 @@ public final class Constants {
     public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.2, 2.5, 0.0);
   }
 
+  public static class VisionConstants {
+    public static final String cameraName = "hhCam";
+  }
+
   public static class CoralIntakeConstants {
-    public static final int intakeMotorID = 0;
+    public static final int intakeMotorID = 9;
   }
 }
