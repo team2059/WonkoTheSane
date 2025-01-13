@@ -10,6 +10,7 @@ import frc.robot.commands.TeleopSwerveCmd;
 import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.SwerveBase;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.AlgaeIntake;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -37,6 +38,7 @@ public class RobotContainer {
   private static final SwerveBase swerveSubsystem = new SwerveBase();
   private static final Vision vision = new Vision();
   private static final CoralIntake coralIntake = new CoralIntake();
+  private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.LogitechControllerPort);
@@ -93,6 +95,15 @@ public class RobotContainer {
       .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
       .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
+    /* INTAKE ALGAE */
+    new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
+      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.1)))
+      .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0)));
+
+    /* RELEASE ALGAE */
+    new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
+      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.1)))
+      .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0)));
   }
   
   /**

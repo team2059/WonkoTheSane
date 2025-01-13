@@ -43,6 +43,8 @@ public final class Constants {
     public static final int JoystickRobotRelative = 3;
     public static final int JoystickIntakeCoral = 4;
     public static final int JoystickReleaseCoral = 6;
+    public static final int JoystickIntakeAlgae = 7;
+    public static final int JoystickReleaseAlgae = 8;
   }
 
   public static class SwerveConstants {
@@ -141,5 +143,10 @@ public final class Constants {
 
   public static class CoralIntakeConstants {
     public static final int intakeMotorID = 9;
+  }
+
+  public static class AlgaeIntakeConstants {
+    public static final int motor1ID = 10;
+    public static final int motor2ID = 11;
   }
 }
