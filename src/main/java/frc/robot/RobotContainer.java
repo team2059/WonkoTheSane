@@ -7,6 +7,8 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.TeleopSwerveCmd;
+import frc.robot.commands.TurnToTag;
+import frc.robot.subsystems.AlgaeIntake;
 import frc.robot.subsystems.CoralIntake;
 import frc.robot.subsystems.SwerveBase;
 import frc.robot.subsystems.Vision;
@@ -37,6 +39,7 @@ public class RobotContainer {
   private static final SwerveBase swerveSubsystem = new SwerveBase();
   private static final Vision vision = new Vision();
   private static final CoralIntake coralIntake = new CoralIntake();
+  // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.LogitechControllerPort);
@@ -85,14 +88,26 @@ public class RobotContainer {
 
     /* INTAKE CORAL */
     new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
-      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.1)))
+      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
       .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
 
     /* RELEASE CORAL */
     new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
-      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
+      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.7)))
       .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
+    // /* INTAKE ALGAE */
+    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
+    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
+    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+
+    // /* RELEASE ALGAE */
+    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
+    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
+    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+
+    new JoystickButton(logitech, 7)
+      .whileTrue(new TurnToTag(swerveSubsystem, vision, 22));
   }
   
   /**
