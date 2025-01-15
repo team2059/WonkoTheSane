@@ -93,7 +93,7 @@ public class RobotContainer {
 
     /* RELEASE CORAL */
     new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
-      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.7)))
+      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
       .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
     // /* INTAKE ALGAE */

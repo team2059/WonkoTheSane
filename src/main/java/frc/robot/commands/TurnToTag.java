@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.MathUtil;
@@ -17,7 +18,7 @@ public class TurnToTag extends Command {
   private final SwerveBase swerveSubsystem;
   private final Vision vision;
   private final int tagID;
-  private final PIDController turnController = new PIDController(4, 0, 0);
+  private final PIDController turnController = new PIDController(4, 0, 0.3);
   private double rotationSpeed;
 
   /** Creates a new TurnToTag. */
@@ -49,6 +50,8 @@ public class TurnToTag extends Command {
       double yaw = t.getYaw();
 
       rotationSpeed = -MathUtil.clamp(turnController.calculate(yaw, 0), -1, 1);
+
+      Logger.recordOutput("y", yaw);
 
       swerveSubsystem.drive(0, 0, rotationSpeed, true);
     } else {
