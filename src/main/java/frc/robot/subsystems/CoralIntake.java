@@ -24,7 +24,7 @@ public class CoralIntake extends SubsystemBase {
     // configure spark
     SparkMaxConfig config = new SparkMaxConfig();
     config.inverted(false);
-    config.idleMode(IdleMode.kBrake);
+    config.idleMode(IdleMode.kCoast);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
   }

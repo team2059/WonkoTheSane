@@ -271,7 +271,7 @@ public class SwerveBase extends SubsystemBase {
         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier, MUST be robot relative 
         (speeds) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds 
         new PPHolonomicDriveController(
-          new PIDConstants(15, 4, 0.1), // Translation PID constants 
+          new PIDConstants(15.5, 0.7, 0.14), // Translation PID constants 
           new PIDConstants(0, 0, 0)), // Rotation PID constants
         config, // Robot configuration
         () -> {

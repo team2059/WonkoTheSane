@@ -6,6 +6,8 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -54,7 +56,7 @@ public class TeleopSwerveCmd extends Command {
 
     // Apply deadband
     xSpeed = Math.abs(xSpeed) > 0.25 ? xSpeed : 0.0;
-    ySpeed = Math.abs(ySpeed) > 0.25 ? ySpeed : 0.0;
+    ySpeed = Math.abs(ySpeed) > 0.35 ? ySpeed : 0.0;
     rot = Math.abs(rot) > 0.4 ? rot : 0.0;
 
     // Make the driving smoother
@@ -69,10 +71,17 @@ public class TeleopSwerveCmd extends Command {
     ySpeed *= sliderVal;
     rot *= sliderVal;
 
+    xSpeed = -MathUtil.applyDeadband(xSpeed, 0.1, 0.75);
+    ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 0.75);
+    rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
+
+    double[] log = {xSpeed, ySpeed, rot};
+    Logger.recordOutput("TELEOP SWERVE CMD", log);
+
     swerveSubsystem.drive(
-      -MathUtil.applyDeadband(xSpeed, 0.1, 0.75),
-      -MathUtil.applyDeadband(ySpeed, 0.1, 0.75), 
-      -MathUtil.applyDeadband(rot, 0.3, 0.75), 
+      xSpeed,
+      ySpeed, 
+      rot, 
       SwerveBase.fieldRelativeStatus
     );
   }
