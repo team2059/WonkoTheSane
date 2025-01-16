@@ -4,9 +4,10 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -52,22 +53,28 @@ public final class Constants {
     public static final double wheelBase = Units.inchesToMeters(24.5); // distance between front wheels (like train track)
     public static final double trackWidth = Units.inchesToMeters(18.5); // distance from center of wheels on side
 
-    public static final double wheelDiameter = Units.inchesToMeters(4.0 / 1.0);
+    public static final double wheelDiameter = Units.inchesToMeters(4.0 / 1);
 
-    // Kinematics gets each module relative to center. X is left/right and Y is forward/backward
-    public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-      new Translation2d(trackWidth / 2.0, wheelBase / 2.0), // front right (+,+)
-      new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), // back right (+,-)
-      new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), // front left (-,+)
-      new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) // back left (-,-)
-    );
+    public static final Translation2d flModuleOffset = new Translation2d(trackWidth / 2.0, wheelBase / 2.0);
+    public static final Translation2d frModuleOffset = new Translation2d(trackWidth / 2.0, -wheelBase / 2.0);
+    public static final Translation2d blModuleOffset = new Translation2d(-trackWidth / 2.0, wheelBase / 2.0);
+    public static final Translation2d brModuleOffset = new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0);
 
     /* =========== */
     /* GEAR RATIOS */
     /* =========== */
 
+    /*
+     * MK4i L2:
+     * - Drive 6.75:1
+     * - Rotation 150:7
+     * 
+     * MK4n L2:
+     * - Drive 5.9:1
+     * - Rotation 75:4
+     */
     public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
-    public static final double rotationGearRatio = (150.0 / 7.0);
+    public static final double rotationGearRatio = (150.0 / 7.0); // 150:7
 
     /* ================== */
     /* CONVERSION FACTORS */
@@ -77,8 +84,8 @@ public final class Constants {
     public static final double driveEncoderPositionConversionFactor = (Math.PI * Units.inchesToMeters(wheelDiameter)) / (driveGearRatio);
     // Given Motor RPM, convert to Meters/second
     public static final double driveEncoderVelocityConversionFactor = driveEncoderPositionConversionFactor / 60.0;
-    // Given Motor Rotations, convert to Radians
-    public static final double rotationEncoderPositionConversionFactor = (14.0 * Math.PI) / 150.0;
+    // Given Motor Rotations, convert to Radians traveled
+    public static final double rotationEncoderPositionConversionFactor = (2.0 * Math.PI) / rotationGearRatio;
     // Given Motor RPM, convert to Radians/second
     public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60.0;
 
@@ -135,6 +142,11 @@ public final class Constants {
     // kV: voltage needed to run at constant velocity
     // kA: voltage needed to accelerate
     public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.2, 2.5, 0.0);
+  }
+
+  public static class AutoConstants {
+    public static final PIDConstants autoTranslationConstants = new PIDConstants(0, 0, 0);
+    public static final PIDConstants autoRotationConstants = new PIDConstants(0, 0, 0);
   }
 
   public static class VisionConstants {

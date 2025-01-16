@@ -8,21 +8,20 @@ import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.subsystems.SwerveBase;
+import frc.robot.subsystems.Drivetrain;
 
-public class TeleopSwerveCmd extends Command {
-  private final SwerveBase swerveSubsystem;
+public class TeleopDriveCmd extends Command {
+  private final Drivetrain drivetrain;
   private final DoubleSupplier forwardX, forwardY, rotation, slider;
   private final SlewRateLimiter xLimiter, yLimiter, rotLimiter;
 
-  /** Creates a new TeleopLogitechExtreme3DSwerveCmd. */
-  public TeleopSwerveCmd(SwerveBase swerveSubsystem, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
+  /** Creates a new TeleopDriveCmd. */
+  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
 
-    this.swerveSubsystem = swerveSubsystem;
+    this.drivetrain = drivetrain;
     this.forwardX = forwardX;
     this.forwardY = forwardY;
     this.rotation = rotation;
@@ -33,7 +32,7 @@ public class TeleopSwerveCmd extends Command {
     this.rotLimiter = new SlewRateLimiter(SwerveConstants.maxAngularAcceleration);
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveSubsystem);
+    addRequirements(drivetrain);
   }
 
   // Called when the command is initially scheduled.
@@ -43,23 +42,22 @@ public class TeleopSwerveCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    /** 
-     * Units are given in meters/sec and radians/sec
-     * Since joysticks give output from -1 to 1, we multiply outputs by the max speed
-     * Otherwise, the max speed would be 1 m/s and 1 rad/s
-     */
 
     // Get joystick input as x, y, and rotation
-    double xSpeed = -forwardX.getAsDouble();
-    double ySpeed = -forwardY.getAsDouble();
-    double rot = -rotation.getAsDouble();
+    double xSpeed = forwardX.getAsDouble();
+    double ySpeed = forwardY.getAsDouble();
+    double rot = rotation.getAsDouble();
 
     // Apply deadband
     xSpeed = Math.abs(xSpeed) > 0.25 ? xSpeed : 0.0;
     ySpeed = Math.abs(ySpeed) > 0.35 ? ySpeed : 0.0;
     rot = Math.abs(rot) > 0.4 ? rot : 0.0;
 
-    // Make the driving smoother
+    /** 
+     * Units are given in meters/sec and radians/sec
+     * Since joysticks give output from -1 to 1, we multiply outputs by the max speed
+     * Otherwise, the max speed would be 1 m/s and 1 rad/s
+     */
     xSpeed = xLimiter.calculate(xSpeed) * SwerveConstants.kTeleDriveMaxSpeed;
     ySpeed = yLimiter.calculate(ySpeed) * SwerveConstants.kTeleDriveMaxSpeed;
     rot = rotLimiter.calculate(rot) * SwerveConstants.kTeleDriveMaxAngularSpeed;
@@ -71,18 +69,14 @@ public class TeleopSwerveCmd extends Command {
     ySpeed *= sliderVal;
     rot *= sliderVal;
 
-    xSpeed = -MathUtil.applyDeadband(xSpeed, 0.1, 0.75);
-    ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 0.75);
-    rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
-
     double[] log = {xSpeed, ySpeed, rot};
     Logger.recordOutput("TELEOP SWERVE CMD", log);
 
-    swerveSubsystem.drive(
+    drivetrain.drive(
       xSpeed,
       ySpeed, 
       rot, 
-      SwerveBase.fieldRelativeStatus
+      Drivetrain.fieldRelativeStatus
     );
   }
 
