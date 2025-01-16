@@ -60,11 +60,9 @@ public final class Constants {
     public static final Translation2d blModuleOffset = new Translation2d(-trackWidth / 2.0, wheelBase / 2.0);
     public static final Translation2d brModuleOffset = new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0);
 
-    /* =========== */
-    /* GEAR RATIOS */
-    /* =========== */
-
-    /*
+    /* ================
+     *   GEAR RATIOS
+     * 
      * MK4i L2:
      * - Drive 6.75:1
      * - Rotation 150:7
@@ -72,7 +70,7 @@ public final class Constants {
      * MK4n L2:
      * - Drive 5.9:1
      * - Rotation 75:4
-     */
+     * =============== */
     public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
     public static final double rotationGearRatio = (150.0 / 7.0); // 150:7
 
@@ -130,7 +128,7 @@ public final class Constants {
     public static final double maxAngularVelocity = 2 * Math.PI; // rad/sec
     public static final double maxAngularAcceleration = 4 * Math.PI; // rad/sec^2
     // Teleop max speeds
-    public static final double kTeleDriveMaxSpeed = 7.5 / 4.0;
+    public static final double kTeleDriveMaxSpeed = 1;
     public static final double kTeleDriveMaxAngularSpeed = 3;
 
     /* =============================== */

@@ -58,9 +58,9 @@ public class TeleopDriveCmd extends Command {
      * Since joysticks give output from -1 to 1, we multiply outputs by the max speed
      * Otherwise, the max speed would be 1 m/s and 1 rad/s
      */
-    xSpeed = xLimiter.calculate(xSpeed) * SwerveConstants.kTeleDriveMaxSpeed;
-    ySpeed = yLimiter.calculate(ySpeed) * SwerveConstants.kTeleDriveMaxSpeed;
-    rot = rotLimiter.calculate(rot) * SwerveConstants.kTeleDriveMaxAngularSpeed;
+    xSpeed *= SwerveConstants.kTeleDriveMaxSpeed;
+    ySpeed *= SwerveConstants.kTeleDriveMaxSpeed;
+    rot *= SwerveConstants.kTeleDriveMaxAngularSpeed;
 
     // Apply slider limit
     double sliderVal = (-slider.getAsDouble() + 1) / 2;
@@ -68,7 +68,13 @@ public class TeleopDriveCmd extends Command {
     xSpeed *= sliderVal;
     ySpeed *= sliderVal;
     rot *= sliderVal;
+    
+    // Use the rate limiter to handle acceleration conditions
+    xSpeed = xLimiter.calculate(xSpeed);
+    ySpeed = yLimiter.calculate(ySpeed);
+    rot = rotLimiter.calculate(rot);
 
+    // logging...
     double[] log = {xSpeed, ySpeed, rot};
     Logger.recordOutput("TELEOP SWERVE CMD", log);
 
