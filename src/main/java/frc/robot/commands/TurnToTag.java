@@ -10,26 +10,26 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.SwerveBase;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Vision;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TurnToTag extends Command {
-  private final SwerveBase swerveSubsystem;
+  private final Drivetrain drivetrain;
   private final Vision vision;
   private final int tagID;
   private final PIDController turnController = new PIDController(4, 0, 0.3);
   private double rotationSpeed;
 
   /** Creates a new TurnToTag. */
-  public TurnToTag(SwerveBase swerveSubsystem, Vision vision, int tagID) {
-    this.swerveSubsystem = swerveSubsystem;
+  public TurnToTag(Drivetrain drivetrain, Vision vision, int tagID) {
+    this.drivetrain = drivetrain;
     this.vision = vision;
     this.tagID = tagID;
     this.rotationSpeed = 0;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveSubsystem, vision);
+    addRequirements(drivetrain, vision);
   }
 
   // Called when the command is initially scheduled.
@@ -53,7 +53,7 @@ public class TurnToTag extends Command {
 
       Logger.recordOutput("y", yaw);
 
-      swerveSubsystem.drive(0, 0, rotationSpeed, true);
+      drivetrain.drive(0, 0, rotationSpeed, true);
     } else {
       this.cancel();
     }
@@ -63,7 +63,7 @@ public class TurnToTag extends Command {
   @Override
   public void end(boolean interrupted) {
     rotationSpeed = 0;
-    swerveSubsystem.drive(0, 0, 0, true);
+    drivetrain.drive(0, 0, 0, true);
   }
 
   // Returns true when the command should end.

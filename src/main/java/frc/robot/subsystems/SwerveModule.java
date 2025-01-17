@@ -15,7 +15,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.DrivetrainConstants;
 
 public class SwerveModule extends SubsystemBase {
     private final SparkMax driveMotor;
@@ -44,20 +44,20 @@ public class SwerveModule extends SubsystemBase {
           driveMotor,
           false,
           IdleMode.kBrake,
-          SwerveConstants.driveEncoderPositionConversionFactor,
-          SwerveConstants.driveEncoderVelocityConversionFactor
+          DrivetrainConstants.driveEncoderPositionConversionFactor,
+          DrivetrainConstants.driveEncoderVelocityConversionFactor
         );
 
         configureSpark(
           rotationMotor,
           false,
           IdleMode.kBrake,
-          SwerveConstants.rotationEncoderPositionConversionFactor,
-          SwerveConstants.rotationEncoderVelocityConversionFactor
+          DrivetrainConstants.rotationEncoderPositionConversionFactor,
+          DrivetrainConstants.rotationEncoderVelocityConversionFactor
         );
 
         // Instantiate rotation PID controller, for smoother and more accurate rotation
-        rotationPidController = new PIDController(SwerveConstants.kPRotation, 0, 0);
+        rotationPidController = new PIDController(DrivetrainConstants.kPRotation, 0, 0);
 
         // tells pidcontroller that -pi is the same as +pi, can calculate shorter path to setpoint from either sign
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
@@ -283,7 +283,7 @@ public class SwerveModule extends SubsystemBase {
         state = optimize(state, getCANcoderRad());
 
         // Set drive motor speed to the ratio of target speed to max speed
-        driveMotor.set(state.speedMetersPerSecond / SwerveConstants.maxVelocity);
+        driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
 
         // use PID for turning to avoid overshooting
         rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
@@ -311,7 +311,7 @@ public class SwerveModule extends SubsystemBase {
             optimizedState.angle.getRadians() // target angle
         ));
         driveMotor.setVoltage(
-          SwerveConstants.driveFF.calculate(optimizedState.speedMetersPerSecond)
+          DrivetrainConstants.driveFF.calculate(optimizedState.speedMetersPerSecond)
         );
     }
 
@@ -319,7 +319,7 @@ public class SwerveModule extends SubsystemBase {
      * @return current distance traveled by the drive motor in meters
      */
     public double getCurrentDistanceMeters() {
-        return driveEncoder.getPosition() * (SwerveConstants.wheelDiameter / 2.0);
+        return driveEncoder.getPosition() * (DrivetrainConstants.wheelDiameter / 2.0);
     }
 
     /**

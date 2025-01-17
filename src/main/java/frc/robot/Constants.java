@@ -47,7 +47,7 @@ public final class Constants {
     public static final int JoystickReleaseAlgae = 0;
   }
 
-  public static class SwerveConstants {
+  public static class DrivetrainConstants {
 
     public static final double wheelBase = Units.inchesToMeters(24.5); // distance between front wheels (like train track)
     public static final double trackWidth = Units.inchesToMeters(18.5); // distance from center of wheels on side
@@ -56,10 +56,10 @@ public final class Constants {
 
     // Kinematics gets each module relative to center. X is left/right and Y is forward/backward
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-      new Translation2d(trackWidth / 2.0, wheelBase / 2.0), // front right (+,+)
-      new Translation2d(trackWidth / 2.0, -wheelBase / 2.0), // back right (+,-)
-      new Translation2d(-trackWidth / 2.0, wheelBase / 2.0), // front left (-,+)
-      new Translation2d(-trackWidth / 2.0, -wheelBase / 2.0) // back left (-,-)
+      new Translation2d(wheelBase / 2.0, trackWidth / 2.0), // front right (+,+)
+      new Translation2d(wheelBase / 2.0, -trackWidth / 2.0), // back right (+,-)
+      new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), // front left (-,+)
+      new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0) // back left (-,-)
     );
 
     /* =========== */
@@ -135,6 +135,12 @@ public final class Constants {
     // kV: voltage needed to run at constant velocity
     // kA: voltage needed to accelerate
     public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.2, 2.5, 0.0);
+
+    /* FOR ROBOTCONFIG AUTO STUFF... */
+    public static final double kMass = 25;
+    public static final double kMomentOfIntertia = 3;
+    public static final double kWheelCoF = 1.1; // Coefficient of friction of wheels
+    public static final double driveCurrentLimit = 40;
   }
 
   public static class VisionConstants {
