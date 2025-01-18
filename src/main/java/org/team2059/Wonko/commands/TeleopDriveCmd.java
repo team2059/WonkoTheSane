@@ -2,25 +2,25 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package org.team2059.Wonko.commands;
 
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.team2059.Wonko.Constants.DrivetrainConstants;
+import org.team2059.Wonko.subsystems.Drivetrain;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.DrivetrainConstants;
-import frc.robot.subsystems.Drivetrain;
 
-public class TeleopSwerveCmd extends Command {
+public class TeleopDriveCmd extends Command {
   private final Drivetrain drivetrain;
   private final DoubleSupplier forwardX, forwardY, rotation, slider;
   private final SlewRateLimiter xLimiter, yLimiter, rotLimiter;
 
-  /** Creates a new TeleopLogitechExtreme3DSwerveCmd. */
-  public TeleopSwerveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
+  /** Creates a new TeleopDriveCmd. */
+  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
 
     this.drivetrain = drivetrain;
     this.forwardX = forwardX;
@@ -76,7 +76,7 @@ public class TeleopSwerveCmd extends Command {
     rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
 
     double[] log = {xSpeed, ySpeed, rot};
-    Logger.recordOutput("TELEOP SWERVE CMD", log);
+    Logger.recordOutput("TELEOP DRIVE CMD", log);
 
     drivetrain.drive(
       xSpeed,

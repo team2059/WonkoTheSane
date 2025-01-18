@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package org.team2059.Wonko.subsystems;
+
+import org.team2059.Wonko.Constants.DrivetrainConstants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -15,7 +17,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DrivetrainConstants;
 
 public class SwerveModule extends SubsystemBase {
     private final SparkMax driveMotor;
@@ -98,9 +99,9 @@ public class SwerveModule extends SubsystemBase {
         .inverted(inverted)
         .idleMode(idleMode);
 
-      config.encoder
-        .positionConversionFactor(positionConversionFactor)
-        .velocityConversionFactor(velocityConversionFactor);
+      // config.encoder
+      //   .positionConversionFactor(positionConversionFactor)
+      //   .velocityConversionFactor(velocityConversionFactor);
 
       spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -134,7 +135,7 @@ public class SwerveModule extends SubsystemBase {
      * @return Current position of drive motor (meters)
      */
     public double getDriveEncoderPosition() {
-        return driveEncoder.getPosition();
+        return driveEncoder.getPosition() * DrivetrainConstants.driveEncoderPositionConversionFactor;
     }
 
     /**
@@ -152,7 +153,7 @@ public class SwerveModule extends SubsystemBase {
      * @return Current velocity of drive motor (m/s)
      */
     public double getDriveVelocity() {
-        return driveEncoder.getVelocity();
+        return driveEncoder.getVelocity() * DrivetrainConstants.driveEncoderVelocityConversionFactor;
     }
 
     /**

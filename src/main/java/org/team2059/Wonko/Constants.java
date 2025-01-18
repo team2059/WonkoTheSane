@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package org.team2059.Wonko;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -19,6 +19,8 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static class OperatorConstants {
+
+    public static final boolean tuningMode = true;
 
     /* ===== */
     /* PORTS */
@@ -54,7 +56,7 @@ public final class Constants {
 
     public static final double wheelDiameter = Units.inchesToMeters(4.0 / 1.0);
 
-    // Kinematics gets each module relative to center. X is left/right and Y is forward/backward
+    // Kinematics gets each module relative to center. X is forward/backward and Y is left/right
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
       new Translation2d(wheelBase / 2.0, trackWidth / 2.0), // front right (+,+)
       new Translation2d(wheelBase / 2.0, -trackWidth / 2.0), // back right (+,-)
@@ -96,22 +98,22 @@ public final class Constants {
     public static final int frontLeftDriveMotorId = 1;
     public static final int frontLeftRotationMotorId = 2;
     public static final int frontLeftCanCoderId = 11;
-    public static final double frontLeftOffsetRad = 0.862061 * 2 * Math.PI;
+    public static final double frontLeftOffsetRad = 0.864990 * 2 * Math.PI;
     // front right
     public static final int frontRightDriveMotorId = 8;
     public static final int frontRightRotationMotorId = 7;
     public static final int frontRightCanCoderId = 12;
-    public static final double frontRightOffsetRad = 0.017578 * 2 * Math.PI;
+    public static final double frontRightOffsetRad = 0.041992 * 2 * Math.PI;
     // back left
     public static final int backLeftDriveMotorId = 5;
     public static final int backLeftRotationMotorId = 6;
     public static final int backLeftCanCoderId = 14;
-    public static final double backLeftOffsetRad = 0.244141 * 2 * Math.PI;
+    public static final double backLeftOffsetRad = 0.249268 * 2 * Math.PI;
     // back right
     public static final int backRightDriveMotorId = 4;
     public static final int backRightRotationMotorId = 3;
     public static final int backRightCanCoderId = 13;
-    public static final double backRightOffsetRad = 0.490234 * 2 * Math.PI;
+    public static final double backRightOffsetRad = 477051 * 2 * Math.PI;
 
     /* ======== */
     /* MAXIMUMS */
@@ -139,8 +141,18 @@ public final class Constants {
     /* FOR ROBOTCONFIG AUTO STUFF... */
     public static final double kMass = 25;
     public static final double kMomentOfIntertia = 3;
+    
     public static final double kWheelCoF = 1.1; // Coefficient of friction of wheels
     public static final double driveCurrentLimit = 40;
+  }
+
+  public static class AutoConstants {
+
+    public static final double kAutoTranslationP = 5;
+    public static final double kAutoTranslationD = 0.0;
+
+    public static final double kAutoRotationP = 5;
+    public static final double kAutoRotationD = 0.0;
   }
 
   public static class VisionConstants {

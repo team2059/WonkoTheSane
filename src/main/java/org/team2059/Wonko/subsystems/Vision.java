@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package org.team2059.Wonko.subsystems;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.team2059.Wonko.Constants.VisionConstants;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
   // Declare name of camera used in pipeline

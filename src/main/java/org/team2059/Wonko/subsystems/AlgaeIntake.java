@@ -3,7 +3,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 // Fuck you Mr. Potter
-package frc.robot.subsystems;
+package org.team2059.Wonko.subsystems;
+
+import org.team2059.Wonko.Constants.AlgaeIntakeConstants;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -13,7 +15,6 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.AlgaeIntakeConstants;
 
 public class AlgaeIntake extends SubsystemBase {
   private final SparkFlex motor1;

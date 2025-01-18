@@ -2,15 +2,20 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package org.team2059.Wonko.subsystems;
 
 import org.littletonrobotics.junction.Logger;
+import org.team2059.Wonko.Constants;
+import org.team2059.Wonko.Constants.AutoConstants;
+import org.team2059.Wonko.Constants.DrivetrainConstants;
+import org.team2059.Wonko.util.LoggedTunableNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,9 +27,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.DrivetrainConstants;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -58,7 +63,24 @@ public class Drivetrain extends SubsystemBase {
   // Create swerve drive odometry engine, used to track robot on field
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
 
+  private final Field2d field;
+
   public Drivetrain() {
+
+    field = new Field2d();
+    SmartDashboard.putData(field);
+
+    PathPlannerLogging.setLogActivePathCallback(
+      (path) -> {
+        Logger.recordOutput("Odometry/Trajectory", path.toArray(new Pose2d[path.size()]));
+        field.getObject("Trajectory").setPoses(path);
+      }
+    );
+    PathPlannerLogging.setLogTargetPoseCallback(
+      (pose) -> {
+        Logger.recordOutput("Odometry/Trajectory Setpoint", pose);
+      }
+    );
 
     // NavX may need an extra second to start...
     navX = new AHRS(AHRS.NavXComType.kMXP_SPI);
@@ -81,7 +103,7 @@ public class Drivetrain extends SubsystemBase {
     frontLeft.setMotorInversion(frontLeft.getDriveMotor(), false);
     frontRight.setMotorInversion(frontRight.getDriveMotor(), true);
     backLeft.setMotorInversion(backLeft.getDriveMotor(), false);
-    backRight.setMotorInversion(backRight.getDriveMotor(), true);
+    backRight.setMotorInversion(backRight.getDriveMotor(), false);
 
     // rotation motor inversions: all or nothing situation
     frontLeft.setMotorInversion(frontLeft.getRotationMotor(), true);
@@ -165,8 +187,8 @@ public class Drivetrain extends SubsystemBase {
    * @param chassisSpeeds
    */
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
+    // ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.DrivetrainConstants.maxVelocity);
     setModuleStates(newStates);
   }
@@ -176,9 +198,9 @@ public class Drivetrain extends SubsystemBase {
    * @param chassisSpeeds
    */
   public void driveFieldRelative(ChassisSpeeds chassisSpeeds) {
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-    discreteSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(discreteSpeeds, getHeading());
-    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
+    // ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
+    chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(chassisSpeeds, getHeading());
+    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.DrivetrainConstants.maxVelocity);
     setModuleStates(newStates);
   }
@@ -201,13 +223,13 @@ public class Drivetrain extends SubsystemBase {
    * @param desiredStates SwerveModuleState[] desired states
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    // makes it never go above 5 m/s
+    // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
-    frontLeft.setDesiredStateClosedLoop(desiredStates[0]);
-    frontRight.setDesiredStateClosedLoop(desiredStates[1]);
-    backLeft.setDesiredStateClosedLoop(desiredStates[2]);
-    backRight.setDesiredStateClosedLoop(desiredStates[3]);
+    frontLeft.setDesiredState(desiredStates[0]);
+    frontRight.setDesiredState(desiredStates[1]);
+    backLeft.setDesiredState(desiredStates[2]);
+    backRight.setDesiredState(desiredStates[3]);
 
     Logger.recordOutput("Target States", desiredStates);
   }
@@ -234,7 +256,7 @@ public class Drivetrain extends SubsystemBase {
         ? ChassisSpeeds.fromFieldRelativeSpeeds(forward, strafe, rotation, getHeading())
         : new ChassisSpeeds(forward, strafe, rotation);
 
-    speeds = ChassisSpeeds.discretize(speeds, 0.02);
+    // speeds = ChassisSpeeds.discretize(speeds, 0.02);
 
     // use kinematics (wheel placements) to convert overall robot state to array of
     // individual module states
@@ -261,6 +283,9 @@ public class Drivetrain extends SubsystemBase {
    * Method to configure AutoBuilder (make sure to do this last)
    */
   public void configureAutoBuilder() {
+
+    System.out.println("Configuring Auto Builder...");
+
     // Fetch RobotConfig from GUI settings
     try {
       // Configure AutoBuilder
@@ -270,8 +295,9 @@ public class Drivetrain extends SubsystemBase {
         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier, MUST be robot relative 
         (speeds) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds 
         new PPHolonomicDriveController(
-          new PIDConstants(10, 0, 0), // Translation PID constants 
-          new PIDConstants(0, 0, 0)), // Rotation PID constants
+          new PIDConstants(AutoConstants.kAutoTranslationP, 0.0, AutoConstants.kAutoTranslationD),
+          new PIDConstants(AutoConstants.kAutoRotationP, 0.0, AutoConstants.kAutoRotationD)
+        ),
         new RobotConfig(
           DrivetrainConstants.kMass, 
           DrivetrainConstants.kMomentOfIntertia, 
@@ -307,11 +333,20 @@ public class Drivetrain extends SubsystemBase {
     // This method will be called once per scheduler run
     odometry.update(getHeading(), getModulePositions());
 
-    Logger.recordOutput("NavX Angle (Degrees)", -navX.getAngle());
+    Logger.recordOutput("Heading", getHeading());
+    
+    Logger.recordOutput("Pose", getPose());
     
     Logger.recordOutput("Real States", getStates());
-    Logger.recordOutput("Pose", getPose());
 
     Logger.recordOutput("FIELD-RELATIVE?", fieldRelativeStatus);
+
+
+    Logger.recordOutput("X Speed", getRobotRelativeSpeeds().vxMetersPerSecond);
+    Logger.recordOutput("Y Speed", getRobotRelativeSpeeds().vyMetersPerSecond);
+    Logger.recordOutput("Z Speed", getRobotRelativeSpeeds().omegaRadiansPerSecond);
+
+    double[] arr = {frontLeft.getDriveVelocity(), frontRight.getDriveVelocity(), backLeft.getDriveVelocity(), backRight.getDriveVelocity()};
+    Logger.recordOutput("arr", arr);
   }
 }

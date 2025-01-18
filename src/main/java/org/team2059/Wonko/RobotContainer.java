@@ -2,16 +2,16 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package org.team2059.Wonko;
 
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.TeleopSwerveCmd;
-import frc.robot.commands.TurnToTag;
-import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.CoralIntake;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Vision;
+import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.commands.TeleopDriveCmd;
+import org.team2059.Wonko.commands.TurnToTag;
+import org.team2059.Wonko.subsystems.AlgaeIntake;
+import org.team2059.Wonko.subsystems.CoralIntake;
+import org.team2059.Wonko.subsystems.Drivetrain;
+import org.team2059.Wonko.subsystems.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -56,7 +56,7 @@ public class RobotContainer {
      * Send axes and buttons from joystick to TeleopSwerveCmd,
      * which will govern the drivetrain during teleop
      */
-    drivetrain.setDefaultCommand(new TeleopSwerveCmd(
+    drivetrain.setDefaultCommand(new TeleopDriveCmd(
       drivetrain, 
       () -> -logitech.getRawAxis(1), // forwardX
       () -> -logitech.getRawAxis(0), // forwardY
