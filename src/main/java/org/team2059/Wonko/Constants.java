@@ -68,19 +68,22 @@ public final class Constants {
     /* GEAR RATIOS */
     /* =========== */
 
-    public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
-    public static final double rotationGearRatio = (150.0 / 7.0);
+    public static final double driveGearRatio = (5.9 / 1.0); // 5.9:1
+    public static final double rotationGearRatio = (18.75 / 1.0); // 18.75
 
     /* ================== */
     /* CONVERSION FACTORS */
     /* ================== */
 
     // Given Motor Rotations, convert to Meters traveled
-    public static final double driveEncoderPositionConversionFactor = 0.0472867872;
+    // (pi * d) / (Gear Ratio)
+    // where d is wheel diameter, in meters
+    public static final double driveEncoderPositionConversionFactor = 0.05409929044;
     // Given Motor RPM, convert to Meters/second
     public static final double driveEncoderVelocityConversionFactor = driveEncoderPositionConversionFactor / 60.0;
     // Given Motor Rotations, convert to Radians
-    public static final double rotationEncoderPositionConversionFactor = 0.2932153143;
+    // (2 * pi) / (Gear Ratio)
+    public static final double rotationEncoderPositionConversionFactor = 0.3351032164;
     // Given Motor RPM, convert to Radians/second
     public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60.0;
 
