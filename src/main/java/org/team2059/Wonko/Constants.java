@@ -145,7 +145,8 @@ public final class Constants {
     public static final double kMass = 30;
     public static final double kMomentOfIntertia = 3;
     
-    public static final double kWheelCoF = 1.1; // Coefficient of friction of wheels
+    // CoF taken from https://www.chiefdelphi.com/t/coefficient-of-friction/467778
+    public static final double kWheelCoF = 1.542; // Coefficient of friction of wheels
     public static final double driveCurrentLimit = 40;
   }
 
