@@ -2,11 +2,15 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems;
+package org.team2059.Wonko.subsystems;
 
 import org.littletonrobotics.junction.Logger;
+import org.team2059.Wonko.Constants;
+import org.team2059.Wonko.Constants.AutoConstants;
+import org.team2059.Wonko.Constants.DrivetrainConstants;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -19,44 +23,54 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.SwerveConstants;
 
-public class SwerveBase extends SubsystemBase {
+public class Drivetrain extends SubsystemBase {
 
   public static boolean fieldRelativeStatus = true;
 
   // Create 4 SwerveModule objects using given constants.
   private final SwerveModule frontLeft = new SwerveModule(
-    SwerveConstants.frontLeftDriveMotorId, 
-    SwerveConstants.frontLeftRotationMotorId, 
-    SwerveConstants.frontLeftCanCoderId, 
-    SwerveConstants.frontLeftOffsetRad);
+    DrivetrainConstants.frontLeftDriveMotorId, 
+    DrivetrainConstants.frontLeftRotationMotorId, 
+    DrivetrainConstants.frontLeftCanCoderId, 
+    DrivetrainConstants.frontLeftOffsetRad,
+    false,
+    true);
   private final SwerveModule frontRight = new SwerveModule(
-    SwerveConstants.frontRightDriveMotorId, 
-    SwerveConstants.frontRightRotationMotorId, 
-    SwerveConstants.frontRightCanCoderId, 
-    SwerveConstants.frontRightOffsetRad);
+    DrivetrainConstants.frontRightDriveMotorId, 
+    DrivetrainConstants.frontRightRotationMotorId, 
+    DrivetrainConstants.frontRightCanCoderId, 
+    DrivetrainConstants.frontRightOffsetRad,
+    true,
+    true);
   private final SwerveModule backLeft = new SwerveModule(
-    SwerveConstants.backLeftDriveMotorId, 
-    SwerveConstants.backLeftRotationMotorId, 
-    SwerveConstants.backLeftCanCoderId, 
-    SwerveConstants.backLeftOffsetRad);
+    DrivetrainConstants.backLeftDriveMotorId, 
+    DrivetrainConstants.backLeftRotationMotorId, 
+    DrivetrainConstants.backLeftCanCoderId, 
+    DrivetrainConstants.backLeftOffsetRad,
+    false,
+    true);
   private final SwerveModule backRight = new SwerveModule(
-    SwerveConstants.backRightDriveMotorId, 
-    SwerveConstants.backRightRotationMotorId, 
-    SwerveConstants.backRightCanCoderId, 
-    SwerveConstants.backRightOffsetRad);
+    DrivetrainConstants.backRightDriveMotorId, 
+    DrivetrainConstants.backRightRotationMotorId, 
+    DrivetrainConstants.backRightCanCoderId, 
+    DrivetrainConstants.backRightOffsetRad,
+    false,
+    true);
 
   // Create NavX object (gyro)
   private final AHRS navX;
 
   // Create swerve drive odometry engine, used to track robot on field
-  private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.SwerveConstants.kinematics, new Rotation2d(), getModulePositions());
+  private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
 
-  public SwerveBase() {
+  public Drivetrain() {
 
     // NavX may need an extra second to start...
     navX = new AHRS(AHRS.NavXComType.kMXP_SPI);
@@ -75,18 +89,6 @@ public class SwerveBase extends SubsystemBase {
     backLeft.initRotationOffset();
     backRight.initRotationOffset();
 
-    // drive motor inversions: offsets mess with these sometimes
-    frontLeft.setMotorInversion(frontLeft.getDriveMotor(), true);
-    frontRight.setMotorInversion(frontRight.getDriveMotor(), false);
-    backLeft.setMotorInversion(backLeft.getDriveMotor(), true);
-    backRight.setMotorInversion(backRight.getDriveMotor(), false);
-
-    // rotation motor inversions: all or nothing situation
-    frontLeft.setMotorInversion(frontLeft.getRotationMotor(), true);
-    frontRight.setMotorInversion(frontRight.getRotationMotor(), true);
-    backLeft.setMotorInversion(backLeft.getRotationMotor(), true);
-    backRight.setMotorInversion(backRight.getRotationMotor(), true);
-
     // reset encoders upon each start
     frontLeft.resetEncoders();
     frontRight.resetEncoders();
@@ -95,6 +97,27 @@ public class SwerveBase extends SubsystemBase {
 
     // Configure auto builder last
     configureAutoBuilder();
+
+    SmartDashboard.putData("Swerve Drive", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveDrive");
+
+        builder.addDoubleProperty("Front Left Angle", () -> frontLeft.getCANcoderRad().getRadians(), null);
+        builder.addDoubleProperty("Front Left Velocity", () -> frontLeft.getDriveVelocity(), null);
+
+        builder.addDoubleProperty("Front Right Angle", () -> frontRight.getCANcoderRad().getRadians(), null);
+        builder.addDoubleProperty("Front Right Velocity", () -> frontRight.getDriveVelocity(), null);
+
+        builder.addDoubleProperty("Back Left Angle", () -> backLeft.getCANcoderRad().getRadians(), null);
+        builder.addDoubleProperty("Back Left Velocity", () -> backLeft.getDriveVelocity(), null);
+
+        builder.addDoubleProperty("Back Right Angle", () -> backRight.getCANcoderRad().getRadians(), null);
+        builder.addDoubleProperty("Back Right Velocity", () -> backRight.getDriveVelocity(), null);
+
+        builder.addDoubleProperty("Robot Angle", () -> getHeading().getRadians(), null);
+      }
+    });
   }
 
   /**
@@ -125,7 +148,7 @@ public class SwerveBase extends SubsystemBase {
    * @return ChassisSpeeds of current robot-relative speeds
    */
   public ChassisSpeeds getRobotRelativeSpeeds() {
-    ChassisSpeeds chassisSpeeds = SwerveConstants.kinematics.toChassisSpeeds(getStates());
+    ChassisSpeeds chassisSpeeds = DrivetrainConstants.kinematics.toChassisSpeeds(getStates());
 
     return chassisSpeeds;
   }
@@ -149,10 +172,10 @@ public class SwerveBase extends SubsystemBase {
    */
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = {
-      new SwerveModulePosition(frontLeft.getCurrentDistanceMeters(), frontLeft.getCANcoderRad()),
-      new SwerveModulePosition(frontRight.getCurrentDistanceMeters(), frontRight.getCANcoderRad()),
-      new SwerveModulePosition(backLeft.getCurrentDistanceMeters(), backLeft.getCANcoderRad()),
-      new SwerveModulePosition(backRight.getCurrentDistanceMeters(), backRight.getCANcoderRad())
+      new SwerveModulePosition(frontLeft.getDriveEncoderPosition(), frontLeft.getCANcoderRad()),
+      new SwerveModulePosition(frontRight.getDriveEncoderPosition(), frontRight.getCANcoderRad()),
+      new SwerveModulePosition(backLeft.getDriveEncoderPosition(), backLeft.getCANcoderRad()),
+      new SwerveModulePosition(backRight.getDriveEncoderPosition(), backRight.getCANcoderRad())
     };
 
     return positions;
@@ -164,8 +187,8 @@ public class SwerveBase extends SubsystemBase {
    */
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-    SwerveModuleState[] newStates = Constants.SwerveConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.SwerveConstants.maxVelocity);
+    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.DrivetrainConstants.maxVelocity);
     setModuleStates(newStates);
   }
 
@@ -175,9 +198,9 @@ public class SwerveBase extends SubsystemBase {
    */
   public void driveFieldRelative(ChassisSpeeds chassisSpeeds) {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-    discreteSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(discreteSpeeds, getHeading());
-    SwerveModuleState[] newStates = Constants.SwerveConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.SwerveConstants.maxVelocity);
+    chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(discreteSpeeds, getHeading());
+    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.DrivetrainConstants.maxVelocity);
     setModuleStates(newStates);
   }
 
@@ -199,8 +222,8 @@ public class SwerveBase extends SubsystemBase {
    * @param desiredStates SwerveModuleState[] desired states
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
-    // makes it never go above 5 m/s
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SwerveConstants.maxVelocity);
+    // makes it never go above specified max velocity
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
     frontLeft.setDesiredStateClosedLoop(desiredStates[0]);
     frontRight.setDesiredStateClosedLoop(desiredStates[1]);
@@ -236,9 +259,9 @@ public class SwerveBase extends SubsystemBase {
 
     // use kinematics (wheel placements) to convert overall robot state to array of
     // individual module states
-    SwerveModuleState[] states = SwerveConstants.kinematics.toSwerveModuleStates(speeds);
+    SwerveModuleState[] states = DrivetrainConstants.kinematics.toSwerveModuleStates(speeds);
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConstants.maxVelocity);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, DrivetrainConstants.maxVelocity);
 
     setModuleStates(states);
 
@@ -259,11 +282,10 @@ public class SwerveBase extends SubsystemBase {
    * Method to configure AutoBuilder (make sure to do this last)
    */
   public void configureAutoBuilder() {
-    // Fetch RobotConfig from GUI settings
-    RobotConfig config;
-    try {
-      config = RobotConfig.fromGUISettings();
 
+    System.out.println("Configuring Auto Builder...");
+
+    try {
       // Configure AutoBuilder
       AutoBuilder.configure(
         this::getPose, // Robot pose supplier
@@ -271,9 +293,22 @@ public class SwerveBase extends SubsystemBase {
         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier, MUST be robot relative 
         (speeds) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds 
         new PPHolonomicDriveController(
-          new PIDConstants(15.5, 0.7, 0.14), // Translation PID constants 
-          new PIDConstants(0, 0, 0)), // Rotation PID constants
-        config, // Robot configuration
+          new PIDConstants(AutoConstants.kAutoTranslationP, 0.0, AutoConstants.kAutoTranslationD),
+          new PIDConstants(AutoConstants.kAutoRotationP, 0.0, AutoConstants.kAutoRotationD)
+        ),
+        new RobotConfig(
+          DrivetrainConstants.kMass, 
+          DrivetrainConstants.kMomentOfIntertia, 
+          new ModuleConfig(
+            DrivetrainConstants.wheelDiameter / 2, 
+            DrivetrainConstants.maxVelocity, 
+            DrivetrainConstants.kWheelCoF, 
+            DCMotor.getNEO(1).withReduction(DrivetrainConstants.driveGearRatio), 
+            DrivetrainConstants.driveCurrentLimit, 
+            1
+          ), 
+          DrivetrainConstants.trackWidth
+        ),
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
           // This will flip the path being followed to the red side of the field
@@ -293,14 +328,12 @@ public class SwerveBase extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     // This method will be called once per scheduler run
-    odometry.update(getHeading(), getModulePositions());
+    odometry.update(getHeading(), getModulePositions());    
 
-    Logger.recordOutput("NavX Angle (Degrees)", -navX.getAngle());
-    
-    Logger.recordOutput("Real States", getStates());
+
     Logger.recordOutput("Pose", getPose());
-
-    Logger.recordOutput("FIELD-RELATIVE?", fieldRelativeStatus);
   }
 }
+ 

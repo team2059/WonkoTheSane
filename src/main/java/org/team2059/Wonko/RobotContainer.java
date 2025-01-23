@@ -2,16 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package org.team2059.Wonko;
 
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.TeleopSwerveCmd;
-import frc.robot.commands.TurnToTag;
-import frc.robot.subsystems.AlgaeIntake;
-import frc.robot.subsystems.CoralIntake;
-import frc.robot.subsystems.SwerveBase;
-import frc.robot.subsystems.Vision;
+import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.commands.TeleopDriveCmd;
+import org.team2059.Wonko.commands.TurnParallelToTag;
+import org.team2059.Wonko.commands.TurnToTag;
+import org.team2059.Wonko.subsystems.AlgaeIntake;
+import org.team2059.Wonko.subsystems.CoralIntake;
+import org.team2059.Wonko.subsystems.Drivetrain;
+import org.team2059.Wonko.subsystems.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -36,9 +37,9 @@ public class RobotContainer {
   SendableChooser<Command> autoChooser;
 
   /* SUBSYSTEMS */
-  private static final SwerveBase swerveSubsystem = new SwerveBase();
+  private static final Drivetrain drivetrain = new Drivetrain();
   private static final Vision vision = new Vision();
-  private static final CoralIntake coralIntake = new CoralIntake();
+  // private static final CoralIntake coralIntake = new CoralIntake();
   // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
   /* CONTROLLERS */
@@ -54,13 +55,13 @@ public class RobotContainer {
 
     /*
      * Send axes and buttons from joystick to TeleopSwerveCmd,
-     * which will govern the SwerveSubsystem during teleop
+     * which will govern the drivetrain during teleop
      */
-    swerveSubsystem.setDefaultCommand(new TeleopSwerveCmd(
-      swerveSubsystem, 
-      () -> logitech.getRawAxis(1), // forwardX
-      () -> logitech.getRawAxis(0), // forwardY
-      () -> logitech.getRawAxis(2), // rotation
+    drivetrain.setDefaultCommand(new TeleopDriveCmd(
+      drivetrain, 
+      () -> -logitech.getRawAxis(1), // forwardX
+      () -> -logitech.getRawAxis(0), // forwardY
+      () -> -logitech.getRawAxis(2), // rotation
       () -> logitech.getRawAxis(3) // slider
     ));
 
@@ -80,21 +81,21 @@ public class RobotContainer {
 
     /* BUTTON 5: RESET NAVX HEADING */
     new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
-      .whileTrue(new InstantCommand(() -> swerveSubsystem.getNavX().zeroYaw()));
+      .whileTrue(new InstantCommand(() -> drivetrain.getNavX().zeroYaw()));
 
     /* BUTTON 3: SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
-      .whileTrue(new InstantCommand(() -> swerveSubsystem.setFieldRelativity()));
+      .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
-    /* INTAKE CORAL */
-    new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
-      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
-      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+    // /* INTAKE CORAL */
+    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
+    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
+    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
 
-    /* RELEASE CORAL */
-    new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
-      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
-      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+    // /* RELEASE CORAL */
+    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
+    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
+    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
     // /* INTAKE ALGAE */
     // new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
@@ -107,7 +108,10 @@ public class RobotContainer {
     //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
     new JoystickButton(logitech, 7)
-      .whileTrue(new TurnToTag(swerveSubsystem, vision, 22));
+      .whileTrue(new TurnToTag(drivetrain, vision, 4));
+
+    new JoystickButton(logitech, 8)
+      .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
   }
   
   /**

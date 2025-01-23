@@ -1,4 +1,6 @@
-package frc.robot.subsystems;
+package org.team2059.Wonko.subsystems;
+
+import org.team2059.Wonko.Constants.DrivetrainConstants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -15,7 +17,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.SwerveConstants;
 
 public class SwerveModule extends SubsystemBase {
     private final SparkMax driveMotor;
@@ -33,7 +34,9 @@ public class SwerveModule extends SubsystemBase {
         int driveMotorId,
         int rotationMotorId,
         int canCoderId,
-        double canCoderOffsetRadians
+        double canCoderOffsetRadians,
+        boolean isDriveInverted,
+        boolean isRotationInverted
     ) {
         // Instantiate motor controller objects
         driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
@@ -42,22 +45,22 @@ public class SwerveModule extends SubsystemBase {
         // Configure motor controllers
         configureSpark(
           driveMotor,
-          false,
+          isDriveInverted,
           IdleMode.kBrake,
-          SwerveConstants.driveEncoderPositionConversionFactor,
-          SwerveConstants.driveEncoderVelocityConversionFactor
+          DrivetrainConstants.driveEncoderPositionConversionFactor,
+          DrivetrainConstants.driveEncoderVelocityConversionFactor
         );
 
         configureSpark(
           rotationMotor,
-          false,
+          isRotationInverted,
           IdleMode.kBrake,
-          SwerveConstants.rotationEncoderPositionConversionFactor,
-          SwerveConstants.rotationEncoderVelocityConversionFactor
+          DrivetrainConstants.rotationEncoderPositionConversionFactor,
+          DrivetrainConstants.rotationEncoderVelocityConversionFactor
         );
 
         // Instantiate rotation PID controller, for smoother and more accurate rotation
-        rotationPidController = new PIDController(SwerveConstants.kPRotation, 0, 0);
+        rotationPidController = new PIDController(DrivetrainConstants.kPRotation, 0, 0);
 
         // tells pidcontroller that -pi is the same as +pi, can calculate shorter path to setpoint from either sign
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
@@ -183,19 +186,6 @@ public class SwerveModule extends SubsystemBase {
         return canCoder;
     }
 
-    /**
-     * Set a Spark motor to be inverted.
-     * @param motor Spark to be inverted
-     * @param inverted boolean containing inversion value
-     */
-    public void setMotorInversion(SparkMax motor, boolean inverted) {
-      motor.configure(
-        new SparkMaxConfig()
-          .inverted(inverted), 
-        ResetMode.kResetSafeParameters, 
-        PersistMode.kPersistParameters
-      );
-    }
 
     /**
      * @return Rotation2d of absolute position from cancoder
@@ -283,7 +273,7 @@ public class SwerveModule extends SubsystemBase {
         state = optimize(state, getCANcoderRad());
 
         // Set drive motor speed to the ratio of target speed to max speed
-        driveMotor.set(state.speedMetersPerSecond / SwerveConstants.maxVelocity);
+        driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
 
         // use PID for turning to avoid overshooting
         rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
@@ -311,15 +301,14 @@ public class SwerveModule extends SubsystemBase {
             optimizedState.angle.getRadians() // target angle
         ));
         driveMotor.setVoltage(
-          SwerveConstants.driveFF.calculate(optimizedState.speedMetersPerSecond)
+          DrivetrainConstants.driveFF.calculate(optimizedState.speedMetersPerSecond)
         );
     }
 
-    /**
-     * @return current distance traveled by the drive motor in meters
-     */
-    public double getCurrentDistanceMeters() {
-        return driveEncoder.getPosition() * (SwerveConstants.wheelDiameter / 2.0);
+    // Only for testing
+    public double[] getConversionFactors() {
+      double[] test = {driveMotor.configAccessor.encoder.getPositionConversionFactor(), driveMotor.configAccessor.encoder.getVelocityConversionFactor(), rotationMotor.configAccessor.encoder.getPositionConversionFactor(), rotationMotor.configAccessor.encoder.getVelocityConversionFactor()};
+      return test;
     }
 
     /**

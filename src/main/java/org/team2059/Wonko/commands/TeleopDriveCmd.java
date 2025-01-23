@@ -2,38 +2,38 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package org.team2059.Wonko.commands;
 
 import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
+import org.team2059.Wonko.Constants.DrivetrainConstants;
+import org.team2059.Wonko.subsystems.Drivetrain;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.SwerveConstants;
-import frc.robot.subsystems.SwerveBase;
 
-public class TeleopSwerveCmd extends Command {
-  private final SwerveBase swerveSubsystem;
+public class TeleopDriveCmd extends Command {
+  private final Drivetrain drivetrain;
   private final DoubleSupplier forwardX, forwardY, rotation, slider;
   private final SlewRateLimiter xLimiter, yLimiter, rotLimiter;
 
-  /** Creates a new TeleopLogitechExtreme3DSwerveCmd. */
-  public TeleopSwerveCmd(SwerveBase swerveSubsystem, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
+  /** Creates a new TeleopDriveCmd. */
+  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
 
-    this.swerveSubsystem = swerveSubsystem;
+    this.drivetrain = drivetrain;
     this.forwardX = forwardX;
     this.forwardY = forwardY;
     this.rotation = rotation;
     this.slider = slider;
 
-    this.xLimiter = new SlewRateLimiter(SwerveConstants.maxAcceleration);
-    this.yLimiter = new SlewRateLimiter(SwerveConstants.maxAcceleration);
-    this.rotLimiter = new SlewRateLimiter(SwerveConstants.maxAngularAcceleration);
+    this.xLimiter = new SlewRateLimiter(DrivetrainConstants.maxAcceleration);
+    this.yLimiter = new SlewRateLimiter(DrivetrainConstants.maxAcceleration);
+    this.rotLimiter = new SlewRateLimiter(DrivetrainConstants.maxAngularAcceleration);
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(swerveSubsystem);
+    addRequirements(drivetrain);
   }
 
   // Called when the command is initially scheduled.
@@ -60,9 +60,9 @@ public class TeleopSwerveCmd extends Command {
     rot = Math.abs(rot) > 0.4 ? rot : 0.0;
 
     // Make the driving smoother
-    xSpeed = xLimiter.calculate(xSpeed) * SwerveConstants.kTeleDriveMaxSpeed;
-    ySpeed = yLimiter.calculate(ySpeed) * SwerveConstants.kTeleDriveMaxSpeed;
-    rot = rotLimiter.calculate(rot) * SwerveConstants.kTeleDriveMaxAngularSpeed;
+    xSpeed = xLimiter.calculate(xSpeed) * DrivetrainConstants.kTeleDriveMaxSpeed;
+    ySpeed = yLimiter.calculate(ySpeed) * DrivetrainConstants.kTeleDriveMaxSpeed;
+    rot = rotLimiter.calculate(rot) * DrivetrainConstants.kTeleDriveMaxAngularSpeed;
 
     // Apply slider limit
     double sliderVal = (-slider.getAsDouble() + 1) / 2;
@@ -75,14 +75,11 @@ public class TeleopSwerveCmd extends Command {
     ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 0.75);
     rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
 
-    double[] log = {xSpeed, ySpeed, rot};
-    Logger.recordOutput("TELEOP SWERVE CMD", log);
-
-    swerveSubsystem.drive(
+    drivetrain.drive(
       xSpeed,
       ySpeed, 
       rot, 
-      SwerveBase.fieldRelativeStatus
+      Drivetrain.fieldRelativeStatus
     );
   }
 
