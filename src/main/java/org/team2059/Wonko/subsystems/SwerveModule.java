@@ -34,7 +34,9 @@ public class SwerveModule extends SubsystemBase {
         int driveMotorId,
         int rotationMotorId,
         int canCoderId,
-        double canCoderOffsetRadians
+        double canCoderOffsetRadians,
+        boolean isDriveInverted,
+        boolean isRotationInverted
     ) {
         // Instantiate motor controller objects
         driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
@@ -43,7 +45,7 @@ public class SwerveModule extends SubsystemBase {
         // Configure motor controllers
         configureSpark(
           driveMotor,
-          false,
+          isDriveInverted,
           IdleMode.kBrake,
           DrivetrainConstants.driveEncoderPositionConversionFactor,
           DrivetrainConstants.driveEncoderVelocityConversionFactor
@@ -51,7 +53,7 @@ public class SwerveModule extends SubsystemBase {
 
         configureSpark(
           rotationMotor,
-          false,
+          isRotationInverted,
           IdleMode.kBrake,
           DrivetrainConstants.rotationEncoderPositionConversionFactor,
           DrivetrainConstants.rotationEncoderVelocityConversionFactor
@@ -99,9 +101,9 @@ public class SwerveModule extends SubsystemBase {
         .inverted(inverted)
         .idleMode(idleMode);
 
-      // config.encoder
-      //   .positionConversionFactor(positionConversionFactor)
-      //   .velocityConversionFactor(velocityConversionFactor);
+      config.encoder
+        .positionConversionFactor(positionConversionFactor)
+        .velocityConversionFactor(velocityConversionFactor);
 
       spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -135,7 +137,7 @@ public class SwerveModule extends SubsystemBase {
      * @return Current position of drive motor (meters)
      */
     public double getDriveEncoderPosition() {
-        return driveEncoder.getPosition() * DrivetrainConstants.driveEncoderPositionConversionFactor;
+        return driveEncoder.getPosition();
     }
 
     /**
@@ -153,7 +155,7 @@ public class SwerveModule extends SubsystemBase {
      * @return Current velocity of drive motor (m/s)
      */
     public double getDriveVelocity() {
-        return driveEncoder.getVelocity() * DrivetrainConstants.driveEncoderVelocityConversionFactor;
+        return driveEncoder.getVelocity();
     }
 
     /**
@@ -184,19 +186,6 @@ public class SwerveModule extends SubsystemBase {
         return canCoder;
     }
 
-    /**
-     * Set a Spark motor to be inverted.
-     * @param motor Spark to be inverted
-     * @param inverted boolean containing inversion value
-     */
-    public void setMotorInversion(SparkMax motor, boolean inverted) {
-      motor.configure(
-        new SparkMaxConfig()
-          .inverted(inverted), 
-        ResetMode.kResetSafeParameters, 
-        PersistMode.kPersistParameters
-      );
-    }
 
     /**
      * @return Rotation2d of absolute position from cancoder
@@ -316,11 +305,10 @@ public class SwerveModule extends SubsystemBase {
         );
     }
 
-    /**
-     * @return current distance traveled by the drive motor in meters
-     */
-    public double getCurrentDistanceMeters() {
-        return driveEncoder.getPosition() * (DrivetrainConstants.wheelDiameter / 2.0);
+    // Only for testing
+    public double[] getConversionFactors() {
+      double[] test = {driveMotor.configAccessor.encoder.getPositionConversionFactor(), driveMotor.configAccessor.encoder.getVelocityConversionFactor(), rotationMotor.configAccessor.encoder.getPositionConversionFactor(), rotationMotor.configAccessor.encoder.getVelocityConversionFactor()};
+      return test;
     }
 
     /**

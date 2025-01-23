@@ -75,9 +75,6 @@ public class TeleopDriveCmd extends Command {
     ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 0.75);
     rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
 
-    double[] log = {xSpeed, ySpeed, rot};
-    Logger.recordOutput("TELEOP DRIVE CMD", log);
-
     drivetrain.drive(
       xSpeed,
       ySpeed, 

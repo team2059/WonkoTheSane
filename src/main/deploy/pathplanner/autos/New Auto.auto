@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "Straight1M"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Straight1MAgain"
           }
         }
       ]

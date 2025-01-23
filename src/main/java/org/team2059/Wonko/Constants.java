@@ -76,11 +76,11 @@ public final class Constants {
     /* ================== */
 
     // Given Motor Rotations, convert to Meters traveled
-    public static final double driveEncoderPositionConversionFactor = (Math.PI * Units.inchesToMeters(wheelDiameter)) / (driveGearRatio);
+    public static final double driveEncoderPositionConversionFactor = 0.0472867872;
     // Given Motor RPM, convert to Meters/second
     public static final double driveEncoderVelocityConversionFactor = driveEncoderPositionConversionFactor / 60.0;
     // Given Motor Rotations, convert to Radians
-    public static final double rotationEncoderPositionConversionFactor = (14.0 * Math.PI) / 150.0;
+    public static final double rotationEncoderPositionConversionFactor = 0.2932153143;
     // Given Motor RPM, convert to Radians/second
     public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60.0;
 
@@ -120,7 +120,7 @@ public final class Constants {
     /* ======== */
 
     // Global maximums
-    public static final double maxVelocity = 4.5; // meters/sec
+    public static final double maxVelocity = 5; // meters/sec
     public static final double maxAcceleration = 10; // meters/sec^2
     public static final double maxAngularVelocity = 2 * Math.PI; // rad/sec
     public static final double maxAngularAcceleration = 4 * Math.PI; // rad/sec^2
@@ -139,7 +139,7 @@ public final class Constants {
     public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.2, 2.5, 0.0);
 
     /* FOR ROBOTCONFIG AUTO STUFF... */
-    public static final double kMass = 25;
+    public static final double kMass = 30;
     public static final double kMomentOfIntertia = 3;
     
     public static final double kWheelCoF = 1.1; // Coefficient of friction of wheels
@@ -148,10 +148,10 @@ public final class Constants {
 
   public static class AutoConstants {
 
-    public static final double kAutoTranslationP = 5;
-    public static final double kAutoTranslationD = 0.0;
+    public static final double kAutoTranslationP = 3.0;
+    public static final double kAutoTranslationD = 0;
 
-    public static final double kAutoRotationP = 5;
+    public static final double kAutoRotationP = 3.0;
     public static final double kAutoRotationD = 0.0;
   }
 

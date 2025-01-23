@@ -7,6 +7,7 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
+import org.team2059.Wonko.commands.TurnParallelToTag;
 import org.team2059.Wonko.commands.TurnToTag;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
@@ -107,7 +108,10 @@ public class RobotContainer {
     //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
     new JoystickButton(logitech, 7)
-      .whileTrue(new TurnToTag(drivetrain, vision, 22));
+      .whileTrue(new TurnToTag(drivetrain, vision, 4));
+
+    new JoystickButton(logitech, 8)
+      .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
   }
   
   /**
