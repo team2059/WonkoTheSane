@@ -303,7 +303,7 @@ public class Drivetrain extends SubsystemBase {
             DrivetrainConstants.wheelDiameter / 2, 
             DrivetrainConstants.maxVelocity, 
             DrivetrainConstants.kWheelCoF, 
-            DCMotor.getNEO(1).withReduction(DrivetrainConstants.driveGearRatio), 
+            DCMotor.getNeoVortex(1).withReduction(DrivetrainConstants.driveGearRatio), 
             DrivetrainConstants.driveCurrentLimit, 
             1
           ), 
@@ -336,4 +336,3 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("Pose", getPose());
   }
 }
- 
