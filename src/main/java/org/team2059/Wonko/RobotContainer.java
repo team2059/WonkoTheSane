@@ -38,7 +38,7 @@ public class RobotContainer {
 
   /* SUBSYSTEMS */
   private static final Drivetrain drivetrain = new Drivetrain();
-  private static final Vision vision = new Vision();
+  // private static final Vision vision = new Vision();
   // private static final CoralIntake coralIntake = new CoralIntake();
   // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
@@ -107,11 +107,11 @@ public class RobotContainer {
     //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
     //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
-    new JoystickButton(logitech, 7)
-      .whileTrue(new TurnToTag(drivetrain, vision, 4));
+    // new JoystickButton(logitech, 7)
+    //   .whileTrue(new TurnToTag(drivetrain, vision, 4));
 
-    new JoystickButton(logitech, 8)
-      .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
+    // new JoystickButton(logitech, 8)
+    //   .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
   }
   
   /**

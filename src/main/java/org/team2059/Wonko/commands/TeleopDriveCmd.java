@@ -6,7 +6,6 @@ package org.team2059.Wonko.commands;
 
 import java.util.function.DoubleSupplier;
 
-import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.subsystems.Drivetrain;
 

@@ -101,22 +101,22 @@ public final class Constants {
     public static final int frontLeftDriveMotorId = 1;
     public static final int frontLeftRotationMotorId = 2;
     public static final int frontLeftCanCoderId = 10;
-    public static final double frontLeftOffsetRad = 0.864990 * 2 * Math.PI;
+    public static final double frontLeftOffsetRad = 0.443359 * 2 * Math.PI;
     // front right
     public static final int frontRightDriveMotorId = 3;
     public static final int frontRightRotationMotorId = 4;
     public static final int frontRightCanCoderId = 20;
-    public static final double frontRightOffsetRad = 0.041992 * 2 * Math.PI;
+    public static final double frontRightOffsetRad = 0.675537 * 2 * Math.PI;
     // back left
     public static final int backLeftDriveMotorId = 5;
     public static final int backLeftRotationMotorId = 6;
     public static final int backLeftCanCoderId = 30;
-    public static final double backLeftOffsetRad = 0.249268 * 2 * Math.PI;
+    public static final double backLeftOffsetRad = 0.051758 * 2 * Math.PI;
     // back right
     public static final int backRightDriveMotorId = 7;
     public static final int backRightRotationMotorId = 8;
     public static final int backRightCanCoderId = 40;
-    public static final double backRightOffsetRad = 477051 * 2 * Math.PI;
+    public static final double backRightOffsetRad = 0.5 * 2 * Math.PI;
 
     /* ======== */
     /* MAXIMUMS */
