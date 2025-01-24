@@ -68,19 +68,22 @@ public final class Constants {
     /* GEAR RATIOS */
     /* =========== */
 
-    public static final double driveGearRatio = (6.75 / 1.0); // 6.75:1
-    public static final double rotationGearRatio = (150.0 / 7.0);
+    public static final double driveGearRatio = (5.9 / 1.0); // 5.9:1
+    public static final double rotationGearRatio = (18.75 / 1.0); // 18.75
 
     /* ================== */
     /* CONVERSION FACTORS */
     /* ================== */
 
     // Given Motor Rotations, convert to Meters traveled
-    public static final double driveEncoderPositionConversionFactor = 0.0472867872;
+    // (pi * d) / (Gear Ratio)
+    // where d is wheel diameter, in meters
+    public static final double driveEncoderPositionConversionFactor = 0.05409929044;
     // Given Motor RPM, convert to Meters/second
     public static final double driveEncoderVelocityConversionFactor = driveEncoderPositionConversionFactor / 60.0;
     // Given Motor Rotations, convert to Radians
-    public static final double rotationEncoderPositionConversionFactor = 0.2932153143;
+    // (2 * pi) / (Gear Ratio)
+    public static final double rotationEncoderPositionConversionFactor = 0.3351032164;
     // Given Motor RPM, convert to Radians/second
     public static final double rotationEncoderVelocityConversionFactor = rotationEncoderPositionConversionFactor / 60.0;
 
@@ -97,23 +100,23 @@ public final class Constants {
     // front left
     public static final int frontLeftDriveMotorId = 1;
     public static final int frontLeftRotationMotorId = 2;
-    public static final int frontLeftCanCoderId = 11;
-    public static final double frontLeftOffsetRad = 0.864990 * 2 * Math.PI;
+    public static final int frontLeftCanCoderId = 10;
+    public static final double frontLeftOffsetRad = 0.443359 * 2 * Math.PI;
     // front right
-    public static final int frontRightDriveMotorId = 8;
-    public static final int frontRightRotationMotorId = 7;
-    public static final int frontRightCanCoderId = 12;
-    public static final double frontRightOffsetRad = 0.041992 * 2 * Math.PI;
+    public static final int frontRightDriveMotorId = 3;
+    public static final int frontRightRotationMotorId = 4;
+    public static final int frontRightCanCoderId = 20;
+    public static final double frontRightOffsetRad = 0.675537 * 2 * Math.PI;
     // back left
     public static final int backLeftDriveMotorId = 5;
     public static final int backLeftRotationMotorId = 6;
-    public static final int backLeftCanCoderId = 14;
-    public static final double backLeftOffsetRad = 0.249268 * 2 * Math.PI;
+    public static final int backLeftCanCoderId = 30;
+    public static final double backLeftOffsetRad = 0.051758 * 2 * Math.PI;
     // back right
-    public static final int backRightDriveMotorId = 4;
-    public static final int backRightRotationMotorId = 3;
-    public static final int backRightCanCoderId = 13;
-    public static final double backRightOffsetRad = 477051 * 2 * Math.PI;
+    public static final int backRightDriveMotorId = 7;
+    public static final int backRightRotationMotorId = 8;
+    public static final int backRightCanCoderId = 40;
+    public static final double backRightOffsetRad = 0.5 * 2 * Math.PI;
 
     /* ======== */
     /* MAXIMUMS */
@@ -142,7 +145,8 @@ public final class Constants {
     public static final double kMass = 30;
     public static final double kMomentOfIntertia = 3;
     
-    public static final double kWheelCoF = 1.1; // Coefficient of friction of wheels
+    // CoF taken from https://www.chiefdelphi.com/t/coefficient-of-friction/467778
+    public static final double kWheelCoF = 1.542; // Coefficient of friction of wheels
     public static final double driveCurrentLimit = 40;
   }
 

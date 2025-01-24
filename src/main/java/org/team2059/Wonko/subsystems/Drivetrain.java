@@ -61,7 +61,7 @@ public class Drivetrain extends SubsystemBase {
     DrivetrainConstants.backRightRotationMotorId, 
     DrivetrainConstants.backRightCanCoderId, 
     DrivetrainConstants.backRightOffsetRad,
-    false,
+    true,
     true);
 
   // Create NavX object (gyro)
@@ -225,10 +225,10 @@ public class Drivetrain extends SubsystemBase {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
-    frontLeft.setDesiredStateClosedLoop(desiredStates[0]);
-    frontRight.setDesiredStateClosedLoop(desiredStates[1]);
-    backLeft.setDesiredStateClosedLoop(desiredStates[2]);
-    backRight.setDesiredStateClosedLoop(desiredStates[3]);
+    frontLeft.setDesiredState(desiredStates[0]);
+    frontRight.setDesiredState(desiredStates[1]);
+    backLeft.setDesiredState(desiredStates[2]);
+    backRight.setDesiredState(desiredStates[3]);
 
     Logger.recordOutput("Target States", desiredStates);
   }
@@ -303,7 +303,7 @@ public class Drivetrain extends SubsystemBase {
             DrivetrainConstants.wheelDiameter / 2, 
             DrivetrainConstants.maxVelocity, 
             DrivetrainConstants.kWheelCoF, 
-            DCMotor.getNEO(1).withReduction(DrivetrainConstants.driveGearRatio), 
+            DCMotor.getNeoVortex(1).withReduction(DrivetrainConstants.driveGearRatio), 
             DrivetrainConstants.driveCurrentLimit, 
             1
           ), 
@@ -334,6 +334,13 @@ public class Drivetrain extends SubsystemBase {
 
 
     Logger.recordOutput("Pose", getPose());
+
+    double[] currentLog = {
+      frontLeft.getDriveMotor().getAppliedOutput(),
+      frontRight.getDriveMotor().getAppliedOutput(),
+      backLeft.getDriveMotor().getAppliedOutput(),
+      backRight.getDriveMotor().getAppliedOutput()
+    };
+    Logger.recordOutput("Output Current", currentLog);
   }
 }
- 

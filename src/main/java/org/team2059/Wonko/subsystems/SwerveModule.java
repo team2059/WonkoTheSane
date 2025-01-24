@@ -5,8 +5,8 @@ import org.team2059.Wonko.Constants.DrivetrainConstants;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -19,8 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveModule extends SubsystemBase {
-    private final SparkMax driveMotor;
-    private final SparkMax rotationMotor;
+    private final SparkFlex driveMotor;
+    private final SparkFlex rotationMotor;
 
     private final RelativeEncoder driveEncoder;
     private final RelativeEncoder rotationEncoder;
@@ -39,8 +39,8 @@ public class SwerveModule extends SubsystemBase {
         boolean isRotationInverted
     ) {
         // Instantiate motor controller objects
-        driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
-        rotationMotor = new SparkMax(rotationMotorId, MotorType.kBrushless);
+        driveMotor = new SparkFlex(driveMotorId, MotorType.kBrushless);
+        rotationMotor = new SparkFlex(rotationMotorId, MotorType.kBrushless);
 
         // Configure motor controllers
         configureSpark(
@@ -89,13 +89,13 @@ public class SwerveModule extends SubsystemBase {
      * @param velocityConversionFactor MotorRotations x [This factor] = units/sec
      */
     private void configureSpark(
-        SparkMax spark, 
+        SparkFlex spark, 
         boolean inverted, 
         IdleMode idleMode,
         double positionConversionFactor,
         double velocityConversionFactor
     ) {
-      SparkMaxConfig config = new SparkMaxConfig();
+      SparkFlexConfig config = new SparkFlexConfig();
 
       config 
         .inverted(inverted)
@@ -166,16 +166,16 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * @return SparkMax drive motor object
+     * @return SparkFlex drive motor object
      */
-    public SparkMax getDriveMotor() {
+    public SparkFlex getDriveMotor() {
         return driveMotor;
     }
 
     /**
-     * @return SparkMax rotation motor object
+     * @return SparkFlex rotation motor object
      */
-    public SparkMax getRotationMotor() {
+    public SparkFlex getRotationMotor() {
         return rotationMotor;
     }
 
