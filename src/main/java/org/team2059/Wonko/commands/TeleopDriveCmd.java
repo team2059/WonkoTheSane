@@ -4,6 +4,7 @@
 
 package org.team2059.Wonko.commands;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.team2059.Wonko.Constants.DrivetrainConstants;
@@ -17,15 +18,17 @@ public class TeleopDriveCmd extends Command {
   private final Drivetrain drivetrain;
   private final DoubleSupplier forwardX, forwardY, rotation, slider;
   private final SlewRateLimiter xLimiter, yLimiter, rotLimiter;
+  private final BooleanSupplier inverted;
 
   /** Creates a new TeleopDriveCmd. */
-  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
+  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider, BooleanSupplier inverted) {
 
     this.drivetrain = drivetrain;
     this.forwardX = forwardX;
     this.forwardY = forwardY;
     this.rotation = rotation;
     this.slider = slider;
+    this.inverted = inverted;
 
     this.xLimiter = new SlewRateLimiter(DrivetrainConstants.maxAcceleration);
     this.yLimiter = new SlewRateLimiter(DrivetrainConstants.maxAcceleration);
@@ -74,12 +77,21 @@ public class TeleopDriveCmd extends Command {
     ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 0.75);
     rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
 
-    drivetrain.drive(
-      xSpeed,
-      ySpeed, 
-      rot, 
-      Drivetrain.fieldRelativeStatus
-    );
+    if (inverted.getAsBoolean()) {
+      drivetrain.drive(
+        -xSpeed, 
+        -ySpeed, 
+        -rot, 
+        Drivetrain.fieldRelativeStatus
+      );
+    } else {
+      drivetrain.drive(
+        xSpeed,
+        ySpeed, 
+        rot, 
+        Drivetrain.fieldRelativeStatus
+      );
+    }
   }
 
   // Called once the command ends or is interrupted.
