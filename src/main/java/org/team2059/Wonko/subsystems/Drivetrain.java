@@ -407,6 +407,5 @@ public class Drivetrain extends SubsystemBase {
     odometry.update(getHeading(), getModulePositions());    
 
     Logger.recordOutput("Pose", getPose());
-
   }
 }
