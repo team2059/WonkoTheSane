@@ -26,7 +26,8 @@ public final class Constants {
     /* PORTS */
     /* ===== */
 
-    public static final int LogitechControllerPort = 0;
+    public static final int logitechControllerPort = 0;
+    public static final int buttonBoxPort = 1;
 
     /* ==== */
     /* AXES */

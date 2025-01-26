@@ -16,14 +16,15 @@ import org.team2059.Wonko.subsystems.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -43,8 +44,8 @@ public class RobotContainer {
   // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
   /* CONTROLLERS */
-  public final static Joystick logitech = new Joystick(OperatorConstants.LogitechControllerPort);
-  //public final static XboxController xboxController = new XboxController(OperatorConstants.XboxControllerPort);
+  public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
+  public final static GenericHID buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -112,6 +113,19 @@ public class RobotContainer {
 
     // new JoystickButton(logitech, 8)
     //   .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
+
+    // Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
+    new JoystickButton(buttonBox, 1)
+      .whileTrue(drivetrain.sysIdDriveQuasistatic(SysIdRoutine.Direction.kForward));
+
+    new JoystickButton(buttonBox, 2)
+      .whileTrue(drivetrain.sysIdDriveQuasistatic(SysIdRoutine.Direction.kReverse));
+
+    new JoystickButton(buttonBox, 3)
+      .whileTrue(drivetrain.sysIdDriveDynamic(SysIdRoutine.Direction.kForward));
+      
+    new JoystickButton(buttonBox, 4)
+      .whileTrue(drivetrain.sysIdDriveDynamic(SysIdRoutine.Direction.kReverse));
   }
   
   /**

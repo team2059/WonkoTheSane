@@ -9,7 +9,6 @@ Drivetrain
 - 4x CTRE CANcoder absolute encoders for each swerve module
 - NavX2
 
-
 ## Notes
 
 ### Basic Vision Tuning
@@ -47,8 +46,19 @@ Make sure that:
 3. Scale back by searching for the value (for example, if it starts oscillating at a P of 10, then try (10 -> 5 -> 7.5 -> etc)) until the module overshoots the setpoint but corrects with no oscillation.
 4. Repeat the process for D. The D value will basically help prevent the overshoot. Ignore I unless absolutely necessary
 
-### Drivetrain Characterization
-[WIP]
+### System Identification
+
+This is the process of determining a mathematical model for the predicted outcome of a system through analysis of its inputs and outputs. In this case, how input voltage affects measurements, such as encoder data.
+
+#### Identification routines
+
+Two types of tests, each run forward & backwards for 4 total tests
+
+1. Quasistatic: mechanism is gradually sped up such that voltage relating to acceleration is negligible
+
+2. Dynamic: "step voltage" is applied to the system, so that behavior while accelerating can be determined
+
+For these routines, WPIlib **SysID** is used. In past seasons, **SysID** would create and deploy a sample project in order to gather data, but this year you create `SysIDRoutines` yourself, and feed the data from that routine into **SysID** to calculate your constants.
 
 ### Swerve programming resources
 

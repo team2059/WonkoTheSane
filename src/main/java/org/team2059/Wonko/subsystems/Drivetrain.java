@@ -4,6 +4,10 @@
 
 package org.team2059.Wonko.subsystems;
 
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants;
 import org.team2059.Wonko.Constants.AutoConstants;
@@ -24,11 +28,17 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -69,6 +79,13 @@ public class Drivetrain extends SubsystemBase {
 
   // Create swerve drive odometry engine, used to track robot on field
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
+
+  private final SysIdRoutine sysIDDriveRoutine;
+
+  // Mutable holders for unit-safe voltage, linear distance, and linear velocity values, persisted to avoid reallocation.
+  private final MutVoltage driveRoutineAppliedVoltage = Volts.mutable(0);
+  private final MutDistance driveRoutineDistance = Meters.mutable(0);
+  private final MutLinearVelocity driveRoutineVelocity = MetersPerSecond.mutable(0);
 
   public Drivetrain() {
 
@@ -118,7 +135,57 @@ public class Drivetrain extends SubsystemBase {
         builder.addDoubleProperty("Robot Angle", () -> getHeading().getRadians(), null);
       }
     });
+
+    // SysID characterization configuration
+    sysIDDriveRoutine = new SysIdRoutine(
+      // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage
+      new SysIdRoutine.Config(), 
+      new SysIdRoutine.Mechanism(
+        // Tell SysID how to plumb the driving voltage to the motors
+        voltage -> {
+          frontLeft.setDriveVoltage(voltage.in(Volts));
+          frontRight.setDriveVoltage(voltage.in(Volts));
+          backLeft.setDriveVoltage(voltage.in(Volts));
+          backRight.setDriveVoltage(voltage.in(Volts));
+        }, 
+        // Tell SysID how to record a frame of data for each motor on the mechanism
+        log -> {
+          log.motor("drive-frontleft")
+            .voltage(driveRoutineAppliedVoltage.mut_replace(frontLeft.getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+            .linearPosition(driveRoutineDistance.mut_replace(frontLeft.getDriveEncoderPosition(), Meters))
+            .linearVelocity(driveRoutineVelocity.mut_replace(frontLeft.getDriveVelocity(), MetersPerSecond));
+
+          log.motor("drive-frontright")
+            .voltage(driveRoutineAppliedVoltage.mut_replace(frontRight.getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+            .linearPosition(driveRoutineDistance.mut_replace(frontRight.getDriveEncoderPosition(), Meters))
+            .linearVelocity(driveRoutineVelocity.mut_replace(frontRight.getDriveVelocity(), MetersPerSecond));
+
+          log.motor("drive-backleft")
+            .voltage(driveRoutineAppliedVoltage.mut_replace(backLeft.getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+            .linearPosition(driveRoutineDistance.mut_replace(backLeft.getDriveEncoderPosition(), Meters))
+            .linearVelocity(driveRoutineVelocity.mut_replace(backLeft.getDriveVelocity(), MetersPerSecond));
+
+          log.motor("drive-backright")
+            .voltage(driveRoutineAppliedVoltage.mut_replace(backRight.getDriveMotor().get() * RobotController.getBatteryVoltage(), Volts))
+            .linearPosition(driveRoutineDistance.mut_replace(backRight.getDriveEncoderPosition(), Meters))
+            .linearVelocity(driveRoutineVelocity.mut_replace(backRight.getDriveVelocity(), MetersPerSecond));
+        }, 
+        // Tell SysId to make generated commands require this subsystem, suffix test state in
+        // WPILog with this subsystem's name ("drive")
+        this
+      )
+    );
   }
+
+  // Returns a command that will execute a quasistatic test in the given direction
+  public Command sysIdDriveQuasistatic(SysIdRoutine.Direction direction) {
+    return sysIDDriveRoutine.quasistatic(direction);
+  }
+
+  // Returns a command that will execute a dynamic test in the given direction
+  public Command sysIdDriveDynamic(SysIdRoutine.Direction direction) {
+    return sysIDDriveRoutine.dynamic(direction);
+  } 
 
   /**
    * @return Current robot pose in meters
@@ -225,10 +292,10 @@ public class Drivetrain extends SubsystemBase {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
-    frontLeft.setDesiredState(desiredStates[0]);
-    frontRight.setDesiredState(desiredStates[1]);
-    backLeft.setDesiredState(desiredStates[2]);
-    backRight.setDesiredState(desiredStates[3]);
+    frontLeft.setState(desiredStates[0], false);
+    frontRight.setState(desiredStates[1], false);
+    backLeft.setState(desiredStates[2], false);
+    backRight.setState(desiredStates[3], false);
 
     Logger.recordOutput("Target States", desiredStates);
   }
@@ -326,21 +393,20 @@ public class Drivetrain extends SubsystemBase {
     }
   }
 
+  public void stopAllMotors() {
+    frontLeft.stop();
+    frontRight.stop();
+    backLeft.stop();
+    backRight.stop();
+  }
+
   @Override
   public void periodic() {
 
     // This method will be called once per scheduler run
     odometry.update(getHeading(), getModulePositions());    
 
-
     Logger.recordOutput("Pose", getPose());
 
-    double[] currentLog = {
-      frontLeft.getDriveMotor().getAppliedOutput(),
-      frontRight.getDriveMotor().getAppliedOutput(),
-      backLeft.getDriveMotor().getAppliedOutput(),
-      backRight.getDriveMotor().getAppliedOutput()
-    };
-    Logger.recordOutput("Output Current", currentLog);
   }
 }
