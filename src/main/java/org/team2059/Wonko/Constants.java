@@ -52,8 +52,8 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final double wheelBase = Units.inchesToMeters(24.5); // distance between front wheels (like train track)
-    public static final double trackWidth = Units.inchesToMeters(18.5); // distance from center of wheels on side
+    public static final double wheelBase = Units.inchesToMeters(25.125); // distance between front wheels (like train track)
+    public static final double trackWidth = Units.inchesToMeters(21.25); // distance from center of wheels on side
 
     public static final double wheelDiameter = Units.inchesToMeters(4.0 / 1.0);
 
