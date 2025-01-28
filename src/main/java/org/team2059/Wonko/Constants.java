@@ -45,8 +45,8 @@ public final class Constants {
     public static final int JoystickRobotRelative = 3;
     public static final int JoystickIntakeCoral = 6;
     public static final int JoystickReleaseCoral = 4;
-    public static final int JoystickIntakeAlgae = 0;
-    public static final int JoystickReleaseAlgae = 0;
+    public static final int JoystickIntakeAlgae = 6;
+    public static final int JoystickReleaseAlgae = 4;
   }
 
   public static class DrivetrainConstants {

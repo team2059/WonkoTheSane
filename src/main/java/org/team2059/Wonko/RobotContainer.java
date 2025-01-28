@@ -40,7 +40,7 @@ public class RobotContainer {
   private static final Drivetrain drivetrain = new Drivetrain();
   // private static final Vision vision = new Vision();
   // private static final CoralIntake coralIntake = new CoralIntake();
-  // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
+  private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.LogitechControllerPort);
@@ -98,14 +98,22 @@ public class RobotContainer {
     //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
     // /* INTAKE ALGAE */
-    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
-    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
-    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+    new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
+       .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
+       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
     // /* RELEASE ALGAE */
-    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
-    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
-    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+     new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
+       .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
+       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+    
+    // /* HOLD ALGAE */
+    new JoystickButton(logitech, 5)
+      .onTrue(new InstantCommand(() -> algaeIntake.holdAlgae(0.05)));
+    
+    // /* STOP HOLD ALGAE */
+    new JoystickButton(logitech, 3)
+      .whileFalse(new InstantCommand(() -> algaeIntake.holdAlgae(0))); 
 
     // new JoystickButton(logitech, 7)
     //   .whileTrue(new TurnToTag(drivetrain, vision, 4));
