@@ -11,8 +11,10 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.CoralIntakeConstants;
+import frc.robot.Constants.DIOConstants;
 
 public class CoralIntake extends SubsystemBase {
   private final SparkMax motor;
@@ -21,12 +23,11 @@ public class CoralIntake extends SubsystemBase {
   public CoralIntake() {
     motor = new SparkMax(CoralIntakeConstants.intakeMotorID, MotorType.kBrushless);
 
-    // configure spark
+    // Configure spark
     SparkMaxConfig config = new SparkMaxConfig();
     config.inverted(false);
     config.idleMode(IdleMode.kBrake);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
   }
 
   public void setIntakeSpeed(double speed) {

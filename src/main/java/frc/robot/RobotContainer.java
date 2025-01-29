@@ -86,24 +86,32 @@ public class RobotContainer {
       .whileTrue(new InstantCommand(() -> swerveSubsystem.setFieldRelativity()));
 
     /* INTAKE CORAL */
-    new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
+    /*new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
       .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.1)))
-      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));*/
 
     /* RELEASE CORAL */
-    new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
+    /*new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
       .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
-      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));*/
     
     /* INTAKE ALGAE */
     new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
-      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.1)))
+      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.2)))
       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0)));
 
     /* RELEASE ALGAE */
     new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
-      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.1)))
+      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.2)))
       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0)));
+
+    /* START HOLD ALGAE */
+    new JoystickButton(logitech, OperatorConstants.startHoldAlgae)
+      .onTrue(new InstantCommand(() -> algaeIntake.setHoldSpeed(0.05)));
+
+    /* STOP HOLD ALGAE */
+    new JoystickButton(logitech, OperatorConstants.stopHoldAlgae)
+      .onTrue(new InstantCommand(() -> algaeIntake.setHoldSpeed(0)));
   }
   
   /**
