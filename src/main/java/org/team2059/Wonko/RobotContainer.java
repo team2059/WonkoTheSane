@@ -4,7 +4,6 @@
 
 package org.team2059.Wonko;
 
-
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToTag;
@@ -114,17 +113,17 @@ public class RobotContainer {
     //   .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
     
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
-    new JoystickButton(buttonBox, 1)
-      .whileTrue(drivetrain.drivetrainRoutine.quasistaticForward());
+    // new JoystickButton(buttonBox, 1)
+    //   .whileTrue(drivetrain.drivetrainRoutine.quasistaticForward());
 
-    new JoystickButton(buttonBox, 2)
-      .whileTrue(drivetrain.drivetrainRoutine.quasistaticReverse());
+    // new JoystickButton(buttonBox, 2)
+    //   .whileTrue(drivetrain.drivetrainRoutine.quasistaticReverse());
 
-    new JoystickButton(buttonBox, 3)
-      .whileTrue(drivetrain.drivetrainRoutine.dynamicForward());
+    // new JoystickButton(buttonBox, 3)
+    //   .whileTrue(drivetrain.drivetrainRoutine.dynamicForward());
       
-    new JoystickButton(buttonBox, 4)
-      .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
+    // new JoystickButton(buttonBox, 4)
+    //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
   }
   
   /**
