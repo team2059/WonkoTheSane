@@ -28,8 +28,8 @@ public class DrivetrainRoutine {
         sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
                 Volts.of(1).per(Units.Second), // Ramp rate in V/s
-                Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
-                Time.ofBaseUnits(5.0, Units.Second), // Use default timeout of 10 sec
+                Volts.of(2), // Reduce dynamic step voltage to 4 to prevent brownout
+                Time.ofBaseUnits(2, Units.Second), // Use default timeout of 10 sec
                 null
             ),
             new SysIdRoutine.Mechanism(

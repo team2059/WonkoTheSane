@@ -289,10 +289,10 @@ public class SwerveModule extends SubsystemBase {
       }
     }
 
-    // ONLY FOR SYSID CHARACTERIZATION
+    // ONLY FOR SYSID CHARACTE
     public void characterizeDriveVoltage(double voltage) {
       // Keep rotation motor set at zero to avoid going off course
-      rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), 0));
+      // rotationMotor.setVoltage(0);
 
       driveMotor.setVoltage(voltage);
     }

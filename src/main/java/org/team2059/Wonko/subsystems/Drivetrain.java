@@ -62,7 +62,7 @@ public class Drivetrain extends SubsystemBase {
     DrivetrainConstants.backRightRotationMotorId, 
     DrivetrainConstants.backRightCanCoderId, 
     DrivetrainConstants.backRightOffsetRad,
-    true,
+    false,
     true);
 
   // Create NavX object (gyro)
@@ -124,6 +124,7 @@ public class Drivetrain extends SubsystemBase {
     });
 
     drivetrainRoutine = new DrivetrainRoutine(this);
+
   }
 
   /**
@@ -231,10 +232,12 @@ public class Drivetrain extends SubsystemBase {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
-    frontLeft.setState(desiredStates[0], false);
-    frontRight.setState(desiredStates[1], false);
-    backLeft.setState(desiredStates[2], false);
-    backRight.setState(desiredStates[3], false);
+    frontLeft.setState(desiredStates[0], true);
+    frontRight.setState(desiredStates[1], true);
+    backLeft.setState(desiredStates[2], true);
+    backRight.setState(desiredStates[3], true);
+
+    Logger.recordOutput("Desired States", desiredStates);
   }
   
   /**
@@ -344,5 +347,7 @@ public class Drivetrain extends SubsystemBase {
     odometry.update(getHeading(), getModulePositions());    
 
     Logger.recordOutput("Pose", getPose());
+    Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
+    Logger.recordOutput("Real States", getStates());
   }
 }

@@ -117,7 +117,7 @@ public final class Constants {
     public static final int backRightDriveMotorId = 7;
     public static final int backRightRotationMotorId = 8;
     public static final int backRightCanCoderId = 40;
-    public static final double backRightOffsetRad = 0.5 * 2 * Math.PI;
+    public static final double backRightOffsetRad = 0 * 2 * Math.PI;
 
     /* ======== */
     /* MAXIMUMS */
@@ -140,7 +140,7 @@ public final class Constants {
     // kS: voltage needed to overcome static friction
     // kV: voltage needed to run at constant velocity
     // kA: voltage needed to accelerate
-    public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.2, 2.5, 0.0);
+    public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.17821, 1.9047, 0.14686);
 
     /* FOR ROBOTCONFIG AUTO STUFF... */
     public static final double kMass = 30;
