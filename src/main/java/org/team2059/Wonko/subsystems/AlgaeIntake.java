@@ -5,6 +5,7 @@
 // Fuck you Mr. Potter
 package org.team2059.Wonko.subsystems;
 
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.AlgaeIntakeConstants;
 
 import com.revrobotics.spark.SparkFlex;
@@ -42,8 +43,18 @@ public class AlgaeIntake extends SubsystemBase {
     motor2.set(speed);
   }
 
+  public SparkFlex getMotor2() {
+    return motor2;
+  }
+
+  public SparkFlex getMotor1() {
+    return motor1;
+  }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    Logger.recordOutput("Current", motor1.getOutputCurrent());
+    Logger.recordOutput("id25 output", motor1.getAppliedOutput());
   }
 }

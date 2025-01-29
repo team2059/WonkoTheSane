@@ -40,7 +40,7 @@ public class RobotContainer {
   private static final Drivetrain drivetrain = new Drivetrain();
   // private static final Vision vision = new Vision();
   // private static final CoralIntake coralIntake = new CoralIntake();
-  // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
+  private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
@@ -52,6 +52,7 @@ public class RobotContainer {
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
     SmartDashboard.putData(autoChooser);
+
 
     /*
      * Send axes and buttons from joystick to TeleopSwerveCmd,
@@ -97,15 +98,18 @@ public class RobotContainer {
     //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
     //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
-    // /* INTAKE ALGAE */
-    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
-    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
-    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+    /* INTAKE ALGAE */
+    new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
+      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
+      .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
-    // /* RELEASE ALGAE */
-    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
-    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
-    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+    new JoystickButton(logitech, 12) 
+      .whileTrue(new InstantCommand(() -> algaeIntake.getMotor1().set(0.5)));
+
+    /* RELEASE ALGAE */
+    new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
+      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
+      .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
     // new JoystickButton(logitech, 7)
     //   .whileTrue(new TurnToTag(drivetrain, vision, 4));

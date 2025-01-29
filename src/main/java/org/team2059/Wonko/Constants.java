@@ -42,12 +42,12 @@ public final class Constants {
     /* BUTTONS */
     /* ======= */
 
-    public static final int JoystickResetHeading = 5;
-    public static final int JoystickRobotRelative = 3;
+    public static final int JoystickResetHeading = 0;
+    public static final int JoystickRobotRelative = 0;
     public static final int JoystickIntakeCoral = 6;
     public static final int JoystickReleaseCoral = 4;
-    public static final int JoystickIntakeAlgae = 0;
-    public static final int JoystickReleaseAlgae = 0;
+    public static final int JoystickIntakeAlgae = 5;
+    public static final int JoystickReleaseAlgae = 3;
   }
 
   public static class DrivetrainConstants {
@@ -172,7 +172,7 @@ public final class Constants {
   }
 
   public static class AlgaeIntakeConstants {
-    public static final int motor1ID = 10;
+    public static final int motor1ID = 25;
     public static final int motor2ID = 11;
   }
 }
