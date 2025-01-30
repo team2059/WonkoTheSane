@@ -76,6 +76,10 @@ public final class Constants {
     /* CONVERSION FACTORS */
     /* ================== */
 
+    public static final double INTAKE_CUBE_SPEED = 0.25;
+    public static final double HOLD_CUBE_SPEED = 0.02;
+    public static final double INTAKE_STALL_DETECTION = 20.0;
+
     // Given Motor Rotations, convert to Meters traveled
     // (pi * d) / (Gear Ratio)
     // where d is wheel diameter, in meters

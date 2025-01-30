@@ -6,6 +6,7 @@ package org.team2059.Wonko;
 
 
 import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.commands.AlgaeIntakeCmd;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToTag;
 import org.team2059.Wonko.commands.TurnToTag;
@@ -98,13 +99,14 @@ public class RobotContainer {
     //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
     //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
-    /* INTAKE ALGAE */
-    new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
-      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
-      .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+    // /* INTAKE ALGAE */
+    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
+    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
+    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
-    new JoystickButton(logitech, 12) 
-      .whileTrue(new InstantCommand(() -> algaeIntake.getMotor1().set(0.5)));
+    /* INTAKE ALGAE USING CURRENT */
+    new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae) 
+      .whileTrue(new AlgaeIntakeCmd(algaeIntake));
 
     /* RELEASE ALGAE */
     new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
