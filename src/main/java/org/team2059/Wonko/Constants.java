@@ -18,6 +18,12 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosly.
  */
 public final class Constants {
+  public static final class DIOConstants {
+
+    public static final int kAlgaeTiltThruBoreEncoderDIO = 0;
+
+  }
+
   public static class OperatorConstants {
 
     public static final boolean tuningMode = true;
@@ -178,5 +184,6 @@ public final class Constants {
   public static class AlgaeIntakeConstants {
     public static final int motor1ID = 25;
     public static final int motor2ID = 11;
+    public static final double throughBoreOffset = 100;
   }
 }
