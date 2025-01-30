@@ -21,6 +21,7 @@ public final class Constants {
   public static final class DIOConstants {
 
     public static final int kAlgaeTiltThruBoreEncoderDIO = 0;
+    public static final int kCoralTiltThruBoreEncoderDIO = 1;
 
   }
 
@@ -179,6 +180,7 @@ public final class Constants {
 
   public static class CoralIntakeConstants {
     public static final int intakeMotorID = 9;
+    public static final double throughBoreOffset = 100;
   }
 
   public static class AlgaeIntakeConstants {
