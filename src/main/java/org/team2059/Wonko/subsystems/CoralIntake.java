@@ -4,6 +4,7 @@
 
 package org.team2059.Wonko.subsystems;
 
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.AlgaeIntakeConstants;
 import org.team2059.Wonko.Constants.CoralIntakeConstants;
 import org.team2059.Wonko.Constants.DIOConstants;
@@ -16,12 +17,14 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralIntake extends SubsystemBase {
   private final SparkMax motor;
   public DutyCycleEncoder coralTiltThruBoreEncoder;
+  public DigitalInput irSensor;
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
@@ -37,8 +40,8 @@ public class CoralIntake extends SubsystemBase {
 
     coralTiltThruBoreEncoder.setDutyCycleRange(0.02, 0.98); // EXAMPLE RANGE CHANGE LATER
     coralTiltThruBoreEncoder.setInverted(true);
-    coralTiltThruBoreEncoder.setAssumedFrequency(1000); // Example frequency
 
+    irSensor = new DigitalInput(CoralIntakeConstants.irSensorDIO);
   }
 
   public void setIntakeSpeed(double speed) {
@@ -61,8 +64,12 @@ public class CoralIntake extends SubsystemBase {
     return coralTiltThruBoreEncoder.isConnected();
   }
 
+  public boolean isCoralPresent() {
+    return irSensor.get();
+  }
+
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    Logger.recordOutput("Throughbore position", getAbsolutePosition());
   }
 }

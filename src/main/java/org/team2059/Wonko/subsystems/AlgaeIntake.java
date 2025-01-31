@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class AlgaeIntake extends SubsystemBase {
   private final SparkFlex motor1;
   private final SparkFlex motor2;
+  public boolean hasAlgae = false; 
 
   public DutyCycleEncoder algaeTiltThruBoreEncoder;
 
@@ -44,7 +45,6 @@ public class AlgaeIntake extends SubsystemBase {
 
     algaeTiltThruBoreEncoder.setDutyCycleRange(0.02, 0.98); // EXAMPLE RANGE CHANGE LATER
     algaeTiltThruBoreEncoder.setInverted(true);
-    algaeTiltThruBoreEncoder.setAssumedFrequency(1000); // Example frequency
 
   }
 
@@ -81,5 +81,6 @@ public class AlgaeIntake extends SubsystemBase {
     Logger.recordOutput("id25 output", motor1.getAppliedOutput());
 
     Logger.recordOutput("AlgaeIntake/TiltPosition", getAbsolutePosition());
+    Logger.recordOutput("Has algae", hasAlgae);
   }
 }
