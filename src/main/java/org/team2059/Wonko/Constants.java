@@ -181,11 +181,13 @@ public final class Constants {
   public static class CoralIntakeConstants {
     public static final int intakeMotorID = 9;
     public static final double throughBoreOffset = 100;
+    public static final double POSITION_TOLERANCE = 0.02;
   }
 
   public static class AlgaeIntakeConstants {
     public static final int motor1ID = 25;
     public static final int motor2ID = 11;
     public static final double throughBoreOffset = 100;
+    public static final double POSITION_TOLERANCE = 0.02;
   }
 }
