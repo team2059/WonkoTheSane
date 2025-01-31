@@ -161,7 +161,8 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final String cameraName = "hhCam";
+    public static final String upperCameraName = "Acam9782";
+    public static final String lowerCameraName = "Bcam9782";
     public static final double cameraHeightMeters = Units.inchesToMeters(21.875);
     public static final double cameraPitchRadians = Math.toRadians(0);
     public static final double targetHeightMeters = Units.inchesToMeters(28.25);

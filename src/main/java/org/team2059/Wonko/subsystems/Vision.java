@@ -16,42 +16,65 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
   // Declare name of camera used in pipeline
-  private final PhotonCamera camera;
+  private final PhotonCamera upperCamera;
+  private final PhotonCamera lowerCamera;
 
   // Store all data that Photonvision returns
-  private List<PhotonPipelineResult> results; 
+  private List<PhotonPipelineResult> upperCameraResults; 
+  private List<PhotonPipelineResult> lowerCameraResults;
 
-  public boolean hasTargets = false;
+  public boolean hasAnyTargets = false;
+  public boolean upperHasTargets = false;
+  public boolean lowerHasTargets = false;
 
   // Store latest data that Photonvision returns
-  private PhotonPipelineResult result;
+  private PhotonPipelineResult upperCameraResult;
+  private PhotonPipelineResult lowerCameraResult;
 
   /** Creates a new Vision. */
   public Vision() {
     // Arducam OV9782
-    camera = new PhotonCamera(VisionConstants.cameraName);
+    upperCamera = new PhotonCamera(VisionConstants.upperCameraName);
+    lowerCamera = new PhotonCamera(VisionConstants.lowerCameraName);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
 
-    // Query all unread results from PhotonVision
-    results = camera.getAllUnreadResults();
-    if (!results.isEmpty()) {
-      // Get latest result from list of all results
-      result = results.get(results.size() - 1);
+    // Update camera readings
+    upperCameraResults = upperCamera.getAllUnreadResults();
+    lowerCameraResults = lowerCamera.getAllUnreadResults();
+    if (!upperCameraResults.isEmpty()) {
+      // Get latest result from list of results
+      upperCameraResult = upperCameraResults.get(upperCameraResults.size() - 1);
 
       // Set boolean value
-      hasTargets = result.hasTargets();
+      upperHasTargets = upperCameraResult.hasTargets();
+    }
+    if (!lowerCameraResults.isEmpty()) {
+      // Get latest result from list of results
+      lowerCameraResult = lowerCameraResults.get(lowerCameraResults.size() - 1);
+
+      // Set boolean value
+      lowerHasTargets = lowerCameraResult.hasTargets();
     }
 
-    Logger.recordOutput("HAS TARGETS?", hasTargets);
+    // Update any targets bool
+    if (lowerHasTargets || upperHasTargets) {
+      hasAnyTargets = true;
+    } else {
+      hasAnyTargets = false;
+    }
+
+    Logger.recordOutput("Any Targets", hasAnyTargets);
+    Logger.recordOutput("Lower Targets", lowerHasTargets);
+    Logger.recordOutput("Upper Targets", upperHasTargets);
   }
 
-  public PhotonTrackedTarget getCertainTarget(int id) {
-    if (result.hasTargets()) {
-      for (var target : result.getTargets()) {
+  public PhotonTrackedTarget getCertainUpperTarget(int id) {
+    if (upperCameraResult.hasTargets()) {
+      for (var target : upperCameraResult.getTargets()) {
         if (target.getFiducialId() == id) {
           return target;
         }
@@ -61,7 +84,23 @@ public class Vision extends SubsystemBase {
     return null;
   }
 
-  public PhotonCamera getCamera() {
-    return camera;
+  public PhotonTrackedTarget getCertainLowerTarget(int id) {
+    if (lowerCameraResult.hasTargets()) {
+      for (var target : lowerCameraResult.getTargets()) {
+        if (target.getFiducialId() == id) {
+          return target;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  public PhotonCamera getUpperCamera() {
+    return upperCamera;
+  }
+
+  public PhotonCamera getLowerCamera() {
+    return lowerCamera;
   }
 }

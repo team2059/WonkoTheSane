@@ -6,8 +6,8 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
-import org.team2059.Wonko.commands.TurnParallelToTag;
-import org.team2059.Wonko.commands.TurnToTag;
+// import org.team2059.Wonko.commands.TurnParallelToTag;
+// import org.team2059.Wonko.commands.TurnToTag;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
@@ -37,7 +37,7 @@ public class RobotContainer {
 
   /* SUBSYSTEMS */
   private static final Drivetrain drivetrain = new Drivetrain();
-  // private static final Vision vision = new Vision();
+  private static final Vision vision = new Vision();
   // private static final CoralIntake coralIntake = new CoralIntake();
   // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
@@ -50,7 +50,7 @@ public class RobotContainer {
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-    SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     /*
      * Send axes and buttons from joystick to TeleopSwerveCmd,
