@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
+import org.team2059.Wonko.routines.DrivetrainRoutine;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -35,33 +36,33 @@ public class Drivetrain extends SubsystemBase {
   public static boolean fieldRelativeStatus = true;
 
   // Create 4 SwerveModule objects using given constants.
-  private final SwerveModule frontLeft = new SwerveModule(
+  public final SwerveModule frontLeft = new SwerveModule(
     DrivetrainConstants.frontLeftDriveMotorId, 
     DrivetrainConstants.frontLeftRotationMotorId, 
     DrivetrainConstants.frontLeftCanCoderId, 
     DrivetrainConstants.frontLeftOffsetRad,
     false,
     true);
-  private final SwerveModule frontRight = new SwerveModule(
+  public final SwerveModule frontRight = new SwerveModule(
     DrivetrainConstants.frontRightDriveMotorId, 
     DrivetrainConstants.frontRightRotationMotorId, 
     DrivetrainConstants.frontRightCanCoderId, 
     DrivetrainConstants.frontRightOffsetRad,
     true,
     true);
-  private final SwerveModule backLeft = new SwerveModule(
+  public final SwerveModule backLeft = new SwerveModule(
     DrivetrainConstants.backLeftDriveMotorId, 
     DrivetrainConstants.backLeftRotationMotorId, 
     DrivetrainConstants.backLeftCanCoderId, 
     DrivetrainConstants.backLeftOffsetRad,
     false,
     true);
-  private final SwerveModule backRight = new SwerveModule(
+  public final SwerveModule backRight = new SwerveModule(
     DrivetrainConstants.backRightDriveMotorId, 
     DrivetrainConstants.backRightRotationMotorId, 
     DrivetrainConstants.backRightCanCoderId, 
     DrivetrainConstants.backRightOffsetRad,
-    true,
+    false,
     true);
 
   // Create NavX object (gyro)
@@ -69,6 +70,8 @@ public class Drivetrain extends SubsystemBase {
 
   // Create swerve drive odometry engine, used to track robot on field
   private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
+
+  public final DrivetrainRoutine drivetrainRoutine;
 
   public Drivetrain() {
 
@@ -80,6 +83,7 @@ public class Drivetrain extends SubsystemBase {
         navX.reset();
         odometry.resetPosition(new Rotation2d(), getModulePositions(), new Pose2d());
       } catch (Exception e) {
+        e.printStackTrace();
       }
     }).start();
 
@@ -118,6 +122,9 @@ public class Drivetrain extends SubsystemBase {
         builder.addDoubleProperty("Robot Angle", () -> getHeading().getRadians(), null);
       }
     });
+
+    drivetrainRoutine = new DrivetrainRoutine(this);
+
   }
 
   /**
@@ -225,12 +232,12 @@ public class Drivetrain extends SubsystemBase {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
-    frontLeft.setDesiredState(desiredStates[0]);
-    frontRight.setDesiredState(desiredStates[1]);
-    backLeft.setDesiredState(desiredStates[2]);
-    backRight.setDesiredState(desiredStates[3]);
+    frontLeft.setState(desiredStates[0], true);
+    frontRight.setState(desiredStates[1], true);
+    backLeft.setState(desiredStates[2], true);
+    backRight.setState(desiredStates[3], true);
 
-    Logger.recordOutput("Target States", desiredStates);
+    Logger.recordOutput("Desired States", desiredStates);
   }
   
   /**
@@ -326,21 +333,21 @@ public class Drivetrain extends SubsystemBase {
     }
   }
 
+  public void stopAllMotors() {
+    frontLeft.stop();
+    frontRight.stop();
+    backLeft.stop();
+    backRight.stop();
+  }
+
   @Override
   public void periodic() {
 
     // This method will be called once per scheduler run
     odometry.update(getHeading(), getModulePositions());    
 
-
     Logger.recordOutput("Pose", getPose());
-
-    double[] currentLog = {
-      frontLeft.getDriveMotor().getAppliedOutput(),
-      frontRight.getDriveMotor().getAppliedOutput(),
-      backLeft.getDriveMotor().getAppliedOutput(),
-      backRight.getDriveMotor().getAppliedOutput()
-    };
-    Logger.recordOutput("Output Current", currentLog);
+    Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
+    Logger.recordOutput("Real States", getStates());
   }
 }

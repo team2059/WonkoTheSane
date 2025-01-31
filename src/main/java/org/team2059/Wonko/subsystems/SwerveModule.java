@@ -263,52 +263,38 @@ public class SwerveModule extends SubsystemBase {
     }
 
     /**
-     * Set desired SwerveModuleState.
-     * Drive: open-loop, Rotation: closed-loop
-     * 
-     * @param state desired SwerveModuleState
+     * Set the state of a module
+     * @param state containing linear velocity setpoint and angular setpoint
+     * @param isClosedLoop
      */
-    public void setDesiredState(SwerveModuleState state) {
-        // Find the closest equivalent angle to target
-        state = optimize(state, getCANcoderRad());
+    public void setState(SwerveModuleState state, boolean isClosedLoop) {
+      // Deadband
+      if (Math.abs(state.speedMetersPerSecond) < 0.001) {
+        stop();
+        return;
+      }
 
-        // Set drive motor speed to the ratio of target speed to max speed
+      // Optimize angle of state to minimize rotation magnitude
+      state = optimize(state, getCANcoderRad());
+
+      // PID-controlled rotation
+      rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
+
+      if (isClosedLoop) {
+        // Feedforward-controlled translation
+        driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond));
+      } else {
+        // Direct set, won't be as accurate
         driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
-
-        // use PID for turning to avoid overshooting
-        rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
+      }
     }
 
-    /**
-     * Set desired SwerveModuleState.
-     * Drive: FF, Rotation: PID
-     * 
-     * @param desiredState desired SwerveModuleState
-     */
-    public void setDesiredStateClosedLoop(SwerveModuleState desiredState) {
-        // Deadband
-        if (Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
-            stop();
-            return;
-        }
+    // ONLY FOR SYSID CHARACTE
+    public void characterizeDriveVoltage(double voltage) {
+      // Keep rotation motor set at zero to avoid going off course
+      // rotationMotor.setVoltage(0);
 
-        // Create optimized state to work with
-        SwerveModuleState optimizedState = optimize(desiredState, getCANcoderRad());
-
-        // Set outputs (PID for rotation, FF for drive)
-        rotationMotor.set(rotationPidController.calculate(
-            getCANcoderRad().getRadians(), // current angle
-            optimizedState.angle.getRadians() // target angle
-        ));
-        driveMotor.setVoltage(
-          DrivetrainConstants.driveFF.calculate(optimizedState.speedMetersPerSecond)
-        );
-    }
-
-    // Only for testing
-    public double[] getConversionFactors() {
-      double[] test = {driveMotor.configAccessor.encoder.getPositionConversionFactor(), driveMotor.configAccessor.encoder.getVelocityConversionFactor(), rotationMotor.configAccessor.encoder.getPositionConversionFactor(), rotationMotor.configAccessor.encoder.getVelocityConversionFactor()};
-      return test;
+      driveMotor.setVoltage(voltage);
     }
 
     /**
