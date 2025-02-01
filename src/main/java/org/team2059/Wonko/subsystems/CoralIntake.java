@@ -22,34 +22,44 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralIntake extends SubsystemBase {
-  private final SparkMax motor;
+  private final SparkFlex intakeMotor;
+  private final SparkMax tiltMotor; 
   public DutyCycleEncoder coralTiltThruBoreEncoder;
   public DigitalInput irSensor;
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
-    motor = new SparkMax(CoralIntakeConstants.intakeMotorID, MotorType.kBrushless);
+    intakeMotor = new SparkFlex(CoralIntakeConstants.intakeMotorID, MotorType.kBrushless);
+    tiltMotor = new SparkMax(CoralIntakeConstants.tiltMotorID, MotorType.kBrushless);
 
     // configure spark
     SparkMaxConfig config = new SparkMaxConfig();
     config.inverted(false);
     config.idleMode(IdleMode.kBrake);
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     coralTiltThruBoreEncoder = new DutyCycleEncoder(DIOConstants.kCoralTiltThruBoreEncoderDIO);
 
-    coralTiltThruBoreEncoder.setDutyCycleRange(0.02, 0.98); // EXAMPLE RANGE CHANGE LATER
-    coralTiltThruBoreEncoder.setInverted(true);
+    coralTiltThruBoreEncoder.setDutyCycleRange(0.02, 0.98); // TODO: EXAMPLE RANGE CHANGE LATER
+    coralTiltThruBoreEncoder.setInverted(true); // TODO: SEE IF INVERTED
 
     irSensor = new DigitalInput(CoralIntakeConstants.irSensorDIO);
   }
 
   public void setIntakeSpeed(double speed) {
-    motor.set(speed);
+    intakeMotor.set(speed);
   }
 
-  public SparkMax getMotor() {
-    return motor;
+  public SparkFlex getIntakeMotor() {
+    return intakeMotor;
+  }
+
+  public void setTiltSpeed(double speed) {
+    tiltMotor.set(speed);
+  }
+
+  public SparkMax getTiltMotor() {
+    return tiltMotor;
   }
 
   public double getAbsolutePosition() {
@@ -65,11 +75,12 @@ public class CoralIntake extends SubsystemBase {
   }
 
   public boolean isCoralPresent() {
-    return irSensor.get();
+    return irSensor.get(); // TODO: MIGHT HAVE TO INVERT 
   }
 
   @Override
   public void periodic() {
     Logger.recordOutput("Throughbore position", getAbsolutePosition());
+    Logger.recordOutput("Has Coral?", isCoralPresent());
   }
 }

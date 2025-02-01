@@ -179,16 +179,23 @@ public final class Constants {
     public static final double POSITION_TOLERANCE = 0.02;
     public static final double throughBoreOffset = 100;
     public static final int irSensorDIO = 0; // TODO: CHANGE DIO WHEN WIRED TO ROBOT
+    public static final int tiltMotorID = 0; // TODO: Change ID when we have it 
   }
 
   public static class AlgaeIntakeConstants {
-    public static final int motor1ID = 25;
-    public static final int motor2ID = 11;
+    public static final int intakeMotor1ID = 25;
+    public static final int intakeMotor2ID = 11;
+    public static final int tiltMotorID = 0; // TODO: CHANGE ID WHEN WE HAVE IT
+    
     public static final double throughBoreOffset = 100; // TODO: CHANGE WHEN WE HAVE THE VALUE
     public static final double POSITION_TOLERANCE = 0.02;
 
     public static final double INTAKE_ALGAE_SPEED = 0.25;
     public static final double HOLD_ALGAE_SPEED = 0.02;
     public static final double INTAKE_STALL_DETECTION = 20.0;
+
+    public static final double kPAlgae = 0.1;
+    public static final double kIAlgae = 0.0;
+    public static final double kDAlgae = 0.0;
   }
 }

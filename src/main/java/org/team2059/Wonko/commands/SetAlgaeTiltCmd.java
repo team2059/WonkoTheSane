@@ -14,17 +14,12 @@ public class SetAlgaeTiltCmd extends Command {
   private final AlgaeIntake algaeIntake;
   private final PIDController pidController;
   private final double targetPosition;
-
-  private static final double kP = 0.1;
-  private static final double kI = 0.0;
-  private static final double kD = 0.0;
-
   
   /** Creates a new SetCoralTiltCmd. */
   public SetAlgaeTiltCmd(AlgaeIntake algaeIntake, double targetPosition) {
     this.algaeIntake = algaeIntake;
     this.targetPosition = targetPosition;
-    this.pidController = new PIDController(kP, kI, kD);
+    this.pidController = new PIDController(AlgaeIntakeConstants.kPAlgae, AlgaeIntakeConstants.kIAlgae, AlgaeIntakeConstants.kDAlgae);
     pidController.setTolerance(AlgaeIntakeConstants.POSITION_TOLERANCE);
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -45,13 +40,13 @@ public class SetAlgaeTiltCmd extends Command {
     
     output = Math.min(Math.max(output, -0.5), 0.5);
     
-    algaeIntake.setEndEffectorSpeed(output);
+    algaeIntake.getTiltMotor().set(output);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    algaeIntake.setEndEffectorSpeed(0);
+    algaeIntake.getTiltMotor().set(0);
   }
 
   // Returns true when the command should end.
