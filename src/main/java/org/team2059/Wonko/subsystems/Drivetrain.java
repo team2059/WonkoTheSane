@@ -91,7 +91,6 @@ public class Drivetrain extends SubsystemBase {
       try {
         Thread.sleep(1000);
         navX.reset();
-        poseEstimator.resetPosition(new Rotation2d(), getModulePositions(), new Pose2d());
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -139,7 +138,7 @@ public class Drivetrain extends SubsystemBase {
       DrivetrainConstants.kinematics, 
       getHeading(), 
       getModulePositions(), 
-      getPose(), 
+      new Pose2d(), 
       VisionConstants.stateStdDevs,
       VisionConstants.measurementStdDevs);
 
@@ -254,8 +253,6 @@ public class Drivetrain extends SubsystemBase {
     frontRight.setState(desiredStates[1], true);
     backLeft.setState(desiredStates[2], true);
     backRight.setState(desiredStates[3], true);
-
-    Logger.recordOutput("Desired States", desiredStates);
   }
   
   /**
@@ -384,6 +381,5 @@ public class Drivetrain extends SubsystemBase {
 
     Logger.recordOutput("Pose", getPose());
     Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
-    Logger.recordOutput("Real States", getStates());
   }
 }
