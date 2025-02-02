@@ -144,7 +144,7 @@ public final class Constants {
 
     /* FOR ROBOTCONFIG AUTO STUFF... */
     public static final double kMass = 30;
-    public static final double kMomentOfIntertia = 3;
+    public static final double kMomentOfIntertia = (1/12) * kMass * (Math.pow(26, 2) + Math.pow(30, 2));
     
     // CoF taken from https://www.chiefdelphi.com/t/coefficient-of-friction/467778
     public static final double kWheelCoF = 1.542; // Coefficient of friction of wheels
