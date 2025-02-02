@@ -4,38 +4,77 @@
 
 package org.team2059.Wonko.subsystems;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team2059.Wonko.Constants.VisionConstants;
+import org.team2059.Wonko.util.LoggedTunableNumber;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
   // Declare name of camera used in pipeline
-  private final PhotonCamera upperCamera;
-  private final PhotonCamera lowerCamera;
+  public final PhotonCamera upperCamera;
+  public final PhotonCamera lowerCamera;
 
   // Store all data that Photonvision returns
   private List<PhotonPipelineResult> upperCameraResults; 
   private List<PhotonPipelineResult> lowerCameraResults;
 
+  // Store latest data that Photonvision returns
+  private PhotonPipelineResult upperCameraResult;
+  private PhotonPipelineResult lowerCameraResult;
+
   public boolean hasAnyTargets = false;
   public boolean upperHasTargets = false;
   public boolean lowerHasTargets = false;
 
-  // Store latest data that Photonvision returns
-  private PhotonPipelineResult upperCameraResult;
-  private PhotonPipelineResult lowerCameraResult;
+  private AprilTagFieldLayout aprilTagFieldLayout;
+  private PhotonPoseEstimator upperPoseEstimator;
+  private PhotonPoseEstimator lowerPoseEstimator;
+
+  // COMMAND STUFF
+  private final LoggedTunableNumber turnP = new LoggedTunableNumber("Vision/TurnP", 1);
+  private final LoggedTunableNumber turnD = new LoggedTunableNumber("Vision/TurnD", 0.02);
+  public PIDController turnController = new PIDController(turnP.get(), 0, turnD.get());
+
+  public static Vision instance;
+  public static Vision getInstance() {
+    if (instance == null) {
+      instance = new Vision();
+    }
+    return instance;
+  }
 
   /** Creates a new Vision. */
   public Vision() {
     // Arducam OV9782
     upperCamera = new PhotonCamera(VisionConstants.upperCameraName);
     lowerCamera = new PhotonCamera(VisionConstants.lowerCameraName);
+
+    try {
+      aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    upperPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.upperCameraToRobot);
+    lowerPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, VisionConstants.lowerCameraToRobot);
+
+    upperPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    lowerPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
   }
 
   @Override
@@ -70,6 +109,20 @@ public class Vision extends SubsystemBase {
     Logger.recordOutput("Any Targets", hasAnyTargets);
     Logger.recordOutput("Lower Targets", lowerHasTargets);
     Logger.recordOutput("Upper Targets", upperHasTargets);
+
+    // Update tunables
+    if (turnP.hasChanged(hashCode()) || turnD.hasChanged(hashCode())) {
+      turnController.setP(turnP.get());
+      turnController.setD(turnD.get());
+    }
+  }
+
+  public Optional<EstimatedRobotPose> getUpperEstimatedGlobalPose() {
+    return upperPoseEstimator.update(upperCameraResult);
+  }
+
+  public Optional<EstimatedRobotPose> getLowerEstimatedRobotPose() {
+    return lowerPoseEstimator.update(lowerCameraResult);
   }
 
   public PhotonTrackedTarget getCertainUpperTarget(int id) {
