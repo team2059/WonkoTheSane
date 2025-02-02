@@ -11,6 +11,7 @@ import org.team2059.Wonko.commands.TurnToTag;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
+import org.team2059.Wonko.subsystems.Elevator;
 import org.team2059.Wonko.subsystems.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -40,6 +41,7 @@ public class RobotContainer {
   // private static final Vision vision = new Vision();
   // private static final CoralIntake coralIntake = new CoralIntake();
   private static final AlgaeIntake algaeIntake = new AlgaeIntake();
+  private static final Elevator elevator = new Elevator();
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
@@ -132,6 +134,21 @@ public class RobotContainer {
       
     // new JoystickButton(buttonBox, 4)
     //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
+
+    //Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
+    new JoystickButton(buttonBox, 1)
+      .whileTrue(elevator.elevatorRoutine.quasistaticForward());
+
+    new JoystickButton(buttonBox, 2)
+      .whileTrue(elevator.elevatorRoutine.quasistaticReverse());
+
+    new JoystickButton(buttonBox, 3)
+      .whileTrue(elevator.elevatorRoutine.dynamicForward());
+      
+    new JoystickButton(buttonBox, 4)
+      .whileTrue(elevator.elevatorRoutine.dynamicReverse());
+
+
   }
   
   /**

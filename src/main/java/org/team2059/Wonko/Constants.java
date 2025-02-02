@@ -167,6 +167,10 @@ public final class Constants {
     public static final double targetHeightMeters = Units.inchesToMeters(28.25);
   }
 
+  public static class ElevatorConstants {
+    public static final int elevatorMotorID = 12;
+  }
+
   public static class CoralIntakeConstants {
     public static final int intakeMotorID = 9;
   }
