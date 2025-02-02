@@ -196,6 +196,28 @@ public class Drivetrain extends SubsystemBase {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
     SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.DrivetrainConstants.maxVelocity);
+    
+    SmartDashboard.putData("Commanded Swerve States", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveDrive");
+
+        builder.addDoubleProperty("Front Left Angle", () -> newStates[0].angle.getRadians(), null);
+        builder.addDoubleProperty("Front Left Velocity", () -> newStates[0].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Front Right Angle", () -> newStates[1].angle.getRadians(), null);
+        builder.addDoubleProperty("Front Right Velocity", () -> newStates[1].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Back Left Angle", () -> newStates[2].angle.getRadians(), null);
+        builder.addDoubleProperty("Back Left Velocity", () -> newStates[2].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Back Right Angle", () -> newStates[3].angle.getRadians(), null);
+        builder.addDoubleProperty("Back Right Velocity", () -> newStates[3].speedMetersPerSecond, null);
+
+        builder.addDoubleProperty("Robot Angle", () -> getHeading().getRadians(), null);
+      }
+    });
+
     setModuleStates(newStates);
   }
 
@@ -229,6 +251,7 @@ public class Drivetrain extends SubsystemBase {
    * @param desiredStates SwerveModuleState[] desired states
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
+    Logger.recordOutput("Desired States", desiredStates);
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
@@ -236,8 +259,6 @@ public class Drivetrain extends SubsystemBase {
     frontRight.setState(desiredStates[1], true);
     backLeft.setState(desiredStates[2], true);
     backRight.setState(desiredStates[3], true);
-
-    Logger.recordOutput("Desired States", desiredStates);
   }
   
   /**
@@ -351,3 +372,4 @@ public class Drivetrain extends SubsystemBase {
     Logger.recordOutput("Real States", getStates());
   }
 }
+

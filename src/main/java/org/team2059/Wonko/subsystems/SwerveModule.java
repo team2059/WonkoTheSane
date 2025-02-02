@@ -1,5 +1,6 @@
 package org.team2059.Wonko.subsystems;
 
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -268,6 +269,8 @@ public class SwerveModule extends SubsystemBase {
      * @param isClosedLoop
      */
     public void setState(SwerveModuleState state, boolean isClosedLoop) {
+      Logger.recordOutput("State velocity", state.speedMetersPerSecond);
+      Logger.recordOutput("State angle", state.angle);
       // Deadband
       if (Math.abs(state.speedMetersPerSecond) < 0.001) {
         stop();

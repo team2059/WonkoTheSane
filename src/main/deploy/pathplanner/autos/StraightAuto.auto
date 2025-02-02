@@ -7,12 +7,6 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Straight1M"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
             "pathName": "Straight1MAgain"
           }
         }

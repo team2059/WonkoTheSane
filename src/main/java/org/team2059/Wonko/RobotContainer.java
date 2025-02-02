@@ -50,7 +50,7 @@ public class RobotContainer {
   public RobotContainer() {
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
-    autoChooser = AutoBuilder.buildAutoChooser("New Auto");
+    autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData(autoChooser);
 
     /*
