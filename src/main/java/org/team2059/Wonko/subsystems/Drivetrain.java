@@ -4,10 +4,14 @@
 
 package org.team2059.Wonko.subsystems;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 import org.team2059.Wonko.Constants;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
+import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.routines.DrivetrainRoutine;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -17,11 +21,11 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.studica.frc.AHRS;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -69,11 +73,17 @@ public class Drivetrain extends SubsystemBase {
   private final AHRS navX;
 
   // Create swerve drive odometry engine, used to track robot on field
-  private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
+  // private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
+
+  private SwerveDrivePoseEstimator poseEstimator;
+
+  private final Vision vision;
 
   public final DrivetrainRoutine drivetrainRoutine;
 
-  public Drivetrain() {
+  public Drivetrain(Vision vision) {
+
+    this.vision = vision;
 
     // NavX may need an extra second to start...
     navX = new AHRS(AHRS.NavXComType.kMXP_SPI);
@@ -81,7 +91,6 @@ public class Drivetrain extends SubsystemBase {
       try {
         Thread.sleep(1000);
         navX.reset();
-        odometry.resetPosition(new Rotation2d(), getModulePositions(), new Pose2d());
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -125,13 +134,21 @@ public class Drivetrain extends SubsystemBase {
 
     drivetrainRoutine = new DrivetrainRoutine(this);
 
+    poseEstimator = new SwerveDrivePoseEstimator(
+      DrivetrainConstants.kinematics, 
+      getHeading(), 
+      getModulePositions(), 
+      new Pose2d(), 
+      VisionConstants.stateStdDevs,
+      VisionConstants.measurementStdDevs);
+
   }
 
   /**
    * @return Current robot pose in meters
    */
   public Pose2d getPose() {
-    return odometry.getPoseMeters();
+    return poseEstimator.getEstimatedPosition();
   }
 
   /**
@@ -148,7 +165,7 @@ public class Drivetrain extends SubsystemBase {
    * @param pose specified Pose2d
    */
   public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(getHeading(), getModulePositions(), pose);
+    poseEstimator.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
   /**
@@ -236,8 +253,6 @@ public class Drivetrain extends SubsystemBase {
     frontRight.setState(desiredStates[1], true);
     backLeft.setState(desiredStates[2], true);
     backRight.setState(desiredStates[3], true);
-
-    Logger.recordOutput("Desired States", desiredStates);
   }
   
   /**
@@ -344,10 +359,27 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
 
     // This method will be called once per scheduler run
-    odometry.update(getHeading(), getModulePositions());    
+    // odometry.update(getHeading(), getModulePositions());    
+
+    final Optional<EstimatedRobotPose> upperOptional = vision.getUpperEstimatedGlobalPose();
+    final Optional<EstimatedRobotPose> lowerOptional = vision.getLowerEstimatedRobotPose();
+
+    if (upperOptional.isPresent()) {
+      poseEstimator.addVisionMeasurement(
+        upperOptional.get().estimatedPose.toPose2d(),
+        upperOptional.get().timestampSeconds
+      );
+    }
+    if (lowerOptional.isPresent()) {
+      poseEstimator.addVisionMeasurement(
+        lowerOptional.get().estimatedPose.toPose2d(), 
+        lowerOptional.get().timestampSeconds
+      );
+    }
+
+    poseEstimator.update(getHeading(), getModulePositions());
 
     Logger.recordOutput("Pose", getPose());
     Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
-    Logger.recordOutput("Real States", getStates());
   }
 }

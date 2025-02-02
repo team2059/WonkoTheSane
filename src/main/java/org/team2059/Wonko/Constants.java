@@ -4,9 +4,16 @@
 
 package org.team2059.Wonko;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -161,10 +168,24 @@ public final class Constants {
   }
 
   public static class VisionConstants {
-    public static final String cameraName = "hhCam";
-    public static final double cameraHeightMeters = Units.inchesToMeters(21.875);
-    public static final double cameraPitchRadians = Math.toRadians(0);
-    public static final double targetHeightMeters = Units.inchesToMeters(28.25);
+    public static final String upperCameraName = "Bcam9782";
+    public static final String lowerCameraName = "Acam9782";
+    
+    // example below: Cam mounted facing forward, half a meter forward of center, half a meter up from center.
+    public static final Transform3d upperCameraToRobot = 
+      new Transform3d(
+        new Translation3d(0.5, 0.0, 0.5), 
+        new Rotation3d(0,0,0)
+      );
+    
+    public static final Transform3d lowerCameraToRobot = 
+      new Transform3d(
+        new Translation3d(0.5, 0.0, 0.5), 
+        new Rotation3d(0,0,0)
+      );
+
+    public static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
+    public static final Matrix<N3, N1> measurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
   }
 
   public static class CoralIntakeConstants {
