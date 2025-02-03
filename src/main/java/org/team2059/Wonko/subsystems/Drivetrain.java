@@ -13,6 +13,7 @@ import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.routines.DrivetrainRoutine;
+import org.team2059.Wonko.subsystems.vision.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
@@ -361,8 +362,8 @@ public class Drivetrain extends SubsystemBase {
     // This method will be called once per scheduler run
     // odometry.update(getHeading(), getModulePositions());    
 
-    final Optional<EstimatedRobotPose> upperOptional = vision.getUpperEstimatedGlobalPose();
-    final Optional<EstimatedRobotPose> lowerOptional = vision.getLowerEstimatedRobotPose();
+    final Optional<EstimatedRobotPose> upperOptional = vision.getEstimatedUpperGlobalPose();
+    final Optional<EstimatedRobotPose> lowerOptional = vision.getEstimatedLowerGlobalPose();
 
     if (upperOptional.isPresent()) {
       poseEstimator.addVisionMeasurement(
