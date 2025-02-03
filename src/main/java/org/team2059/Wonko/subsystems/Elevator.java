@@ -16,9 +16,11 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants;
+import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.routines.ElevatorRoutine;
 
 public class Elevator extends SubsystemBase {
@@ -26,7 +28,7 @@ public class Elevator extends SubsystemBase {
   private final ProfiledPIDController profiledPIDController;
   private final ElevatorFeedforward feedforward;
   private final TrapezoidProfile.Constraints constraints;
-
+  private final DigitalInput levelOne, levelTwo, levelThree, levelFour;
   public final ElevatorRoutine elevatorRoutine;
 
   private double setpoint = 0.0;
@@ -36,7 +38,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotor = new SparkFlex(Constants.ElevatorConstants.elevatorMotorID, MotorType.kBrushless);
 
     SparkFlexConfig config = new SparkFlexConfig();
-    config.inverted(false);
+    config.inverted(true);
     config.idleMode(IdleMode.kBrake);
     elevatorMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -64,6 +66,15 @@ public class Elevator extends SubsystemBase {
     feedforward = new ElevatorFeedforward(0.0, 0.0, 0.0, 0.0); // Values obtained from SysID
 
     elevatorRoutine = new ElevatorRoutine(this);
+
+    levelOne = new DigitalInput(Constants.ElevatorConstants.levelOneDIO);
+    levelTwo = new DigitalInput(Constants.ElevatorConstants.levelTwoDIO);
+    levelThree = new DigitalInput(Constants.ElevatorConstants.levelThreeDIO);
+    levelFour = new DigitalInput(Constants.ElevatorConstants.levelFourDIO);
+  }
+
+  public void setSpeed(double speed) {
+    elevatorMotor.set(speed);
   }
 
   public void setGoal(double position) {
@@ -94,8 +105,7 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setVoltage(volts);
   }
 
-  @Override
-  public void periodic() {
+  public void setCalculatedVoltage() {
     // Get the next profile state from the motion profile
     double pidOutput = profiledPIDController.calculate(getPosition());
 
@@ -108,5 +118,9 @@ public class Elevator extends SubsystemBase {
 
     // Output applied to the motor
     elevatorMotor.setVoltage(output);
+  }
+
+  @Override
+  public void periodic() {
   }
 }

@@ -136,17 +136,25 @@ public class RobotContainer {
     //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
 
     //Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
-    new JoystickButton(buttonBox, 1)
-      .whileTrue(elevator.elevatorRoutine.quasistaticForward());
+    // new JoystickButton(buttonBox, 1)
+    //   .whileTrue(elevator.elevatorRoutine.quasistaticForward());
 
-    new JoystickButton(buttonBox, 2)
-      .whileTrue(elevator.elevatorRoutine.quasistaticReverse());
+    // new JoystickButton(buttonBox, 2)
+    //   .whileTrue(elevator.elevatorRoutine.quasistaticReverse());
 
-    new JoystickButton(buttonBox, 3)
-      .whileTrue(elevator.elevatorRoutine.dynamicForward());
+    // new JoystickButton(buttonBox, 3)
+    //   .whileTrue(elevator.elevatorRoutine.dynamicForward());
       
-    new JoystickButton(buttonBox, 4)
-      .whileTrue(elevator.elevatorRoutine.dynamicReverse());
+    // new JoystickButton(buttonBox, 4)
+    //   .whileTrue(elevator.elevatorRoutine.dynamicReverse());
+
+    new JoystickButton(buttonBox, 5)
+      .whileTrue(new InstantCommand(() -> elevator.setSpeed(0.5)))
+      .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));
+    
+    new JoystickButton(buttonBox, 6)
+      .whileTrue(new InstantCommand(() -> elevator.setSpeed(-0.5)))
+      .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));    
 
 
   }
