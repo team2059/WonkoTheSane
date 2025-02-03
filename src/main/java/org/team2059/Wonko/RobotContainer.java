@@ -6,12 +6,11 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
-import org.team2059.Wonko.commands.TurnParallelToReef;
-import org.team2059.Wonko.commands.TurnToReefTag;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
-import org.team2059.Wonko.subsystems.Vision;
+import org.team2059.Wonko.subsystems.vision.Vision;
+import org.team2059.Wonko.subsystems.vision.VisionIOReal;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -36,8 +35,8 @@ public class RobotContainer {
   SendableChooser<Command> autoChooser;
 
   /* SUBSYSTEMS */
-  private static final Vision vision = new Vision();
-  private static final Drivetrain drivetrain = new Drivetrain(vision);
+  private static Vision vision;
+  private static Drivetrain drivetrain;
   // private static final CoralIntake coralIntake = new CoralIntake();
   // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
@@ -47,6 +46,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    vision = new Vision(new VisionIOReal());
+    drivetrain = new Drivetrain(vision);
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -105,9 +107,6 @@ public class RobotContainer {
     // new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
     //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
     //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
-
-    new JoystickButton(logitech, 7)
-      .whileTrue(new TurnParallelToReef(drivetrain, vision, 22));
 
     // new JoystickButton(logitech, 8)
     //   .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
