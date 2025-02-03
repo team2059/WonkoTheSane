@@ -6,8 +6,8 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
-import org.team2059.Wonko.commands.TurnParallelToTag;
-import org.team2059.Wonko.commands.TurnToTag;
+import org.team2059.Wonko.commands.TurnParallelToReef;
+import org.team2059.Wonko.commands.TurnToReefTag;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
@@ -37,8 +37,8 @@ public class RobotContainer {
   SendableChooser<Command> autoChooser;
 
   /* SUBSYSTEMS */
-  private static final Drivetrain drivetrain = new Drivetrain();
-  // private static final Vision vision = new Vision();
+  private static final Vision vision = new Vision();
+  private static final Drivetrain drivetrain = new Drivetrain(vision);
   // private static final CoralIntake coralIntake = new CoralIntake();
   private static final AlgaeIntake algaeIntake = new AlgaeIntake();
   private static final Elevator elevator = new Elevator();
@@ -52,7 +52,7 @@ public class RobotContainer {
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-    SmartDashboard.putData(autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     /*
      * Send axes and buttons from joystick to TeleopSwerveCmd,
@@ -116,8 +116,8 @@ public class RobotContainer {
     new JoystickButton(logitech, 3)
       .whileFalse(new InstantCommand(() -> algaeIntake.holdAlgae(0))); 
 
-    // new JoystickButton(logitech, 7)
-    //   .whileTrue(new TurnToTag(drivetrain, vision, 4));
+    new JoystickButton(logitech, 7)
+      .whileTrue(new TurnParallelToReef(drivetrain, vision, 22));
 
     // new JoystickButton(logitech, 8)
     //   .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
