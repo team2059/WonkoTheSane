@@ -5,6 +5,7 @@
 package org.team2059.Wonko;
 
 
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToTag;
@@ -15,13 +16,20 @@ import org.team2059.Wonko.subsystems.Drivetrain;
 import org.team2059.Wonko.subsystems.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -125,6 +133,9 @@ public class RobotContainer {
       
     new JoystickButton(buttonBox, 4)
       .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
+
+    new JoystickButton(logitech, 4)
+      .onTrue(new InstantCommand(() -> drivetrain.resetOdometry(new Pose2d(new Translation2d(1, 5.5), new Rotation2d(0)))));
   }
   
   /**
@@ -133,6 +144,17 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    try{
+        // Load the path you want to follow using its name in the GUI
+        PathPlannerPath path = PathPlannerPath.fromPathFile("Straight1MAgain");
+
+        // Create a path following command using AutoBuilder. This will also trigger event markers.
+        Logger.recordOutput("Starting Pose", path.getStartingHolonomicPose().get().getX());
+        Logger.recordOutput("Starting Pose", path.getStartingHolonomicPose().get().getY());
+        return AutoBuilder.followPath(path);
+    } catch (Exception e) {
+        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+        return Commands.none();
+    }
   }
 }

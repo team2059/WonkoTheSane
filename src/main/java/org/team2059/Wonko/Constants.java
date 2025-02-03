@@ -148,15 +148,15 @@ public final class Constants {
     
     // CoF taken from https://www.chiefdelphi.com/t/coefficient-of-friction/467778
     public static final double kWheelCoF = 1.542; // Coefficient of friction of wheels
-    public static final double driveCurrentLimit = 40;
+    public static final double driveCurrentLimit = 5;
   }
 
   public static class AutoConstants {
 
-    public static final double kAutoTranslationP = 3.0;
+    public static final double kAutoTranslationP = 1;
     public static final double kAutoTranslationD = 0;
 
-    public static final double kAutoRotationP = 3.0;
+    public static final double kAutoRotationP = 1;
     public static final double kAutoRotationD = 0.0;
   }
 

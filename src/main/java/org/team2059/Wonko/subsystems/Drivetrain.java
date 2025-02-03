@@ -148,6 +148,7 @@ public class Drivetrain extends SubsystemBase {
    * @param pose specified Pose2d
    */
   public void resetOdometry(Pose2d pose) {
+    Logger.recordOutput("Commanded Pose", pose);
     odometry.resetPosition(getHeading(), getModulePositions(), pose);
   }
 
@@ -255,10 +256,10 @@ public class Drivetrain extends SubsystemBase {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
-    frontLeft.setState(desiredStates[0], true);
-    frontRight.setState(desiredStates[1], true);
-    backLeft.setState(desiredStates[2], true);
-    backRight.setState(desiredStates[3], true);
+    frontLeft.setState(desiredStates[0], false);
+    frontRight.setState(desiredStates[1], false);
+    backLeft.setState(desiredStates[2], false);
+    backRight.setState(desiredStates[3], false);
   }
   
   /**
