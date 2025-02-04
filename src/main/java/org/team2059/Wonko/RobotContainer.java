@@ -134,7 +134,7 @@ public class RobotContainer {
       .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
     
     new JoystickButton(logitech, 4)
-    .onTrue(new InstantCommand(() -> drivetrain.resetOdometry(new Pose2d(new Translation2d(1, 5.5), new Rotation2d(0)))));
+      .onTrue(new InstantCommand(() -> drivetrain.resetOdometry(new Pose2d(new Translation2d(1, 5.5), new Rotation2d(0)))));
   }
   
   /**
