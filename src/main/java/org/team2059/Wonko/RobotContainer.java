@@ -4,12 +4,11 @@
 
 package org.team2059.Wonko;
 
-
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
-import org.team2059.Wonko.commands.TurnParallelToTag;
-import org.team2059.Wonko.commands.TurnToTag;
+import org.team2059.Wonko.commands.TurnParallelToReef;
+import org.team2059.Wonko.commands.TurnToReefTag;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
@@ -45,8 +44,8 @@ public class RobotContainer {
   SendableChooser<Command> autoChooser;
 
   /* SUBSYSTEMS */
-  private static final Drivetrain drivetrain = new Drivetrain();
-  // private static final Vision vision = new Vision();
+  private static final Vision vision = new Vision();
+  private static final Drivetrain drivetrain = new Drivetrain(vision);
   // private static final CoralIntake coralIntake = new CoralIntake();
   // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
@@ -115,27 +114,27 @@ public class RobotContainer {
     //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
     //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
-    // new JoystickButton(logitech, 7)
-    //   .whileTrue(new TurnToTag(drivetrain, vision, 4));
+    new JoystickButton(logitech, 7)
+      .whileTrue(new TurnParallelToReef(drivetrain, vision, 22));
 
     // new JoystickButton(logitech, 8)
     //   .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
     
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
-    new JoystickButton(buttonBox, 1)
-      .whileTrue(drivetrain.drivetrainRoutine.quasistaticForward());
+    // new JoystickButton(buttonBox, 1)
+    //   .whileTrue(drivetrain.drivetrainRoutine.quasistaticForward());
 
-    new JoystickButton(buttonBox, 2)
-      .whileTrue(drivetrain.drivetrainRoutine.quasistaticReverse());
+    // new JoystickButton(buttonBox, 2)
+    //   .whileTrue(drivetrain.drivetrainRoutine.quasistaticReverse());
 
-    new JoystickButton(buttonBox, 3)
-      .whileTrue(drivetrain.drivetrainRoutine.dynamicForward());
+    // new JoystickButton(buttonBox, 3)
+    //   .whileTrue(drivetrain.drivetrainRoutine.dynamicForward());
       
     new JoystickButton(buttonBox, 4)
       .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
-
+    
     new JoystickButton(logitech, 4)
-      .onTrue(new InstantCommand(() -> drivetrain.resetOdometry(new Pose2d(new Translation2d(1, 5.5), new Rotation2d(0)))));
+    .onTrue(new InstantCommand(() -> drivetrain.resetOdometry(new Pose2d(new Translation2d(1, 5.5), new Rotation2d(0)))));
   }
   
   /**

@@ -212,7 +212,7 @@ public class SwerveModule extends SubsystemBase {
         return new SwerveModuleState(getDriveVelocity(), getCANcoderRad());
     }
 
-    public static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+    private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
         double lowerBound;
         double upperBound;
         double lowerOffset = scopeReference % (2.0 * Math.PI);
@@ -249,7 +249,7 @@ public class SwerveModule extends SubsystemBase {
      * @param desiredState The desired state.
      * @param currentAngle The current module angle.
      */
-    public static SwerveModuleState optimize(
+    private static SwerveModuleState optimize(
         SwerveModuleState desiredState, Rotation2d currentAngle) {
 
         double targetAngle = placeInAppropriate0To360Scope(currentAngle.getRadians(), desiredState.angle.getRadians());

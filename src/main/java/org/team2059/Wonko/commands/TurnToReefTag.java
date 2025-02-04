@@ -9,24 +9,21 @@ import org.team2059.Wonko.subsystems.Drivetrain;
 import org.team2059.Wonko.subsystems.Vision;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class TurnParallelToTag extends Command {
-
+public class TurnToReefTag extends Command {
   private final Drivetrain drivetrain;
   private final Vision vision;
-  PIDController turnController = new PIDController(1.5, 0, 0);
-  private double rotationSpeed;
   private final int tagID;
-  private double lastKnownZ = 0.0;
+  private double rotationSpeed;
 
-  /** Creates a new TurnParallelToTag. */
-  public TurnParallelToTag(Drivetrain drivetrain, Vision vision, int tagID) {
+  /** Creates a new TurnToTag. */
+  public TurnToReefTag(Drivetrain drivetrain, Vision vision, int tagID) {
     this.drivetrain = drivetrain;
     this.vision = vision;
     this.tagID = tagID;
+    this.rotationSpeed = 0;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(drivetrain, vision);
@@ -35,26 +32,21 @@ public class TurnParallelToTag extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    turnController.setTolerance(0.01);
-    turnController.enableContinuousInput(-Math.PI, Math.PI);
+    vision.turnController.setTolerance(0.05);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
 
-    boolean b = vision.hasTargets;
+    PhotonTrackedTarget t = vision.getCertainLowerTarget(tagID);
 
-    PhotonTrackedTarget t = vision.getCertainTarget(tagID);
+    if (vision.lowerHasTargets && t != null) {
+      double yaw = t.getYaw();
 
-    if (b && t != null && t.getPoseAmbiguity() <= 0.2 || lastKnownZ != 0.0) {
-
-      lastKnownZ = t.getBestCameraToTarget().getRotation().getZ();
-
-      rotationSpeed = -MathUtil.clamp(turnController.calculate(lastKnownZ, Math.PI), -1, 1);
+      rotationSpeed = MathUtil.clamp(vision.turnController.calculate(yaw, 0), -1, 1);
 
       drivetrain.drive(0, 0, rotationSpeed, true);
-
     } else {
       this.cancel();
     }
@@ -64,12 +56,12 @@ public class TurnParallelToTag extends Command {
   @Override
   public void end(boolean interrupted) {
     rotationSpeed = 0;
-    drivetrain.drive(0,0,0,true);
+    drivetrain.drive(0, 0, 0, true);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return turnController.atSetpoint();
+    return vision.turnController.atSetpoint();
   }
 }
