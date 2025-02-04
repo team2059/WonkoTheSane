@@ -25,9 +25,12 @@ public class CoralIntakeCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // Uses method from ir sensor to check if coral is in the intake 
     if (coralIntake.isCoralPresent()) {
+      // If coral exists already then motor shouldn't run
       coralIntake.setIntakeSpeed(0);
     } else {
+      // If coral isn't in the intake, start intaking 
       coralIntake.setIntakeSpeed(0.3);
     }
   }
@@ -35,6 +38,7 @@ public class CoralIntakeCmd extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    // Set coral to 0 when interrupted (outtake cmd is used)
     coralIntake.setIntakeSpeed(0);
   }
 

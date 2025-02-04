@@ -24,11 +24,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class CoralIntake extends SubsystemBase {
   private final SparkFlex intakeMotor;
   private final SparkMax tiltMotor; 
+  // Throughbore encoder is a DutyCycleEncoder, goes from 0-1
   public DutyCycleEncoder coralTiltThruBoreEncoder;
+  // IR sensor is a digital sensor that detects if light is reflected (returns 0 or 1)
   public DigitalInput irSensor;
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
+    // Creating tilt and intake motor
     intakeMotor = new SparkFlex(CoralIntakeConstants.intakeMotorID, MotorType.kBrushless);
     tiltMotor = new SparkMax(CoralIntakeConstants.tiltMotorID, MotorType.kBrushless);
 
@@ -38,42 +41,53 @@ public class CoralIntake extends SubsystemBase {
     config.idleMode(IdleMode.kBrake);
     intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    // Creating coral throughbore
     coralTiltThruBoreEncoder = new DutyCycleEncoder(DIOConstants.kCoralTiltThruBoreEncoderDIO);
 
+    // Adding range
     coralTiltThruBoreEncoder.setDutyCycleRange(0.02, 0.98); // TODO: EXAMPLE RANGE CHANGE LATER
+    // Might be inverted 
     coralTiltThruBoreEncoder.setInverted(true); // TODO: SEE IF INVERTED
 
     irSensor = new DigitalInput(CoralIntakeConstants.irSensorDIO);
   }
 
+  // Setting intake speed using params given
   public void setIntakeSpeed(double speed) {
     intakeMotor.set(speed);
   }
 
+  // Getting intake motor
   public SparkFlex getIntakeMotor() {
     return intakeMotor;
   }
-
+  
+  // Setting tilt speed using params given
   public void setTiltSpeed(double speed) {
     tiltMotor.set(speed);
   }
 
+  // Getting tilt motor
   public SparkMax getTiltMotor() {
     return tiltMotor;
   }
 
+  // Getting throughbore position by subtracting offset 
   public double getAbsolutePosition() {
     return coralTiltThruBoreEncoder.get() - CoralIntakeConstants.throughBoreOffset;
   }
 
+  // Getting true throughbore position
   public double getRawEncoderPosition() {
     return coralTiltThruBoreEncoder.get();
   }
 
+  // Sees if encoder is connected 
   public boolean isEncoderConnected() {
     return coralTiltThruBoreEncoder.isConnected();
   }
 
+  // Checks if coral is present by returning value from ir sensor (will be 0 or 1)
   public boolean isCoralPresent() {
     return irSensor.get(); // TODO: MIGHT HAVE TO INVERT 
   }

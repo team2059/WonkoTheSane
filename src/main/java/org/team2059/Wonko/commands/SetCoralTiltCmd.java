@@ -22,6 +22,7 @@ public class SetCoralTiltCmd extends Command {
   
   /** Creates a new SetCoralTiltCmd. */
   public SetCoralTiltCmd(CoralIntake coralIntake, double targetPosition) {
+    // Adding coral intake and pid controllers 
     this.coralIntake = coralIntake;
     this.targetPosition = targetPosition;
     this.pidController = new PIDController(kP, kI, kD);
@@ -40,23 +41,29 @@ public class SetCoralTiltCmd extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // Getting throughbore position
     double currentPosition = coralIntake.getAbsolutePosition();
+    // Getting output by seeing distance between current throughbore and target throughbore position, using pid to calculate 
     double output = pidController.calculate(currentPosition, targetPosition);
     
+    // max speed is 50%
     output = Math.min(Math.max(output, -0.5), 0.5);
     
+    // Setting tilt motor to output 
     coralIntake.setTiltSpeed(output);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    coralIntake.setIntakeSpeed(0);
+    // Sets tilt motor to 0 when command is done 
+    coralIntake.setTiltSpeed(0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // Ends command when at setpoint (WITHIN POSITION TOLERANCE)
     return pidController.atSetpoint();
   }
 }

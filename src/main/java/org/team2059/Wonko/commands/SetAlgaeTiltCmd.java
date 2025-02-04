@@ -17,9 +17,11 @@ public class SetAlgaeTiltCmd extends Command {
   
   /** Creates a new SetCoralTiltCmd. */
   public SetAlgaeTiltCmd(AlgaeIntake algaeIntake, double targetPosition) {
+    // Creates algaeIntake, target (tilt degrees of the algae), and PID controller for smooth tilting
     this.algaeIntake = algaeIntake;
     this.targetPosition = targetPosition;
     this.pidController = new PIDController(AlgaeIntakeConstants.kPAlgae, AlgaeIntakeConstants.kIAlgae, AlgaeIntakeConstants.kDAlgae);
+    // Sets tolerance so it won't continue the command once in the position tolerance so it won't continue oscillating forever 
     pidController.setTolerance(AlgaeIntakeConstants.POSITION_TOLERANCE);
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -29,17 +31,22 @@ public class SetAlgaeTiltCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    // Resets all error from PID from previous requests
     pidController.reset();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    // Gets throughbore position
     double currentPosition = algaeIntake.getAbsolutePosition();
+    // Gets amount of percent to put by using PID controller to calculate optimally 
     double output = pidController.calculate(currentPosition, targetPosition);
     
+    // Max speed is 50% 
     output = Math.min(Math.max(output, -0.5), 0.5);
     
+    // Sets pid output to the tilt motor 
     algaeIntake.getTiltMotor().set(output);
   }
 
@@ -52,6 +59,7 @@ public class SetAlgaeTiltCmd extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    // Command ends when setpoint is reached (WITHIN THE POSITION TOLERANCE)
     return pidController.atSetpoint();
   }
 }

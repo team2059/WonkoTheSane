@@ -30,11 +30,12 @@ public class AlgaeIntake extends SubsystemBase {
 
   /** Creates a new algaeEndEffector. */
   public AlgaeIntake() {
+    // Creates intake motors and tilt motor
     intakeMotor1 = new SparkFlex(AlgaeIntakeConstants.intakeMotor1ID, MotorType.kBrushless);
     intakeMotor2 = new SparkFlex(AlgaeIntakeConstants.intakeMotor2ID, MotorType.kBrushless);
     tiltMotor = new SparkMax(AlgaeIntakeConstants.tiltMotorID, MotorType.kBrushless);
 
-
+    // Spark flex config
     SparkFlexConfig config1 = new SparkFlexConfig();
     config1.inverted(false);
     config1.idleMode(IdleMode.kBrake);
@@ -45,6 +46,7 @@ public class AlgaeIntake extends SubsystemBase {
     config2.idleMode(IdleMode.kBrake);
     intakeMotor2.configure(config2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    // Creating throughbore as duty cycle encoder
     algaeTiltThruBoreEncoder = new DutyCycleEncoder(DIOConstants.kAlgaeTiltThruBoreEncoderDIO);
 
     algaeTiltThruBoreEncoder.setDutyCycleRange(0.02, 0.98); // TODO: EXAMPLE RANGE CHANGE LATER
@@ -52,36 +54,44 @@ public class AlgaeIntake extends SubsystemBase {
 
   }
 
+  // Sets speed of motors to intake or outtake using params
   public void setEndEffectorSpeed(double speed) {
     // This needs to be changed
     intakeMotor1.set(speed);
     intakeMotor2.set(speed);
   }
 
+  // Setting tilt speed using params given
   public void setTiltSpeed(double speed) {
     tiltMotor.set(speed);
   }
 
+  // Getting intake motor 
   public SparkFlex getMotor2() {
     return intakeMotor2;
   }
 
+  // Getting outtake motor 
   public SparkFlex getMotor1() {
     return intakeMotor1;
   }
   
+  // Getting tilt motor 
   public SparkMax getTiltMotor() {
     return tiltMotor;
   }
 
+  // Getting absolute position of throughbore by subtracting offset 
   public double getAbsolutePosition() {
     return algaeTiltThruBoreEncoder.get() - AlgaeIntakeConstants.throughBoreOffset;
   }
 
+  // Getting true throughbore position
   public double getRawEncoderPosition() {
     return algaeTiltThruBoreEncoder.get();
   }
 
+  // Sees if encoder is connected by pinging DIO 
   public boolean isEncoderConnected() {
     return algaeTiltThruBoreEncoder.isConnected();
   }
