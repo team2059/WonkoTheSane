@@ -160,10 +160,10 @@ public final class Constants {
 
   public static class AutoConstants {
 
-    public static final double kAutoTranslationP = 3.0;
+    public static final double kAutoTranslationP = 5.0;
     public static final double kAutoTranslationD = 0;
 
-    public static final double kAutoRotationP = 3.0;
+    public static final double kAutoRotationP = 5.0;
     public static final double kAutoRotationD = 0.0;
   }
 

@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.team2059.Wonko.Constants;
+import org.team2059.Wonko.Robot;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
@@ -250,10 +251,10 @@ public class Drivetrain extends SubsystemBase {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
     // Sets the speed and rotation of each module
-    frontLeft.setState(desiredStates[0], true);
-    frontRight.setState(desiredStates[1], true);
-    backLeft.setState(desiredStates[2], true);
-    backRight.setState(desiredStates[3], true);
+    frontLeft.setState(desiredStates[0], false);
+    frontRight.setState(desiredStates[1], false);
+    backLeft.setState(desiredStates[2], false);
+    backRight.setState(desiredStates[3], false);
   }
   
   /**
@@ -309,6 +310,8 @@ public class Drivetrain extends SubsystemBase {
     System.out.println("Configuring Auto Builder...");
 
     try {
+      RobotConfig config = RobotConfig.fromGUISettings();
+
       // Configure AutoBuilder
       AutoBuilder.configure(
         this::getPose, // Robot pose supplier
@@ -319,19 +322,7 @@ public class Drivetrain extends SubsystemBase {
           new PIDConstants(AutoConstants.kAutoTranslationP, 0.0, AutoConstants.kAutoTranslationD),
           new PIDConstants(AutoConstants.kAutoRotationP, 0.0, AutoConstants.kAutoRotationD)
         ),
-        new RobotConfig(
-          DrivetrainConstants.kMass, 
-          DrivetrainConstants.kMomentOfIntertia, 
-          new ModuleConfig(
-            DrivetrainConstants.wheelDiameter / 2, 
-            DrivetrainConstants.maxVelocity, 
-            DrivetrainConstants.kWheelCoF, 
-            DCMotor.getNeoVortex(1).withReduction(DrivetrainConstants.driveGearRatio), 
-            DrivetrainConstants.driveCurrentLimit, 
-            1
-          ), 
-          DrivetrainConstants.trackWidth
-        ),
+        config,
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
           // This will flip the path being followed to the red side of the field
