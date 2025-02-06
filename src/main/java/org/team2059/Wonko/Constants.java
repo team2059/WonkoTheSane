@@ -191,9 +191,9 @@ public final class Constants {
   public static class ElevatorConstants {
     public static final int elevatorMotorID = 12;
     public static final int levelOneDIO = 0;
-    public static final int levelTwoDIO = 0;
-    public static final int levelThreeDIO = 0;
-    public static final int levelFourDIO = 0;
+    public static final int levelTwoDIO = 1;
+    public static final int levelThreeDIO = 2;
+    public static final int levelFourDIO = 3;
   }
 
   public static class CoralIntakeConstants {

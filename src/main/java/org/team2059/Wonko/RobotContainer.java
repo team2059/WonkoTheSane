@@ -5,6 +5,7 @@
 package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.commands.ElevatorGoToSetpoint;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToReef;
 import org.team2059.Wonko.commands.TurnToReefTag;
@@ -149,12 +150,15 @@ public class RobotContainer {
     //   .whileTrue(elevator.elevatorRoutine.dynamicReverse());
 
     new JoystickButton(buttonBox, 5)
-      .whileTrue(new InstantCommand(() -> elevator.setSpeed(0.5)))
+      .whileTrue(new InstantCommand(() -> elevator.setSpeed(0.2)))
       .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));
     
     new JoystickButton(buttonBox, 6)
-      .whileTrue(new InstantCommand(() -> elevator.setSpeed(-0.5)))
+      .whileTrue(new InstantCommand(() -> elevator.setSpeed(-0.2)))
       .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));    
+
+    new JoystickButton(buttonBox, 7)
+      .whileTrue(new ElevatorGoToSetpoint(elevator, 40));
 
 
   }
