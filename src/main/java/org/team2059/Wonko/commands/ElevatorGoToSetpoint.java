@@ -18,6 +18,7 @@ public class ElevatorGoToSetpoint extends Command {
   private final double setpoint;
   private final SparkMax motor;
   private final PIDController pidController;
+  
 
   /** Creates a new ElevatorGoToSetpoint. */
   public ElevatorGoToSetpoint(Elevator elevator, double setpoint) {

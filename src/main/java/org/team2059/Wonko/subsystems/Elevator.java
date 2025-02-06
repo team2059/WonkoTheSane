@@ -162,6 +162,7 @@ public class Elevator extends SubsystemBase {
     if (elevatorP.hasChanged(hashCode()) || elevatorD.hasChanged(hashCode()) || tolerance.hasChanged(hashCode())) {
       turnController.setP(elevatorP.get());
       turnController.setD(elevatorD.get());
+      turnController.setTolerance(tolerance.get());
     }
     Logger.recordOutput("Elevator/RelativeEncoder", getPosition());
 
