@@ -19,7 +19,8 @@ public class TeleopDriveCmd extends Command {
   private final SlewRateLimiter xLimiter, yLimiter, rotLimiter;
 
   /** Creates a new TeleopDriveCmd. */
-  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
+  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY,
+      DoubleSupplier rotation, DoubleSupplier slider) {
 
     this.drivetrain = drivetrain;
     this.forwardX = forwardX;
@@ -37,14 +38,16 @@ public class TeleopDriveCmd extends Command {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    /** 
+    /**
      * Units are given in meters/sec and radians/sec
-     * Since joysticks give output from -1 to 1, we multiply outputs by the max speed
+     * Since joysticks give output from -1 to 1, we multiply outputs by the max
+     * speed
      * Otherwise, the max speed would be 1 m/s and 1 rad/s
      */
 
@@ -75,16 +78,16 @@ public class TeleopDriveCmd extends Command {
     rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
 
     drivetrain.drive(
-      xSpeed,
-      ySpeed, 
-      rot, 
-      Drivetrain.fieldRelativeStatus
-    );
+        xSpeed,
+        ySpeed,
+        rot,
+        drivetrain.isFieldRelative());
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+  }
 
   // Returns true when the command should end.
   @Override

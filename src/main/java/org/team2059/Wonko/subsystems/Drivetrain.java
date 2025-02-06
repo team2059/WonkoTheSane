@@ -39,61 +39,64 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
 
-  public static boolean fieldRelativeStatus = true;
+  private boolean m_fieldRelative = true;
 
   // Create 4 SwerveModule objects using given constants.
   public final SwerveModule frontLeft = new SwerveModule(
-    DrivetrainConstants.frontLeftDriveMotorId, 
-    DrivetrainConstants.frontLeftRotationMotorId, 
-    DrivetrainConstants.frontLeftCanCoderId, 
-    DrivetrainConstants.frontLeftOffsetRad,
-    false,
-    true);
+      DrivetrainConstants.frontLeftDriveMotorId,
+      DrivetrainConstants.frontLeftRotationMotorId,
+      DrivetrainConstants.frontLeftCanCoderId,
+      DrivetrainConstants.frontLeftOffsetRad,
+      false,
+      true);
   public final SwerveModule frontRight = new SwerveModule(
-    DrivetrainConstants.frontRightDriveMotorId, 
-    DrivetrainConstants.frontRightRotationMotorId, 
-    DrivetrainConstants.frontRightCanCoderId, 
-    DrivetrainConstants.frontRightOffsetRad,
-    true,
-    true);
+      DrivetrainConstants.frontRightDriveMotorId,
+      DrivetrainConstants.frontRightRotationMotorId,
+      DrivetrainConstants.frontRightCanCoderId,
+      DrivetrainConstants.frontRightOffsetRad,
+      true,
+      true);
   public final SwerveModule backLeft = new SwerveModule(
-    DrivetrainConstants.backLeftDriveMotorId, 
-    DrivetrainConstants.backLeftRotationMotorId, 
-    DrivetrainConstants.backLeftCanCoderId, 
-    DrivetrainConstants.backLeftOffsetRad,
-    false,
-    true);
+      DrivetrainConstants.backLeftDriveMotorId,
+      DrivetrainConstants.backLeftRotationMotorId,
+      DrivetrainConstants.backLeftCanCoderId,
+      DrivetrainConstants.backLeftOffsetRad,
+      false,
+      true);
   public final SwerveModule backRight = new SwerveModule(
-    DrivetrainConstants.backRightDriveMotorId, 
-    DrivetrainConstants.backRightRotationMotorId, 
-    DrivetrainConstants.backRightCanCoderId, 
-    DrivetrainConstants.backRightOffsetRad,
-    false,
-    true);
+      DrivetrainConstants.backRightDriveMotorId,
+      DrivetrainConstants.backRightRotationMotorId,
+      DrivetrainConstants.backRightCanCoderId,
+      DrivetrainConstants.backRightOffsetRad,
+      false,
+      true);
 
   // Create NavX object (gyro)
-  private final AHRS navX;
+  private final AHRS m_navX;
 
   // Create swerve drive odometry engine, used to track robot on field
-  // private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
+  // private final SwerveDriveOdometry odometry = new
+  // SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new
+  // Rotation2d(), getModulePositions());
 
   private SwerveDrivePoseEstimator poseEstimator;
 
-  private final Vision vision;
+  private final Vision m_vision;
 
   public final DrivetrainRoutine drivetrainRoutine;
 
   public Drivetrain(Vision vision) {
 
-    this.vision = vision;
+    m_vision = vision;
 
     // NavX may need an extra second to start...
-    navX = new AHRS(AHRS.NavXComType.kMXP_SPI);
+    m_navX = new AHRS(AHRS.NavXComType.kMXP_SPI);
     new Thread(() -> {
       try {
         Thread.sleep(1000);
-        navX.reset();
+        m_navX.reset();
       } catch (Exception e) {
+        DriverStation.reportError("NavX failed to initialize: " + e.getMessage(), true);
         e.printStackTrace();
       }
     }).start();
@@ -134,16 +137,15 @@ public class Drivetrain extends SubsystemBase {
       }
     });
 
-    drivetrainRoutine = new DrivetrainRoutine(this);
-
     poseEstimator = new SwerveDrivePoseEstimator(
-      DrivetrainConstants.kinematics, 
-      getHeading(), 
-      getModulePositions(), 
-      new Pose2d(), 
-      VisionConstants.stateStdDevs,
-      VisionConstants.measurementStdDevs);
+        DrivetrainConstants.kinematics,
+        getHeading(),
+        getModulePositions(),
+        new Pose2d(),
+        VisionConstants.stateStdDevs,
+        VisionConstants.measurementStdDevs);
 
+    drivetrainRoutine = new DrivetrainRoutine(this);
   }
 
   /**
@@ -157,7 +159,7 @@ public class Drivetrain extends SubsystemBase {
    * @return AHRS navX object
    */
   public AHRS getNavX() {
-    return navX;
+    return m_navX;
   }
 
   /**
@@ -174,23 +176,21 @@ public class Drivetrain extends SubsystemBase {
    * @return ChassisSpeeds of current robot-relative speeds
    */
   public ChassisSpeeds getRobotRelativeSpeeds() {
-    ChassisSpeeds chassisSpeeds = DrivetrainConstants.kinematics.toChassisSpeeds(getStates());
-
-    return chassisSpeeds;
+    return DrivetrainConstants.kinematics.toChassisSpeeds(getStates());
   }
 
   /**
    * Set navX heading to zero
    */
   public void zeroHeading() {
-    navX.reset();
+    m_navX.reset();
   }
 
   /**
    * @return Rotation2d of current navX heading
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(-navX.getYaw());
+    return Rotation2d.fromDegrees(-m_navX.getYaw());
   }
 
   /**
@@ -198,35 +198,41 @@ public class Drivetrain extends SubsystemBase {
    */
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = {
-      new SwerveModulePosition(frontLeft.getDriveEncoderPosition(), frontLeft.getCANcoderRad()),
-      new SwerveModulePosition(frontRight.getDriveEncoderPosition(), frontRight.getCANcoderRad()),
-      new SwerveModulePosition(backLeft.getDriveEncoderPosition(), backLeft.getCANcoderRad()),
-      new SwerveModulePosition(backRight.getDriveEncoderPosition(), backRight.getCANcoderRad())
+        new SwerveModulePosition(frontLeft.getDriveEncoderPosition(), frontLeft.getCANcoderRad()),
+        new SwerveModulePosition(frontRight.getDriveEncoderPosition(), frontRight.getCANcoderRad()),
+        new SwerveModulePosition(backLeft.getDriveEncoderPosition(), backLeft.getCANcoderRad()),
+        new SwerveModulePosition(backRight.getDriveEncoderPosition(), backRight.getCANcoderRad())
     };
-
     return positions;
   }
 
   /**
    * Method to drive robot-relative
+   * 
    * @param chassisSpeeds
    */
   public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.DrivetrainConstants.maxVelocity);
-    setModuleStates(newStates);
+    driveWithChassisSpeeds(chassisSpeeds, false);
   }
 
   /**
    * Method to drive field-relative
+   * 
    * @param chassisSpeeds
    */
   public void driveFieldRelative(ChassisSpeeds chassisSpeeds) {
+    driveWithChassisSpeeds(chassisSpeeds, true);
+  }
+
+  private void driveWithChassisSpeeds(ChassisSpeeds chassisSpeeds, boolean fieldRelative) {
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02);
-    chassisSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(discreteSpeeds, getHeading());
-    SwerveModuleState[] newStates = Constants.DrivetrainConstants.kinematics.toSwerveModuleStates(chassisSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(newStates, Constants.DrivetrainConstants.maxVelocity);
+
+    if (fieldRelative) {
+      discreteSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(discreteSpeeds, getHeading());
+    }
+
+    SwerveModuleState[] newStates = DrivetrainConstants.kinematics.toSwerveModuleStates(discreteSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(newStates, DrivetrainConstants.maxVelocity);
     setModuleStates(newStates);
   }
 
@@ -234,17 +240,18 @@ public class Drivetrain extends SubsystemBase {
    * @return current swerve module states of all modules
    */
   public SwerveModuleState[] getStates() {
-    SwerveModuleState[] states = new SwerveModuleState[4];
-    states[0] = frontLeft.getState();
-    states[1] = frontRight.getState();
-    states[2] = backLeft.getState();
-    states[3] = backRight.getState();
-
+    SwerveModuleState[] states = {
+        frontLeft.getState(),
+        frontRight.getState(),
+        backLeft.getState(),
+        backRight.getState()
+    };
     return states;
   }
 
   /**
    * Method to set module states
+   * 
    * @param desiredStates SwerveModuleState[] desired states
    */
   public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -256,9 +263,10 @@ public class Drivetrain extends SubsystemBase {
     backLeft.setState(desiredStates[2], false);
     backRight.setState(desiredStates[3], false);
   }
-  
+
   /**
    * Method to drive the robot either field or robot relative
+   * 
    * @param forward
    * @param strafe
    * @param rotation
@@ -291,20 +299,19 @@ public class Drivetrain extends SubsystemBase {
 
   }
 
-  /**
-   * Switch fieldRelativeStatus boolean to the opposite value
-   */
-  public void setFieldRelativity() {
-    if (fieldRelativeStatus) {
-      fieldRelativeStatus = false;
-    } else {
-      fieldRelativeStatus = true;
-    }
+  public boolean toggleFieldRelative() {
+    m_fieldRelative = !m_fieldRelative;
+    return m_fieldRelative;
   }
 
-  /**
-   * Method to configure AutoBuilder (make sure to do this last)
-   */
+  public boolean isFieldRelative() {
+    return m_fieldRelative;
+  }
+
+  public void setFieldRelative(boolean fieldRelative) {
+    m_fieldRelative = fieldRelative;
+  }
+
   public void configureAutoBuilder() {
 
     System.out.println("Configuring Auto Builder...");
@@ -314,28 +321,29 @@ public class Drivetrain extends SubsystemBase {
 
       // Configure AutoBuilder
       AutoBuilder.configure(
-        this::getPose, // Robot pose supplier
-        this::resetOdometry, // Method to reset odometry
-        this::getRobotRelativeSpeeds, // ChassisSpeeds supplier, MUST be robot relative 
-        (speeds) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds 
-        new PPHolonomicDriveController(
-          new PIDConstants(AutoConstants.kAutoTranslationP, 0.0, AutoConstants.kAutoTranslationD),
-          new PIDConstants(AutoConstants.kAutoRotationP, 0.0, AutoConstants.kAutoRotationD)
-        ),
-        config,
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red alliance
-          // This will flip the path being followed to the red side of the field
-          // The origin will remain on the blue side
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        }, 
-        this // reference to this subsystem to set requirements
+          this::getPose, // Robot pose supplier
+          this::resetOdometry, // Method to reset odometry
+          this::getRobotRelativeSpeeds, // ChassisSpeeds supplier, MUST be robot relative
+          (speeds) -> driveRobotRelative(speeds), // Method that will drive the robot given robot-relative chassisspeeds
+          new PPHolonomicDriveController(
+              new PIDConstants(AutoConstants.kAutoTranslationP, 0.0, AutoConstants.kAutoTranslationD),
+              new PIDConstants(AutoConstants.kAutoRotationP, 0.0, AutoConstants.kAutoRotationD)),
+          config,
+          () -> {
+            // Boolean supplier that controls when the path will be mirrored for the red
+            // alliance
+            // This will flip the path being followed to the red side of the field
+            // The origin will remain on the blue side
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+              return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
+          },
+          this // reference to this subsystem to set requirements
       );
     } catch (Exception e) {
+      DriverStation.reportError("AutoBuilder config failed: " + e.getMessage(), true);
       e.printStackTrace();
     }
   }
@@ -351,27 +359,25 @@ public class Drivetrain extends SubsystemBase {
   public void periodic() {
 
     // This method will be called once per scheduler run
-    // odometry.update(getHeading(), getModulePositions());    
+    // odometry.update(getHeading(), getModulePositions());
 
-    final Optional<EstimatedRobotPose> upperOptional = vision.getEstimatedUpperGlobalPose();
-    final Optional<EstimatedRobotPose> lowerOptional = vision.getEstimatedLowerGlobalPose();
+    final Optional<EstimatedRobotPose> upperOptional = m_vision.getEstimatedUpperGlobalPose();
+    final Optional<EstimatedRobotPose> lowerOptional = m_vision.getEstimatedLowerGlobalPose();
 
     if (upperOptional.isPresent()) {
       poseEstimator.addVisionMeasurement(
-        upperOptional.get().estimatedPose.toPose2d(),
-        upperOptional.get().timestampSeconds
-      );
+          upperOptional.get().estimatedPose.toPose2d(),
+          upperOptional.get().timestampSeconds);
     }
     if (lowerOptional.isPresent()) {
       poseEstimator.addVisionMeasurement(
-        lowerOptional.get().estimatedPose.toPose2d(), 
-        lowerOptional.get().timestampSeconds
-      );
+          lowerOptional.get().estimatedPose.toPose2d(),
+          lowerOptional.get().timestampSeconds);
     }
 
     poseEstimator.update(getHeading(), getModulePositions());
 
     Logger.recordOutput("Pose", getPose());
-    Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
+    Logger.recordOutput("Field-Relative?", m_fieldRelative);
   }
 }
