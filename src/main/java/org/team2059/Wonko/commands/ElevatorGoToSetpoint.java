@@ -4,10 +4,12 @@
 
 package org.team2059.Wonko.commands;
 
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.subsystems.Elevator;
 
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -42,6 +44,11 @@ public class ElevatorGoToSetpoint extends Command {
   @Override
   public void execute() {
     double output = pidController.calculate(motor.getEncoder().getPosition(), setpoint);
+
+    Logger.recordOutput("PID output", output);
+    Logger.recordOutput("Setpoint", setpoint);
+
+    output = MathUtil.clamp(output, -1, 1);
 
     motor.set(output);
   }

@@ -5,6 +5,7 @@
 package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.Constants.ElevatorConstants.ElevatorPose;
 import org.team2059.Wonko.commands.ElevatorGoToSetpoint;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToReef;
@@ -14,6 +15,7 @@ import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
 import org.team2059.Wonko.subsystems.Elevator;
 import org.team2059.Wonko.subsystems.Vision;
+import org.team2059.Wonko.Constants.ElevatorConstants.ElevatorPose;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -43,7 +46,6 @@ public class RobotContainer {
   // private static final CoralIntake coralIntake = new CoralIntake();
   private static final AlgaeIntake algaeIntake = new AlgaeIntake();
   private static final Elevator elevator = new Elevator();
-
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
   public final static GenericHID buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
@@ -81,6 +83,10 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
+    /* ============== */
+    /* DRIVE COMMANDS */
+    /* ============== */
+
     /* BUTTON 5: RESET NAVX HEADING */
     new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
       .whileTrue(new InstantCommand(() -> drivetrain.getNavX().zeroYaw()));
@@ -88,35 +94,7 @@ public class RobotContainer {
     /* BUTTON 3: SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
       .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
-
-    // /* INTAKE CORAL */
-    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
-    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
-    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
-
-    // /* RELEASE CORAL */
-    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
-    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
-    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
-    // /* INTAKE ALGAE */
-    new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
-       .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
-       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
-
-    // /* RELEASE ALGAE */
-     new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
-       .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
-       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
-    
-    // /* HOLD ALGAE */
-    new JoystickButton(logitech, 5)
-      .onTrue(new InstantCommand(() -> algaeIntake.holdAlgae(0.05)));
-    
-    // /* STOP HOLD ALGAE */
-    new JoystickButton(logitech, 3)
-      .whileFalse(new InstantCommand(() -> algaeIntake.holdAlgae(0))); 
-
     new JoystickButton(logitech, 7)
       .whileTrue(new TurnParallelToReef(drivetrain, vision, 22));
 
@@ -136,6 +114,72 @@ public class RobotContainer {
     // new JoystickButton(buttonBox, 4)
     //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
 
+
+    /* ============== */
+    /* CORAL COMMANDS */
+    /* ============== */
+
+    // /* INTAKE CORAL */
+    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
+    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
+    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+
+    // /* RELEASE CORAL */
+    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
+    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
+    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+    
+
+    /* ============== */
+    /* ALGAE COMMANDS */
+    /* ============== */
+
+    // /* INTAKE ALGAE */
+    new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
+       .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
+       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+
+    // /* RELEASE ALGAE */
+     new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
+       .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
+       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+    
+    // /* HOLD ALGAE */
+    new JoystickButton(logitech, 5)
+      .onTrue(new InstantCommand(() -> algaeIntake.holdAlgae(0.05)));
+    
+    // /* STOP HOLD ALGAE */
+    new JoystickButton(logitech, 3)
+      .whileFalse(new InstantCommand(() -> algaeIntake.holdAlgae(0))); 
+  
+    
+    /* ================= */
+    /* ELEVATOR COMMANDS */
+    /* ================= */
+
+    new JoystickButton(buttonBox, 5)
+      .whileTrue(new InstantCommand(() -> elevator.setSpeed(0.2)))
+      .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));
+    
+    new JoystickButton(buttonBox, 6)
+      .whileTrue(new InstantCommand(() -> elevator.setSpeed(-0.2)))
+      .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));    
+    
+    new JoystickButton(buttonBox, 8)
+      .whileTrue(new ElevatorGoToSetpoint(elevator, ElevatorPose.L0.value));
+
+    new JoystickButton(buttonBox, 9)
+      .whileTrue(new ElevatorGoToSetpoint(elevator, ElevatorPose.L1.value));
+
+    // new JoystickButton(buttonBox, 10)
+    //   .whileTrue(new ElevatorGoToSetpoint(elevator, ElevatorPose.L2.value));
+
+    // new JoystickButton(buttonBox, 11)
+    //   .whileTrue(new ElevatorGoToSetpoint(elevator, ElevatorPose.L3.value));
+    
+    // new JoystickButton(buttonBox, 12)
+    //   .whileTrue(new ElevatorGoToSetpoint(elevator, ElevatorPose.L4.value));
+
     //Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
     // new JoystickButton(buttonBox, 1)
     //   .whileTrue(elevator.elevatorRoutine.quasistaticForward());
@@ -148,17 +192,6 @@ public class RobotContainer {
       
     // new JoystickButton(buttonBox, 4)
     //   .whileTrue(elevator.elevatorRoutine.dynamicReverse());
-
-    new JoystickButton(buttonBox, 5)
-      .whileTrue(new InstantCommand(() -> elevator.setSpeed(0.2)))
-      .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));
-    
-    new JoystickButton(buttonBox, 6)
-      .whileTrue(new InstantCommand(() -> elevator.setSpeed(-0.2)))
-      .whileFalse(new InstantCommand(() -> elevator.setSpeed(0)));    
-
-    new JoystickButton(buttonBox, 7)
-      .whileTrue(new ElevatorGoToSetpoint(elevator, 40));
 
 
   }

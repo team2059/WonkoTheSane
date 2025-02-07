@@ -4,6 +4,7 @@
 
 package org.team2059.Wonko.subsystems;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -26,20 +27,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
+import org.team2059.Wonko.Constants.ElevatorConstants.ElevatorPose;
 import org.team2059.Wonko.routines.ElevatorRoutine;
 
 
 public class Elevator extends SubsystemBase {
-  enum elevatorPositionEnum {
-    L0,
-    L1,
-    L2,
-    L3,
-    L4,
-  }
-  
-  private elevatorPositionEnum elevatorPosition;
   public final SparkMax elevatorMotor;
+  private final RelativeEncoder elevatorRelativeEncoder;
 
   // Motion Profiling, PID, Feedforward
   private final ProfiledPIDController profiledPIDController;
@@ -48,7 +42,7 @@ public class Elevator extends SubsystemBase {
   private final ElevatorRoutine elevatorRoutine;
 
   // Limit Switches
-  private final DigitalInput levelOne, levelTwo, levelThree, levelFour;
+  private final DigitalInput zero, levelOne, levelTwo, levelThree, levelFour;
 
   // Tunable Numbers for PID
   private final LoggedTunableNumber elevatorP = new LoggedTunableNumber("Elevator/P", 0.01);
@@ -59,6 +53,7 @@ public class Elevator extends SubsystemBase {
   /** Creates a new Elevator. */
   public Elevator() {
     elevatorMotor = new SparkMax(Constants.ElevatorConstants.elevatorMotorID, MotorType.kBrushless);
+    elevatorRelativeEncoder = elevatorMotor.getEncoder();
 
     SparkMaxConfig config = new SparkMaxConfig();
     config.inverted(true);
@@ -93,11 +88,13 @@ public class Elevator extends SubsystemBase {
 
     elevatorRoutine = new ElevatorRoutine(this);
 
+    zero = new DigitalInput(Constants.ElevatorConstants.zeroDIO);
     levelOne = new DigitalInput(Constants.ElevatorConstants.levelOneDIO);
     levelTwo = new DigitalInput(Constants.ElevatorConstants.levelTwoDIO);
     levelThree = new DigitalInput(Constants.ElevatorConstants.levelThreeDIO);
     levelFour = new DigitalInput(Constants.ElevatorConstants.levelFourDIO);
     
+    elevatorRelativeEncoder.setPosition(0);
   }
 
   public void setSpeed(double speed) {
@@ -128,42 +125,34 @@ public class Elevator extends SubsystemBase {
     elevatorMotor.setVoltage(volts);
   }
 
-  public void setCalculatedVoltage() {
-    // Get the next profile state from the motion profile
-    double pidOutput = profiledPIDController.calculate(getPosition());
+  // public void setCalculatedVoltage() {
+  //   // Get the next profile state from the motion profile
+  //   double pidOutput = profiledPIDController.calculate(getPosition());
 
-    // Get the feedforward output based on the profile's velocity and acceleration
-    TrapezoidProfile.State setpoint = profiledPIDController.getSetpoint();
-    double feedforwardOutput = feedforward.calculate(setpoint.position, setpoint.velocity);
+  //   // Get the feedforward output based on the profile's velocity and acceleration
+  //   TrapezoidProfile.State setpoint = profiledPIDController.getSetpoint();
+  //   double feedforwardOutput = feedforward.calculate(setpoint.position, setpoint.velocity);
 
-    // Outputs Combined
-    double output = pidOutput + feedforwardOutput;
+  //   // Outputs Combined
+  //   double output = pidOutput + feedforwardOutput;
 
-    // Output applied to the motor
-    elevatorMotor.setVoltage(output);
-  }
+  //   // Output applied to the motor
+  //   elevatorMotor.setVoltage(output);
+  // }
 
-  public void goToSetpoint(double setpoint) {
-    double output = turnController.calculate(elevatorMotor.getEncoder().getPosition(), setpoint);
+  // public void goToSetpoint(double setpoint) {
+  //   double output = turnController.calculate(elevatorRelativeEncoder.getPosition(), setpoint);
 
-    elevatorMotor.set(output);
-  }
-
-  // 
-  private void goToZero() {
-    // 
-    // TODO:
-    // move down until hit limit switch 0, unless already at 0
-    elevatorPosition = elevatorPositionEnum.L0;
-  }
+  //   elevatorMotor.set(output);
+  // }
 
   @Override
   public void periodic() {
-    if (elevatorP.hasChanged(hashCode()) || elevatorD.hasChanged(hashCode()) || tolerance.hasChanged(hashCode())) {
-      turnController.setP(elevatorP.get());
-      turnController.setD(elevatorD.get());
-      turnController.setTolerance(tolerance.get());
-    }
+    // if (elevatorP.hasChanged(hashCode()) || elevatorD.hasChanged(hashCode()) || tolerance.hasChanged(hashCode())) {
+    //   turnController.setP(elevatorP.get());
+    //   turnController.setD(elevatorD.get());
+    //   turnController.setTolerance(tolerance.get());
+    // }
     Logger.recordOutput("Elevator/RelativeEncoder", getPosition());
 
     

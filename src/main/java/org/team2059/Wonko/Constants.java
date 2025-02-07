@@ -190,10 +190,27 @@ public final class Constants {
 
   public static class ElevatorConstants {
     public static final int elevatorMotorID = 12;
-    public static final int levelOneDIO = 0;
-    public static final int levelTwoDIO = 1;
-    public static final int levelThreeDIO = 2;
-    public static final int levelFourDIO = 3;
+    public static final int zeroDIO = 0;
+    public static final int levelOneDIO = 1;
+    public static final int levelTwoDIO = 2;
+    public static final int levelThreeDIO = 3;
+    public static final int levelFourDIO = 4;
+
+    public static enum ElevatorPose {
+      // TODO: Add measured values
+      L0(0),
+      L1(55),
+      L2(0),
+      L3(0),
+      L4(0);
+
+      public final double value;
+
+      private ElevatorPose(double value) {
+        this.value = value;
+      }
+    }
+
   }
 
   public static class CoralIntakeConstants {
