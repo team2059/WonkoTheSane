@@ -1,24 +1,24 @@
-package org.team2059.Wonko.subsystems;
+package org.team2059.Wonko.subsystems.drive;
 
 import org.team2059.Wonko.Constants.DrivetrainConstants;
+import org.team2059.Wonko.util.SwerveUtilities;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class SwerveModule extends SubsystemBase {
+public class SwerveModuleIOVortex implements SwerveModuleIO {
     private final SparkFlex driveMotor;
     private final SparkFlex rotationMotor;
 
@@ -30,7 +30,7 @@ public class SwerveModule extends SubsystemBase {
 
     private final PIDController rotationPidController;
 
-    public SwerveModule(
+    public SwerveModuleIOVortex(
         int driveMotorId,
         int rotationMotorId,
         int canCoderId,
@@ -38,41 +38,34 @@ public class SwerveModule extends SubsystemBase {
         boolean isDriveInverted,
         boolean isRotationInverted
     ) {
-        // Instantiate motor controller objects
+        // Motor controllers
         driveMotor = new SparkFlex(driveMotorId, MotorType.kBrushless);
         rotationMotor = new SparkFlex(rotationMotorId, MotorType.kBrushless);
 
         // Configure motor controllers
         configureSpark(
-          driveMotor,
-          isDriveInverted,
-          IdleMode.kBrake,
-          DrivetrainConstants.driveEncoderPositionConversionFactor,
-          DrivetrainConstants.driveEncoderVelocityConversionFactor
+            driveMotor,
+            isDriveInverted,
+            IdleMode.kBrake,
+            DrivetrainConstants.driveEncoderPositionConversionFactor,
+            DrivetrainConstants.driveEncoderVelocityConversionFactor
         );
 
         configureSpark(
-          rotationMotor,
-          isRotationInverted,
-          IdleMode.kBrake,
-          DrivetrainConstants.rotationEncoderPositionConversionFactor,
-          DrivetrainConstants.rotationEncoderVelocityConversionFactor
+            rotationMotor,
+            isRotationInverted,
+            IdleMode.kBrake,
+            DrivetrainConstants.rotationEncoderPositionConversionFactor,
+            DrivetrainConstants.rotationEncoderVelocityConversionFactor
         );
 
-        // Instantiate rotation PID controller, for smoother and more accurate rotation
         rotationPidController = new PIDController(DrivetrainConstants.kPRotation, 0, 0);
-
-        // tells pidcontroller that -pi is the same as +pi, can calculate shorter path to setpoint from either sign
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
 
-        // Instantiate new CANcoder and respective offset
         canCoder = new CANcoder(canCoderId);
         offset = new Rotation2d(canCoderOffsetRadians);
-
-        // Configure CANcoder
         configureCanCoder();
 
-        // Set encoder objects to appropriate motor's encoders
         driveEncoder = driveMotor.getEncoder();
         rotationEncoder = rotationMotor.getEncoder();
     }
@@ -119,7 +112,7 @@ public class SwerveModule extends SubsystemBase {
         // Makes the range of the sensor 0-1 so that radians can be calculated
         config.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
 
-        // Makes turning ccw positive
+        // Makes rotationing ccw positive
         config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
 
         // Apply cancoder configuration
@@ -144,11 +137,7 @@ public class SwerveModule extends SubsystemBase {
      * @return Rotation2d of current rotation encoder position (radians), range 0-2pi
      */
     public Rotation2d getRotationEncoderPosition() {
-        double unsignedAngle = rotationEncoder.getPosition() % (2 * Math.PI);
-
-        if (unsignedAngle < 0) unsignedAngle += 2 * Math.PI;
-
-        return new Rotation2d(unsignedAngle);
+        return new Rotation2d(rotationEncoder.getPosition());
     }
 
     /**
@@ -195,10 +184,35 @@ public class SwerveModule extends SubsystemBase {
         return new Rotation2d(canCoderRad);
     }
 
+    public double getDriveVolts() {
+        return (driveMotor.getAppliedOutput() * driveMotor.getBusVoltage());
+    }
+
+    public double getRotationVolts() {
+        return (rotationMotor.getAppliedOutput() * rotationMotor.getBusVoltage());
+    }
+
+    public double getDriveCurrent() {
+        return driveMotor.getOutputCurrent();
+    }
+
+    public double getRotationCurrent() {
+        return rotationMotor.getOutputCurrent();
+    }
+
+    public double getDriveMotorTemp() {
+        return driveMotor.getMotorTemperature();
+    }
+
+    public double getRotationMotorTemp() {
+        return rotationMotor.getMotorTemperature();
+    }
+
     /**
      * Reset Spark builtin encoders.
      * DriveEncoder = 0, RotationEncoder = cancoder offset
      */
+    @Override
     public void resetEncoders() {
         driveEncoder.setPosition(0);
         rotationEncoder.setPosition(getCANcoderRad().getRadians());
@@ -211,62 +225,12 @@ public class SwerveModule extends SubsystemBase {
         return new SwerveModuleState(getDriveVelocity(), getCANcoderRad());
     }
 
-    private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
-        double lowerBound;
-        double upperBound;
-        double lowerOffset = scopeReference % (2.0 * Math.PI);
-        if (lowerOffset >= 0) {
-          lowerBound = scopeReference - lowerOffset;
-          upperBound = scopeReference + ((2.0 * Math.PI) - lowerOffset);
-        } else {
-          upperBound = scopeReference - lowerOffset;
-          lowerBound = scopeReference - ((2.0 * Math.PI) + lowerOffset);
-        }
-        while (newAngle < lowerBound) {
-          newAngle += (2.0 * Math.PI);
-        }
-        while (newAngle > upperBound) {
-          newAngle -= (2.0 * Math.PI);
-        }
-        if (newAngle - scopeReference > (Math.PI)) {
-          newAngle -= (2.0 * Math.PI);
-        } else if (newAngle - scopeReference < -(Math.PI)) {
-          newAngle += (2.0 * Math.PI);
-        }
-        return newAngle;
-    }
-
-    /**
-     * Minimize the change in heading the desired swerve module state would require
-     * by potentially
-     * reversing the direction the wheel spins. Customized from WPILib's version to
-     * include placing in
-     * appropriate scope for CTRE and REV onboard control as both controllers as of
-     * writing don't have
-     * support for continuous input.
-     *
-     * @param desiredState The desired state.
-     * @param currentAngle The current module angle.
-     */
-    private static SwerveModuleState optimize(
-        SwerveModuleState desiredState, Rotation2d currentAngle) {
-
-        double targetAngle = placeInAppropriate0To360Scope(currentAngle.getRadians(), desiredState.angle.getRadians());
-
-        double targetSpeed = desiredState.speedMetersPerSecond;
-        double delta = (targetAngle - currentAngle.getRadians());
-        if (Math.abs(delta) > (Math.PI / 2)) {
-        targetSpeed = -targetSpeed;
-        targetAngle = delta > Math.PI / 2 ? (targetAngle -= Math.PI) : (targetAngle += Math.PI);
-        }
-        return new SwerveModuleState(targetSpeed, new Rotation2d(targetAngle));
-    }
-
     /**
      * Set the state of a module
      * @param state containing linear velocity setpoint and angular setpoint
      * @param isClosedLoop
      */
+    @Override
     public void setState(SwerveModuleState state, boolean isClosedLoop) {
       // Deadband
       if (Math.abs(state.speedMetersPerSecond) < 0.001) {
@@ -275,7 +239,7 @@ public class SwerveModule extends SubsystemBase {
       }
 
       // Optimize angle of state to minimize rotation magnitude
-      state = optimize(state, getCANcoderRad());
+      state = SwerveUtilities.optimize(state, getCANcoderRad());
 
       // PID-controlled rotation
       rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
@@ -289,30 +253,42 @@ public class SwerveModule extends SubsystemBase {
       }
     }
 
-    // ONLY FOR SYSID CHARACTE
-    public void characterizeDriveVoltage(double voltage) {
-      // Keep rotation motor set at zero to avoid going off course
-      // rotationMotor.setVoltage(0);
-
-      driveMotor.setVoltage(voltage);
-    }
-
     /**
      * Stop all motors in a module
      */
+    @Override
     public void stop() {
         driveMotor.set(0);
         rotationMotor.set(0);
     }
 
     @Override
-    public void periodic() {
+    public void updateInputs(SwerveModuleIOInputs inputs) {
+        
+        inputs.drivePosition = getDriveEncoderPosition();
+        inputs.driveVelocity = getDriveVelocity();
+
+        inputs.driveAppliedVolts = getDriveVolts();
+        inputs.driveCurrentAmps = getDriveCurrent();
+
+        inputs.rotationAbsolutePositionRadians = getCANcoderRad().getRadians();
+        inputs.rotationPositionRadians = getRotationEncoderPosition().getRadians();
+        inputs.rotationVelocityRadPerSec = getRotationVelocity();
+
+        inputs.rotationAppliedVolts = getRotationVolts();
+        inputs.rotationCurrentAmps = getRotationCurrent();
+
+        inputs.driveMotorTemp = getDriveMotorTemp();
+        inputs.rotationMotorTemp = getRotationMotorTemp();
     }
-  
+
     @Override
-    public void simulationPeriodic() {
-      // This method will be called once per scheduler run during simulation
+    public void setDriveVoltage(double volts) {
+        driveMotor.setVoltage(volts);
+    }
+
+    @Override
+    public void setRotationVoltage(double volts) {
+        rotationMotor.setVoltage(volts);
     }
 }
-
-

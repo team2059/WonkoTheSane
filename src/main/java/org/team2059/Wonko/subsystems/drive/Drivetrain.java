@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.team2059.Wonko.subsystems;
+package org.team2059.Wonko.subsystems.drive;
 
 import java.util.Optional;
 
@@ -14,13 +14,13 @@ import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.routines.DrivetrainRoutine;
 import org.team2059.Wonko.subsystems.vision.Vision;
+import org.team2059.Wonko.subsystems.drive.GyroIOInputsAutoLogged;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.studica.frc.AHRS;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -30,49 +30,74 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.RobotBase;
 
 public class Drivetrain extends SubsystemBase {
 
   public static boolean fieldRelativeStatus = true;
 
-  // Create 4 SwerveModule objects using given constants.
-  public final SwerveModule frontLeft = new SwerveModule(
-    DrivetrainConstants.frontLeftDriveMotorId, 
-    DrivetrainConstants.frontLeftRotationMotorId, 
-    DrivetrainConstants.frontLeftCanCoderId, 
-    DrivetrainConstants.frontLeftOffsetRad,
-    false,
-    true);
-  public final SwerveModule frontRight = new SwerveModule(
-    DrivetrainConstants.frontRightDriveMotorId, 
-    DrivetrainConstants.frontRightRotationMotorId, 
-    DrivetrainConstants.frontRightCanCoderId, 
-    DrivetrainConstants.frontRightOffsetRad,
-    true,
-    true);
-  public final SwerveModule backLeft = new SwerveModule(
-    DrivetrainConstants.backLeftDriveMotorId, 
-    DrivetrainConstants.backLeftRotationMotorId, 
-    DrivetrainConstants.backLeftCanCoderId, 
-    DrivetrainConstants.backLeftOffsetRad,
-    false,
-    true);
-  public final SwerveModule backRight = new SwerveModule(
-    DrivetrainConstants.backRightDriveMotorId, 
-    DrivetrainConstants.backRightRotationMotorId, 
-    DrivetrainConstants.backRightCanCoderId, 
-    DrivetrainConstants.backRightOffsetRad,
-    false,
-    true);
+    public final SwerveModule frontLeft = new SwerveModule(
+      1,
+      (RobotBase.isReal())
+      ? new SwerveModuleIOVortex(
+          DrivetrainConstants.frontLeftDriveMotorId, 
+          DrivetrainConstants.frontLeftRotationMotorId, 
+          DrivetrainConstants.frontLeftCanCoderId, 
+          DrivetrainConstants.frontLeftOffsetRad, 
+          false, 
+          true
+        )
+      : new SwerveModuleIOSim()
 
-  // Create NavX object (gyro)
-  private final AHRS navX;
+    );
 
+    public final SwerveModule frontRight = new SwerveModule(
+      2,
+      (RobotBase.isReal()) 
+      ? new SwerveModuleIOVortex(
+        DrivetrainConstants.frontRightDriveMotorId, 
+        DrivetrainConstants.frontRightRotationMotorId, 
+        DrivetrainConstants.frontRightCanCoderId, 
+        DrivetrainConstants.frontRightOffsetRad, 
+        true, 
+        true
+      )
+      : new SwerveModuleIOSim()
+    );
+
+    public final SwerveModule backLeft = new SwerveModule(
+      3,
+      (RobotBase.isReal())
+      ? new SwerveModuleIOVortex(
+        DrivetrainConstants.backLeftDriveMotorId, 
+        DrivetrainConstants.backLeftRotationMotorId, 
+        DrivetrainConstants.backLeftCanCoderId, 
+        DrivetrainConstants.backLeftOffsetRad, 
+        false, 
+        true
+      )
+      : new SwerveModuleIOSim()
+    );
+
+    public final SwerveModule backRight = new SwerveModule(
+      4,
+      (RobotBase.isReal())
+      ? new SwerveModuleIOVortex(
+        DrivetrainConstants.backRightDriveMotorId, 
+        DrivetrainConstants.backRightRotationMotorId, 
+        DrivetrainConstants.backRightCanCoderId, 
+        DrivetrainConstants.backRightOffsetRad, 
+        false, 
+        true
+      )
+      : new SwerveModuleIOSim()
+    );
+
+  private GyroIO gyro;
+  private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  
   // Create swerve drive odometry engine, used to track robot on field
   // private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
 
@@ -82,16 +107,16 @@ public class Drivetrain extends SubsystemBase {
 
   public final DrivetrainRoutine drivetrainRoutine;
 
-  public Drivetrain(Vision vision) {
+  public Drivetrain(Vision vision, GyroIO gyro) {
 
     this.vision = vision;
+    this.gyro = gyro;
 
-    // NavX may need an extra second to start...
-    navX = new AHRS(AHRS.NavXComType.kMXP_SPI);
+    // gyro may need an extra second to start...
     new Thread(() -> {
       try {
         Thread.sleep(1000);
-        navX.reset();
+        gyro.reset();
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -112,26 +137,27 @@ public class Drivetrain extends SubsystemBase {
     // Configure auto builder last
     configureAutoBuilder();
 
-    SmartDashboard.putData("Swerve Drive", new Sendable() {
-      @Override
-      public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("SwerveDrive");
+    // Elastic widget for swerve chassis visualization
+    // SmartDashboard.putData("Swerve Drive", new Sendable() {
+    //   @Override
+    //   public void initSendable(SendableBuilder builder) {
+    //     builder.setSmartDashboardType("SwerveDrive");
 
-        builder.addDoubleProperty("Front Left Angle", () -> frontLeft.getCANcoderRad().getRadians(), null);
-        builder.addDoubleProperty("Front Left Velocity", () -> frontLeft.getDriveVelocity(), null);
+    //     builder.addDoubleProperty("Front Left Angle", () -> frontLeft.getRotationAbsolutePosition(), null);
+    //     builder.addDoubleProperty("Front Left Velocity", () -> frontLeft.getDriveVelocity(), null);
 
-        builder.addDoubleProperty("Front Right Angle", () -> frontRight.getCANcoderRad().getRadians(), null);
-        builder.addDoubleProperty("Front Right Velocity", () -> frontRight.getDriveVelocity(), null);
+    //     builder.addDoubleProperty("Front Right Angle", () -> frontRight.getRotationAbsolutePosition(), null);
+    //     builder.addDoubleProperty("Front Right Velocity", () -> frontRight.getDriveVelocity(), null);
 
-        builder.addDoubleProperty("Back Left Angle", () -> backLeft.getCANcoderRad().getRadians(), null);
-        builder.addDoubleProperty("Back Left Velocity", () -> backLeft.getDriveVelocity(), null);
+    //     builder.addDoubleProperty("Back Left Angle", () -> backLeft.getRotationAbsolutePosition(), null);
+    //     builder.addDoubleProperty("Back Left Velocity", () -> backLeft.getDriveVelocity(), null);
 
-        builder.addDoubleProperty("Back Right Angle", () -> backRight.getCANcoderRad().getRadians(), null);
-        builder.addDoubleProperty("Back Right Velocity", () -> backRight.getDriveVelocity(), null);
+    //     builder.addDoubleProperty("Back Right Angle", () -> backRight.getRotationAbsolutePosition(), null);
+    //     builder.addDoubleProperty("Back Right Velocity", () -> backRight.getDriveVelocity(), null);
 
-        builder.addDoubleProperty("Robot Angle", () -> getHeading().getRadians(), null);
-      }
-    });
+    //     builder.addDoubleProperty("Robot Angle", () -> getHeading().getRadians(), null);
+    //   }
+    // });
 
     drivetrainRoutine = new DrivetrainRoutine(this);
 
@@ -150,13 +176,6 @@ public class Drivetrain extends SubsystemBase {
    */
   public Pose2d getPose() {
     return poseEstimator.getEstimatedPosition();
-  }
-
-  /**
-   * @return AHRS navX object
-   */
-  public AHRS getNavX() {
-    return navX;
   }
 
   /**
@@ -182,14 +201,14 @@ public class Drivetrain extends SubsystemBase {
    * Set navX heading to zero
    */
   public void zeroHeading() {
-    navX.reset();
+    gyro.reset();
   }
 
   /**
    * @return Rotation2d of current navX heading
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(-navX.getYaw());
+    return Rotation2d.fromDegrees(-gyroInputs.yaw);
   }
 
   /**
@@ -197,10 +216,10 @@ public class Drivetrain extends SubsystemBase {
    */
   public SwerveModulePosition[] getModulePositions() {
     SwerveModulePosition[] positions = {
-      new SwerveModulePosition(frontLeft.getDriveEncoderPosition(), frontLeft.getCANcoderRad()),
-      new SwerveModulePosition(frontRight.getDriveEncoderPosition(), frontRight.getCANcoderRad()),
-      new SwerveModulePosition(backLeft.getDriveEncoderPosition(), backLeft.getCANcoderRad()),
-      new SwerveModulePosition(backRight.getDriveEncoderPosition(), backRight.getCANcoderRad())
+      new SwerveModulePosition(frontLeft.getDrivePositionMeters(), new Rotation2d(frontLeft.getRotationAbsolutePosition())),
+      new SwerveModulePosition(frontRight.getDrivePositionMeters(), new Rotation2d(frontRight.getRotationAbsolutePosition())),
+      new SwerveModulePosition(backLeft.getDrivePositionMeters(), new Rotation2d(backLeft.getRotationAbsolutePosition())),
+      new SwerveModulePosition(backRight.getDrivePositionMeters(), new Rotation2d(backRight.getRotationAbsolutePosition()))
     };
 
     return positions;
@@ -249,6 +268,9 @@ public class Drivetrain extends SubsystemBase {
   public void setModuleStates(SwerveModuleState[] desiredStates) {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
+
+    // Logger.recordOutput("Desired States", desiredStates);
+
     // Sets the speed and rotation of each module
     frontLeft.setState(desiredStates[0], true);
     frontRight.setState(desiredStates[1], true);
@@ -349,6 +371,7 @@ public class Drivetrain extends SubsystemBase {
     }
   }
 
+  // Stop all motors in every swerve module
   public void stopAllMotors() {
     frontLeft.stop();
     frontRight.stop();
@@ -359,28 +382,43 @@ public class Drivetrain extends SubsystemBase {
   @Override
   public void periodic() {
 
+    // Update gyro inputs & logging
+    gyro.updateInputs(gyroInputs);
+    Logger.processInputs("Gyro", gyroInputs);
+
+    // For safety...
+    if (DriverStation.isDisabled()) {
+      stopAllMotors();
+    }
+
     // This method will be called once per scheduler run
     // odometry.update(getHeading(), getModulePositions());    
 
+    // Add vision measurements from both cameras
     final Optional<EstimatedRobotPose> upperOptional = vision.getEstimatedUpperGlobalPose();
     final Optional<EstimatedRobotPose> lowerOptional = vision.getEstimatedLowerGlobalPose();
 
-    if (upperOptional.isPresent()) {
+    if (upperOptional.isPresent() && RobotBase.isReal()) {
       poseEstimator.addVisionMeasurement(
         upperOptional.get().estimatedPose.toPose2d(),
         upperOptional.get().timestampSeconds
       );
     }
-    if (lowerOptional.isPresent()) {
+
+    if (lowerOptional.isPresent() && RobotBase.isReal()) {
       poseEstimator.addVisionMeasurement(
         lowerOptional.get().estimatedPose.toPose2d(), 
         lowerOptional.get().timestampSeconds
       );
     }
 
+    // Update pose estimator as if it were simply Odometry
     poseEstimator.update(getHeading(), getModulePositions());
 
+    // Logging
     Logger.recordOutput("Pose", getPose());
     Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
+    Logger.recordOutput("Real States", getStates());
   }
+
 }

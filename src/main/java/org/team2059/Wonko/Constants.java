@@ -25,6 +25,7 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosly.
  */
 public final class Constants {
+  
   public static class OperatorConstants {
 
     public static final boolean tuningMode = true;
@@ -148,6 +149,7 @@ public final class Constants {
     // kV: voltage needed to run at constant velocity
     // kA: voltage needed to accelerate
     public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.17821, 1.9047, 0.14686);
+    public static final SimpleMotorFeedforward turnFF = new SimpleMotorFeedforward(0, 0, 0);
 
     /* FOR ROBOTCONFIG AUTO STUFF... */
     public static final double kMass = 30;
@@ -155,7 +157,8 @@ public final class Constants {
     
     // CoF taken from https://www.chiefdelphi.com/t/coefficient-of-friction/467778
     public static final double kWheelCoF = 1.542; // Coefficient of friction of wheels
-    public static final double driveCurrentLimit = 40;
+    public static final int driveCurrentLimit = 40;
+    public static final int turnCurrentLimit = 20;
   }
 
   public static class AutoConstants {

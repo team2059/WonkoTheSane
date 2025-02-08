@@ -7,7 +7,7 @@ package org.team2059.Wonko.commands;
 import java.util.function.DoubleSupplier;
 
 import org.team2059.Wonko.Constants.DrivetrainConstants;
-import org.team2059.Wonko.subsystems.Drivetrain;
+import org.team2059.Wonko.subsystems.drive.Drivetrain;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
