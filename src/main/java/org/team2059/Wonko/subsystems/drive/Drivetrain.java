@@ -14,10 +14,8 @@ import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.routines.DrivetrainRoutine;
 import org.team2059.Wonko.subsystems.vision.Vision;
-import org.team2059.Wonko.subsystems.drive.GyroIOInputsAutoLogged;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -29,7 +27,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -331,6 +328,8 @@ public class Drivetrain extends SubsystemBase {
     System.out.println("Configuring Auto Builder...");
 
     try {
+      RobotConfig config = RobotConfig.fromGUISettings();
+
       // Configure AutoBuilder
       AutoBuilder.configure(
         this::getPose, // Robot pose supplier
@@ -341,19 +340,7 @@ public class Drivetrain extends SubsystemBase {
           new PIDConstants(AutoConstants.kAutoTranslationP, 0.0, AutoConstants.kAutoTranslationD),
           new PIDConstants(AutoConstants.kAutoRotationP, 0.0, AutoConstants.kAutoRotationD)
         ),
-        new RobotConfig(
-          DrivetrainConstants.kMass, 
-          DrivetrainConstants.kMomentOfIntertia, 
-          new ModuleConfig(
-            DrivetrainConstants.wheelDiameter / 2, 
-            DrivetrainConstants.maxVelocity, 
-            DrivetrainConstants.kWheelCoF, 
-            DCMotor.getNeoVortex(1).withReduction(DrivetrainConstants.driveGearRatio), 
-            DrivetrainConstants.driveCurrentLimit, 
-            1
-          ), 
-          DrivetrainConstants.trackWidth
-        ),
+        config,
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
           // This will flip the path being followed to the red side of the field
