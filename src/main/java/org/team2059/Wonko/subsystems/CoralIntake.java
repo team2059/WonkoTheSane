@@ -4,19 +4,24 @@
 
 package org.team2059.Wonko.subsystems;
 
+import org.team2059.Wonko.Constants.AlgaeIntakeConstants;
 import org.team2059.Wonko.Constants.CoralIntakeConstants;
+import org.team2059.Wonko.Constants.DIOConstants;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralIntake extends SubsystemBase {
   private final SparkMax motor;
+  public DutyCycleEncoder coralTiltThruBoreEncoder;
 
   /** Creates a new CoralIntake. */
   public CoralIntake() {
@@ -28,10 +33,32 @@ public class CoralIntake extends SubsystemBase {
     config.idleMode(IdleMode.kBrake);
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+    coralTiltThruBoreEncoder = new DutyCycleEncoder(DIOConstants.kCoralTiltThruBoreEncoderDIO);
+
+    coralTiltThruBoreEncoder.setDutyCycleRange(0.02, 0.98); // EXAMPLE RANGE CHANGE LATER
+    coralTiltThruBoreEncoder.setInverted(true);
+    coralTiltThruBoreEncoder.setAssumedFrequency(1000); // Example frequency
+
   }
 
   public void setIntakeSpeed(double speed) {
     motor.set(speed);
+  }
+
+  public SparkMax getMotor() {
+    return motor;
+  }
+
+  public double getAbsolutePosition() {
+    return coralTiltThruBoreEncoder.get() - CoralIntakeConstants.throughBoreOffset;
+  }
+
+  public double getRawEncoderPosition() {
+    return coralTiltThruBoreEncoder.get();
+  }
+
+  public boolean isEncoderConnected() {
+    return coralTiltThruBoreEncoder.isConnected();
   }
 
   @Override

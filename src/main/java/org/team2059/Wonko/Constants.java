@@ -25,6 +25,13 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosly.
  */
 public final class Constants {
+  public static final class DIOConstants {
+
+    public static final int kAlgaeTiltThruBoreEncoderDIO = 0;
+    public static final int kCoralTiltThruBoreEncoderDIO = 1;
+
+  }
+
   public static class OperatorConstants {
 
     public static final boolean tuningMode = true;
@@ -49,12 +56,12 @@ public final class Constants {
     /* BUTTONS */
     /* ======= */
 
-    public static final int JoystickResetHeading = 5;
-    public static final int JoystickRobotRelative = 3;
+    public static final int JoystickResetHeading = 0;
+    public static final int JoystickRobotRelative = 0;
     public static final int JoystickIntakeCoral = 6;
     public static final int JoystickReleaseCoral = 4;
-    public static final int JoystickIntakeAlgae = 6;
-    public static final int JoystickReleaseAlgae = 4;
+    public static final int JoystickIntakeAlgae = 3;
+    public static final int JoystickReleaseAlgae = 5;
   }
 
   public static class DrivetrainConstants {
@@ -82,6 +89,10 @@ public final class Constants {
     /* ================== */
     /* CONVERSION FACTORS */
     /* ================== */
+
+    public static final double INTAKE_CUBE_SPEED = 0.25;
+    public static final double HOLD_CUBE_SPEED = 0.02;
+    public static final double INTAKE_STALL_DETECTION = 20.0;
 
     // Given Motor Rotations, convert to Meters traveled
     // (pi * d) / (Gear Ratio)
@@ -215,10 +226,14 @@ public final class Constants {
 
   public static class CoralIntakeConstants {
     public static final int intakeMotorID = 9;
+    public static final double throughBoreOffset = 100;
+    public static final double POSITION_TOLERANCE = 0.02;
   }
 
   public static class AlgaeIntakeConstants {
-    public static final int motor1ID = 10;
+    public static final int motor1ID = 25;
     public static final int motor2ID = 11;
+    public static final double throughBoreOffset = 100;
+    public static final double POSITION_TOLERANCE = 0.02;
   }
 }

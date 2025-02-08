@@ -7,6 +7,7 @@ package org.team2059.Wonko;
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants.ElevatorPose;
 import org.team2059.Wonko.commands.ElevatorGoToSetpoint;
+import org.team2059.Wonko.commands.AlgaeIntakeCmd;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToReef;
 import org.team2059.Wonko.commands.TurnToReefTag;
@@ -43,9 +44,10 @@ public class RobotContainer {
   /* SUBSYSTEMS */
   private static final Vision vision = new Vision();
   private static final Drivetrain drivetrain = new Drivetrain(vision);
-  // private static final CoralIntake coralIntake = new CoralIntake();
+  private static final CoralIntake coralIntake = new CoralIntake();
   private static final AlgaeIntake algaeIntake = new AlgaeIntake();
   private static final Elevator elevator = new Elevator();
+
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
   public final static GenericHID buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
@@ -119,15 +121,15 @@ public class RobotContainer {
     /* CORAL COMMANDS */
     /* ============== */
 
-    // /* INTAKE CORAL */
-    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
-    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
-    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+    /* INTAKE CORAL */
+    new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
+      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
+      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
 
-    // /* RELEASE CORAL */
-    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
-    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
-    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+    /* RELEASE CORAL */
+    new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
+      .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
+      .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
     
 
     /* ============== */
@@ -139,18 +141,20 @@ public class RobotContainer {
        .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
        .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
 
-    // /* RELEASE ALGAE */
-     new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
-       .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
-       .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
+    // /* INTAKE ALGAE USING CURRENT */
+    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae) 
+    //   .whileTrue(new AlgaeIntakeCmd(algaeIntake));
+
+    /* RELEASE ALGAE */
+    new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
+      .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
+      .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
     
     // /* HOLD ALGAE */
-    new JoystickButton(logitech, 5)
-      .onTrue(new InstantCommand(() -> algaeIntake.holdAlgae(0.05)));
-    
-    // /* STOP HOLD ALGAE */
-    new JoystickButton(logitech, 3)
+    new JoystickButton(logitech, 8)
+      .whileTrue(new InstantCommand(() -> algaeIntake.holdAlgae(0.05)))
       .whileFalse(new InstantCommand(() -> algaeIntake.holdAlgae(0))); 
+      
   
     
     /* ================= */
