@@ -63,7 +63,8 @@ public class RobotContainer {
       () -> -logitech.getRawAxis(1), // forwardX
       () -> -logitech.getRawAxis(0), // forwardY
       () -> -logitech.getRawAxis(2), // rotation
-      () -> logitech.getRawAxis(3) // slider
+      () -> logitech.getRawAxis(3), // slider
+      () -> logitech.getRawButton(6) // inverted
     ));
 
     configureBindings();
