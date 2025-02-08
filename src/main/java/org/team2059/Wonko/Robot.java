@@ -7,7 +7,6 @@ package org.team2059.Wonko;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -50,6 +49,7 @@ public class Robot extends LoggedRobot {
     
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
+    // for the drivercam: attach USB camera to Rio
     CameraServer.startAutomaticCapture();
   }
 
