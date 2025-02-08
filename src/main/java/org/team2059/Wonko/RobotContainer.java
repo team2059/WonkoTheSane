@@ -8,14 +8,17 @@ import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
-import org.team2059.Wonko.subsystems.Drivetrain;
+import org.team2059.Wonko.subsystems.drive.Drivetrain;
+import org.team2059.Wonko.subsystems.drive.GyroIONavX;
 import org.team2059.Wonko.subsystems.vision.Vision;
 import org.team2059.Wonko.subsystems.vision.VisionIOReal;
+import org.team2059.Wonko.subsystems.vision.VisionIOSim;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -36,7 +39,7 @@ public class RobotContainer {
 
   /* SUBSYSTEMS */
   private static Vision vision;
-  private static Drivetrain drivetrain;
+  public static Drivetrain drivetrain;
   // private static final CoralIntake coralIntake = new CoralIntake();
   // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
 
@@ -47,8 +50,11 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    vision = new Vision(new VisionIOReal());
-    drivetrain = new Drivetrain(vision);
+    vision = new Vision(RobotBase.isReal() ? new VisionIOReal() : new VisionIOSim());
+    drivetrain = new Drivetrain(
+      vision,
+      new GyroIONavX()
+    );
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -82,7 +88,7 @@ public class RobotContainer {
 
     /* BUTTON 5: RESET NAVX HEADING */
     new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
-      .whileTrue(new InstantCommand(() -> drivetrain.getNavX().zeroYaw()));
+      .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
 
     /* BUTTON 3: SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
