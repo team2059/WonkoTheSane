@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.team2059.Wonko.Constants;
+import org.team2059.Wonko.Robot;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
@@ -269,10 +270,10 @@ public class Drivetrain extends SubsystemBase {
     // Logger.recordOutput("Desired States", desiredStates);
 
     // Sets the speed and rotation of each module
-    frontLeft.setState(desiredStates[0], true);
-    frontRight.setState(desiredStates[1], true);
-    backLeft.setState(desiredStates[2], true);
-    backRight.setState(desiredStates[3], true);
+    frontLeft.setState(desiredStates[0], false);
+    frontRight.setState(desiredStates[1], false);
+    backLeft.setState(desiredStates[2], false);
+    backRight.setState(desiredStates[3], false);
   }
   
   /**
