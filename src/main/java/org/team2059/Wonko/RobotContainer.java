@@ -6,11 +6,11 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants.ElevatorPose;
-import org.team2059.Wonko.commands.ElevatorGoToSetpoint;
-import org.team2059.Wonko.commands.AlgaeIntakeCmd;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
-import org.team2059.Wonko.commands.TurnParallelToReef;
-import org.team2059.Wonko.commands.TurnToReefTag;
+import org.team2059.Wonko.commands.AlgaeCmds.AlgaeIntakeCmd;
+import org.team2059.Wonko.commands.ElevatorCmds.ElevatorGoToSetpoint;
+import org.team2059.Wonko.commands.VisionCmds.TurnParallelToReef;
+import org.team2059.Wonko.commands.VisionCmds.TurnToReefTag;
 import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
@@ -130,6 +130,17 @@ public class RobotContainer {
     new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
       .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
       .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
+    
+    /* TILT CORAL UP*/
+    new JoystickButton(logitech, OperatorConstants.JoystickTiltCoralDown)
+      .whileTrue(new InstantCommand(() -> coralIntake.setTiltSpeed(0.1)))
+      .whileFalse(new InstantCommand(() -> coralIntake.setTiltSpeed(0)));
+
+    /* TILT CORAL DOWN */
+    new JoystickButton(logitech, OperatorConstants.JoystickTiltCoralUp)
+      .whileTrue(new InstantCommand(() -> coralIntake.setTiltSpeed(-0.1)))
+      .whileFalse(new InstantCommand(() -> coralIntake.setTiltSpeed(0)));
+
     
 
     /* ============== */
