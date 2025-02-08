@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.team2059.Wonko.Constants;
-import org.team2059.Wonko.Robot;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
