@@ -5,7 +5,8 @@
 package org.team2059.Wonko.commands;
 
 import org.team2059.Wonko.Constants.AlgaeIntakeConstants;
-import org.team2059.Wonko.subsystems.AlgaeIntake;
+import org.team2059.Wonko.subsystems.Algae.AlgaeIntake;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 

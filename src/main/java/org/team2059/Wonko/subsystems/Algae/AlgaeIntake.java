@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 // Fuck you Mr. Potter
-package org.team2059.Wonko.subsystems;
+package org.team2059.Wonko.subsystems.Algae;
 
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.AlgaeIntakeConstants;

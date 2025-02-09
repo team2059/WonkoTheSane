@@ -10,10 +10,10 @@ import org.team2059.Wonko.commands.AlgaeIntakeCmd;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToTag;
 import org.team2059.Wonko.commands.TurnToTag;
-import org.team2059.Wonko.subsystems.AlgaeIntake;
 import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
 import org.team2059.Wonko.subsystems.Vision;
+import org.team2059.Wonko.subsystems.Algae.AlgaeIntake;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 

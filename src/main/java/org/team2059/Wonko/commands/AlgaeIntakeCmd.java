@@ -6,7 +6,7 @@ package org.team2059.Wonko.commands;
 
 import org.team2059.Wonko.Constants.AlgaeIntakeConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
-import org.team2059.Wonko.subsystems.AlgaeIntake;
+import org.team2059.Wonko.subsystems.Algae.AlgaeIntake;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.Command;
