@@ -4,11 +4,14 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+// Collection of methods to configure Spark motor controllers
 public class SparkConfigurationUtility {
+
     /**
      * Configure a Spark motor controller. 
      * In 2025, REV made changes requiring use 
@@ -37,7 +40,10 @@ public class SparkConfigurationUtility {
         .positionConversionFactor(positionConversionFactor)
         .velocityConversionFactor(velocityConversionFactor);
 
-      spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      config.closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+
+      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
     public static void configureSpark(
         SparkMax spark, 
@@ -56,6 +62,25 @@ public class SparkConfigurationUtility {
         .positionConversionFactor(positionConversionFactor)
         .velocityConversionFactor(velocityConversionFactor);
 
-      spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      config.closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+
+      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    }
+
+    // Configure a PID controller's values
+    public static void setPID(SparkMax spark, double p, double i, double d) {
+      SparkMaxConfig config = new SparkMaxConfig();
+
+      config.closedLoop.pid(p, i, d);
+
+      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+    }
+    public static void setPID(SparkFlex spark, double p, double i, double d) {
+      SparkFlexConfig config = new SparkFlexConfig();
+
+      config.closedLoop.pid(p, i, d);
+
+      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 }

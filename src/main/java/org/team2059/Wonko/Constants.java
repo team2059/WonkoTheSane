@@ -191,12 +191,32 @@ public final class Constants {
     public static final Matrix<N3, N1> measurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
   }
 
-  public static class CoralIntakeConstants {
+  public static class CoralCollectorConstants {
     public static final int intakeMotorID = 9;
   }
 
-  public static class AlgaeIntakeConstants {
-    public static final int motor1ID = 10;
-    public static final int motor2ID = 11;
+  public static class AlgaeCollectorConstants {
+    public static final int motor1Id = 10;
+    public static final int motor2Id = 11;
+    public static final int tiltMotorId = 13;
+
+    public static final int tiltEncoderDio = 5;
+    public static final double tiltEncoderMin = 0.02;
+    public static final double tiltEncoderMax = 0.98;
+
+    public static final double stallDetectionAmps = 20.0;
+
+    public static final double holdSpeed = 0.02;
+
+  }
+
+  public static class ElevatorConstants {
+    public static final int motorId = 12;
+
+    public static final double positionConversionFactor = 0.0354650904;
+    public static final double velocityConversionFactor = positionConversionFactor / 60;
+
+    public static final int[] limitSwitchDIO = {0, 1, 2, 3, 4};
+    public static final double[] levels = {0.1, 0.5, 1, 1.5, 2};
   }
 }

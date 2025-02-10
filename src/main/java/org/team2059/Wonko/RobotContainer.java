@@ -6,10 +6,12 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
-import org.team2059.Wonko.subsystems.AlgaeIntake;
-import org.team2059.Wonko.subsystems.CoralIntake;
+import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
+import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.drive.GyroIONavX;
+import org.team2059.Wonko.subsystems.elevator.Elevator;
+import org.team2059.Wonko.subsystems.elevator.ElevatorIOVortex;
 import org.team2059.Wonko.subsystems.vision.Vision;
 import org.team2059.Wonko.subsystems.vision.VisionIOReal;
 import org.team2059.Wonko.subsystems.vision.VisionIOSim;
@@ -40,8 +42,9 @@ public class RobotContainer {
   /* SUBSYSTEMS */
   private static Vision vision;
   public static Drivetrain drivetrain;
+  private static Elevator elevator;
   // private static final CoralIntake coralIntake = new CoralIntake();
-  // private static final AlgaeIntake algaeIntake = new AlgaeIntake();
+  private static AlgaeCollector algaeCollector;
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
@@ -51,10 +54,15 @@ public class RobotContainer {
   public RobotContainer() {
 
     vision = new Vision(RobotBase.isReal() ? new VisionIOReal() : new VisionIOSim());
+
     drivetrain = new Drivetrain(
       vision,
       new GyroIONavX()
     );
+
+    elevator = new Elevator(new ElevatorIOVortex());
+
+    algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -93,29 +101,6 @@ public class RobotContainer {
     /* BUTTON 3: SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
       .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
-
-    // /* INTAKE CORAL */
-    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeCoral)
-    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(-0.1)))
-    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
-
-    // /* RELEASE CORAL */
-    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseCoral)
-    //   .whileTrue(new InstantCommand(() -> coralIntake.setIntakeSpeed(0.5)))
-    //   .whileFalse(new InstantCommand(() -> coralIntake.setIntakeSpeed(0)));
-    
-    // /* INTAKE ALGAE */
-    // new JoystickButton(logitech, OperatorConstants.JoystickIntakeAlgae)
-    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0.25)))
-    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
-
-    // /* RELEASE ALGAE */
-    // new JoystickButton(logitech, OperatorConstants.JoystickReleaseAlgae)
-    //   .whileTrue(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(-0.25)))
-    //   .whileFalse(new InstantCommand(() -> algaeIntake.setEndEffectorSpeed(0))); 
-
-    // new JoystickButton(logitech, 8)
-    //   .whileTrue(new TurnParallelToTag(drivetrain, vision, 4));
     
     // Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
     // new JoystickButton(buttonBox, 1)
@@ -129,6 +114,17 @@ public class RobotContainer {
       
     // new JoystickButton(buttonBox, 4)
     //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
+
+    /* ELEVATOR */
+    new JoystickButton(buttonBox, 2) // level 2
+      .whileTrue(elevator.goToLevelCommand(2));
+
+    /* ALGAE COLLECTOR */
+    new JoystickButton(buttonBox, 5) // intake
+      .whileTrue(algaeCollector.intakeCommand());
+
+    new JoystickButton(buttonBox, 6) // outtake
+      .whileTrue(algaeCollector.outtakeCommand());
   }
   
   /**

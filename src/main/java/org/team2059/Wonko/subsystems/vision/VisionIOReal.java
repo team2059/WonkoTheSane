@@ -81,11 +81,19 @@ public class VisionIOReal implements VisionIO {
 
     @Override
     public Optional<EstimatedRobotPose> getEstimatedUpperGlobalPose() {
-        return upperPoseEstimator.update(upperCameraResult);
+        if (upperCameraResult != null) {
+            return upperPoseEstimator.update(upperCameraResult);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<EstimatedRobotPose> getEstimatedLowerGlobalPose() {
-        return lowerPoseEstimator.update(lowerCameraResult);
+        if (lowerCameraResult != null) {
+            return lowerPoseEstimator.update(lowerCameraResult);
+        } else {
+            return Optional.empty();
+        }
     }
 }

@@ -35,6 +35,14 @@ public class Drivetrain extends SubsystemBase {
 
   public static boolean fieldRelativeStatus = true;
 
+    /*
+     * Create four SwerveModules
+     * 1 frontLeft
+     * 2 frontRight
+     * 3 backLeft
+     * 4 backRight
+     */
+
     public final SwerveModule frontLeft = new SwerveModule(
       1,
       (RobotBase.isReal())
@@ -391,7 +399,6 @@ public class Drivetrain extends SubsystemBase {
         upperOptional.get().timestampSeconds
       );
     }
-
     if (lowerOptional.isPresent() && RobotBase.isReal()) {
       poseEstimator.addVisionMeasurement(
         lowerOptional.get().estimatedPose.toPose2d(), 
