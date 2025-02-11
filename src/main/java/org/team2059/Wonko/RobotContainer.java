@@ -8,10 +8,12 @@ import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
+import org.team2059.Wonko.subsystems.coral.CoralCollector;
+import org.team2059.Wonko.subsystems.coral.CoralCollectorIOReal;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.drive.GyroIONavX;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
-import org.team2059.Wonko.subsystems.elevator.ElevatorIOVortex;
+import org.team2059.Wonko.subsystems.elevator.ElevatorIOReal;
 import org.team2059.Wonko.subsystems.vision.Vision;
 import org.team2059.Wonko.subsystems.vision.VisionIOReal;
 import org.team2059.Wonko.subsystems.vision.VisionIOSim;
@@ -44,7 +46,8 @@ public class RobotContainer {
   public static Drivetrain drivetrain;
   private static Elevator elevator;
   // private static final CoralIntake coralIntake = new CoralIntake();
-  private static AlgaeCollector algaeCollector;
+  // private static AlgaeCollector algaeCollector;
+  // private static CoralCollector coralCollector;
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
@@ -60,9 +63,10 @@ public class RobotContainer {
       new GyroIONavX()
     );
 
-    elevator = new Elevator(new ElevatorIOVortex());
+    elevator = new Elevator(new ElevatorIOReal());
 
-    algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
+    // algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
+    // coralCollector = new CoralCollector(new CoralCollectorIOReal());
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -119,12 +123,19 @@ public class RobotContainer {
     new JoystickButton(buttonBox, 2) // level 2
       .whileTrue(elevator.goToLevelCommand(2));
 
-    /* ALGAE COLLECTOR */
-    new JoystickButton(buttonBox, 5) // intake
-      .whileTrue(algaeCollector.intakeCommand());
+    // /* ALGAE COLLECTOR */
+    // new JoystickButton(buttonBox, 5) // intake
+    //   .whileTrue(algaeCollector.intakeCommand());
 
-    new JoystickButton(buttonBox, 6) // outtake
-      .whileTrue(algaeCollector.outtakeCommand());
+    // new JoystickButton(buttonBox, 6) // outtake
+    //   .whileTrue(algaeCollector.outtakeCommand());
+
+    // /* CORAL COLLECTOR */
+    // new JoystickButton(buttonBox, 7) // Intake
+    //   .whileTrue(coralCollector.intakeCommand());
+    
+    // new JoystickButton(buttonBox, 8) // Outtake
+    //   .whileTrue(coralCollector.outtakeCommand());
   }
   
   /**

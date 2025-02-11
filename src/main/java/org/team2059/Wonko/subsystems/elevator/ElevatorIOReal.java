@@ -16,7 +16,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 // import edu.wpi.first.wpilibj.DigitalInput;
 
-public class ElevatorIOVortex implements ElevatorIO {
+public class ElevatorIOReal implements ElevatorIO {
 
     private final SparkMax motor;
     private final RelativeEncoder encoder;
@@ -31,7 +31,7 @@ public class ElevatorIOVortex implements ElevatorIO {
     private LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI", 0);
     private LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0);
 
-    public ElevatorIOVortex() {
+    public ElevatorIOReal() {
         motor = new SparkMax(ElevatorConstants.motorId, MotorType.kBrushless);
 
         feedforward = new ElevatorFeedforward(0, 0, 0);

@@ -191,10 +191,6 @@ public final class Constants {
     public static final Matrix<N3, N1> measurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
   }
 
-  public static class CoralCollectorConstants {
-    public static final int intakeMotorID = 9;
-  }
-
   public static class AlgaeCollectorConstants {
     public static final int motor1Id = 10;
     public static final int motor2Id = 11;
@@ -208,6 +204,15 @@ public final class Constants {
 
     public static final double holdSpeed = 0.02;
 
+  }
+
+  public static class CoralCollectorConstants {
+    public static final int intakeMotorId = 14;
+    public static final int tiltMotorId = 15;
+    public static final int irSensorDio = 6;
+    public static final int thruBoreDio = 7;
+    public static final double tiltEncoderMin = 0.02;
+    public static final double tiltEncoderMax = 0.98;
   }
 
   public static class ElevatorConstants {

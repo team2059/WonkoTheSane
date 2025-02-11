@@ -1,20 +1,19 @@
-package org.team2059.Wonko.subsystems.algae;
+package org.team2059.Wonko.subsystems.coral;
 
 import org.littletonrobotics.junction.Logger;
-import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class AlgaeCollector extends SubsystemBase {
+public class CoralCollector extends SubsystemBase {
 
-    private AlgaeCollectorIO io;
-    
-    private AlgaeCollectorIOInputsAutoLogged inputs = new AlgaeCollectorIOInputsAutoLogged();
+    private CoralCollectorIO io;
+    private CoralCollectorIOInputsAutoLogged inputs;
 
-    public AlgaeCollector(AlgaeCollectorIO io) {
+    public CoralCollector(CoralCollectorIO io) {
         this.io = io;
+        inputs = new CoralCollectorIOInputsAutoLogged();
     }
 
     public Command tiltCommand() {
@@ -22,8 +21,8 @@ public class AlgaeCollector extends SubsystemBase {
     }
 
     public Command intakeCommand() {
-        return this.startEnd(() -> io.setIntakeSpeed(0.25), () -> io.setIntakeSpeed(AlgaeCollectorConstants.holdSpeed))
-            .until(() -> inputs.hasAlgae);
+        return this.startEnd(() -> io.setIntakeSpeed(0.25), () -> io.stopIntake())
+            .until(() -> inputs.hasCoral);
     }
 
     public Command outtakeCommand() {
@@ -33,6 +32,6 @@ public class AlgaeCollector extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs("AlgaeCollector", inputs);
+        Logger.processInputs("CoralCollector", inputs);
     }
 }
