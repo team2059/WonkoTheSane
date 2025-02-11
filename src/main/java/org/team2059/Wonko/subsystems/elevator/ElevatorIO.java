@@ -14,7 +14,7 @@ public interface ElevatorIO {
 
         public double motorTemp = 0.0;
 
-        public boolean[] limitSwitches = new boolean[5];
+        // public boolean[] limitSwitches = new boolean[5];
     }
 
     public void updateInputs(ElevatorIOInputs inputs);

@@ -14,7 +14,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.wpilibj.DigitalInput;
+// import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ElevatorIOVortex implements ElevatorIO {
 
@@ -24,7 +24,7 @@ public class ElevatorIOVortex implements ElevatorIO {
     private ElevatorFeedforward feedforward;
     
     // Limit switches
-    private final DigitalInput[] limitSwitches = new DigitalInput[5];
+    // private final DigitalInput[] limitSwitches = new DigitalInput[5];
 
     // Tunable numbers
     private LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 0.1);
@@ -49,9 +49,9 @@ public class ElevatorIOVortex implements ElevatorIO {
 
         SparkConfigurationUtility.setPID(motor, kP.get(), kI.get(), kD.get());
 
-        for (int i = 0; i < limitSwitches.length; i++) {
-            limitSwitches[i] = new DigitalInput(ElevatorConstants.limitSwitchDIO[i]);
-        }
+        // for (int i = 0; i < limitSwitches.length; i++) {
+        //     limitSwitches[i] = new DigitalInput(ElevatorConstants.limitSwitchDIO[i]);
+        // }
     }
 
     @Override
@@ -68,9 +68,9 @@ public class ElevatorIOVortex implements ElevatorIO {
         inputs.currentAmps = motor.getOutputCurrent();
         inputs.motorTemp = motor.getMotorTemperature();
 
-        for (int i = 0; i < inputs.limitSwitches.length; i++) {
-            inputs.limitSwitches[i] = limitSwitches[i].get();
-        }
+        // for (int i = 0; i < inputs.limitSwitches.length; i++) {
+        //     inputs.limitSwitches[i] = limitSwitches[i].get();
+        // }
     }
 
     public double getAppliedVolts() {

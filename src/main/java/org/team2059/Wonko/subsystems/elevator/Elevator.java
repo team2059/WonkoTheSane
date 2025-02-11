@@ -36,13 +36,13 @@ public class Elevator extends SubsystemBase {
         io.setVoltage(volts);
     }
 
-    public boolean getLimitSwitch(int level) {
-        return inputs.limitSwitches[level];
-    }
+    // public boolean getLimitSwitch(int level) {
+    //     return inputs.limitSwitches[level];
+    // }
 
     public Command goToLevelCommand(int level) {
-        return this.startEnd(() -> this.setLevel(level), () -> this.stop())
-            .until(() -> this.getLimitSwitch(level));
+        return this.startEnd(() -> this.setLevel(level), () -> this.stop());
+            // .until(() -> this.getLimitSwitch(level));
     }
 
     @Override
