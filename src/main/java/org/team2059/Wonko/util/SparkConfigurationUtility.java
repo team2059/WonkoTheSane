@@ -9,7 +9,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-// Collection of methods to configure Spark motor controllers
+// Collection of methods used to configure Spark motor controllers
 public class SparkConfigurationUtility {
 
     /**

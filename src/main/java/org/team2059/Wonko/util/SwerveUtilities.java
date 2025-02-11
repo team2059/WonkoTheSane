@@ -3,6 +3,7 @@ package org.team2059.Wonko.util;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
+// Collection of methods for angle optimization used during swerve module state calculations.
 public class SwerveUtilities {
     public static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
         double lowerBound;

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+// Methods used to configure CANcoders in real swerve drivetrain
 public class CanCoderConfigurationUtility {
     public static void configureCanCoder(CANcoder canCoder) {
         // Create the new configuration
