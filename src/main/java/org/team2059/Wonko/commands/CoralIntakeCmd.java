@@ -4,7 +4,7 @@
 
 package org.team2059.Wonko.commands;
 
-import org.team2059.Wonko.subsystems.CoralIntake;
+import org.team2059.Wonko.subsystems.Coral.CoralIntake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 

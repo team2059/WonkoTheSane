@@ -18,13 +18,20 @@ public interface AlgaeIntakeIO {
 
         public double tiltPosition = 0.0;  // Position of tilt throughbore
         public double tiltVelocity = 0.0;  // Velocity of tilt
-        public boolean hasAlgae = false;  // if encoder detects (TODO: Get encoder in SIM)
-        public boolean encoderConnected = false; // Encoder connection status
+        public boolean hasAlgae = false; 
     }
 
     public void updateInputs(AlgaeIntakeIOInputs inputs);
 
     public default void setIntakeSpeed(double speed) {}
-    public default void setTiltSpeed(double speed) {}
+    public default void setTiltPosition(double positionRadians) {}
+    public default boolean isAlgae() {return false;}
+    public default void setTiltVoltage(double voltage) {}
+
+    public default void stopIntake() {}
+
+    public default void stopTilt() {}
+
+    public default void stopAll() {}
 }
 

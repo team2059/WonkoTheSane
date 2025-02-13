@@ -10,10 +10,10 @@ import org.team2059.Wonko.commands.AlgaeIntakeCmd;
 import org.team2059.Wonko.commands.TeleopDriveCmd;
 import org.team2059.Wonko.commands.TurnParallelToTag;
 import org.team2059.Wonko.commands.TurnToTag;
-import org.team2059.Wonko.subsystems.CoralIntake;
 import org.team2059.Wonko.subsystems.Drivetrain;
 import org.team2059.Wonko.subsystems.Vision;
 import org.team2059.Wonko.subsystems.Algae.AlgaeIntake;
+import org.team2059.Wonko.subsystems.Coral.CoralIntake;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -53,7 +53,6 @@ public class RobotContainer {
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
     SmartDashboard.putData(autoChooser);
-
 
     /*
      * Send axes and buttons from joystick to TeleopSwerveCmd,

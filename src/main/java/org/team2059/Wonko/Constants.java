@@ -180,6 +180,10 @@ public final class Constants {
     public static final double throughBoreOffset = 100;
     public static final int irSensorDIO = 0; // TODO: CHANGE DIO WHEN WIRED TO ROBOT
     public static final int tiltMotorID = 0; // TODO: Change ID when we have it 
+
+    public static final double kPCoral = 0.0; 
+    public static final double kICoral = 0.0;
+    public static final double kDCoral = 0.0; 
   }
 
   public static class AlgaeIntakeConstants {
