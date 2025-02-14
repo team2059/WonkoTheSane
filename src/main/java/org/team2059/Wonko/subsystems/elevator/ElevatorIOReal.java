@@ -15,13 +15,21 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 // import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public class ElevatorIOReal implements ElevatorIO {
 
     private final SparkMax motor;
     private final RelativeEncoder encoder;
     private SparkClosedLoopController pidController;
+    
+    // Motion Profiling Components
     private ElevatorFeedforward feedforward;
+    private final TrapezoidProfile.Constraints constraints;
+    private final TrapezoidProfile profile;
+    private TrapezoidProfile.State setpoint;
+    private TrapezoidProfile.State goal;
+    
     
     // Limit switches
     // private final DigitalInput[] limitSwitches = new DigitalInput[5];
@@ -34,7 +42,20 @@ public class ElevatorIOReal implements ElevatorIO {
     public ElevatorIOReal() {
         motor = new SparkMax(ElevatorConstants.motorId, MotorType.kBrushless);
 
-        feedforward = new ElevatorFeedforward(0, 0, 0);
+        // Initialize motion profiling
+        feedforward = new ElevatorFeedforward(
+            ElevatorConstants.ks,   // Static Friction
+            ElevatorConstants.kg,   // Gravity Compensation
+            ElevatorConstants.kv);  // Velocity Feedforward
+
+        constraints = new TrapezoidProfile.Constraints(
+            ElevatorConstants.MAX_VELOCITY, 
+            ElevatorConstants.MAX_ACCELERATION);
+
+        profile = new TrapezoidProfile(constraints);
+        setpoint = new TrapezoidProfile.State();
+        goal = new TrapezoidProfile.State();
+        
         
         SparkConfigurationUtility.configureSpark(
             motor,
@@ -67,10 +88,46 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.appliedVolts = getAppliedVolts();
         inputs.currentAmps = motor.getOutputCurrent();
         inputs.motorTemp = motor.getMotorTemperature();
+        inputs.setpointPosition = setpoint.position;
+        inputs.setpointVelocity = setpoint.velocity;
+        inputs.goalPosition = goal.position;
 
         // for (int i = 0; i < inputs.limitSwitches.length; i++) {
         //     inputs.limitSwitches[i] = limitSwitches[i].get();
         // }
+    }
+
+    @Override
+    public void setGoal(double position) {
+        setpoint = new TrapezoidProfile.State(encoder.getPosition(), encoder.getVelocity());
+        goal = new TrapezoidProfile.State(position, 0);
+    }
+
+    @Override
+    public void updateMotionProfile() {
+        double prevVelocity = setpoint.velocity;
+        setpoint = profile.calculate(0.02, setpoint, goal); // 20ms period
+        
+        // Calculate acceleration for feedforward
+        double acceleration = (setpoint.velocity - prevVelocity) / 0.02;
+        
+        // Calculate feedforward voltage
+        double ffVolts = feedforward.calculate(setpoint.velocity, acceleration);
+        
+        // Set position with feedforward
+        pidController.setReference(
+            setpoint.position,
+            ControlType.kPosition,
+            ClosedLoopSlot.kSlot0,
+            ffVolts
+        );
+    }
+
+    @Override
+    public void hold() {
+        // Apply just enough voltage to hold position against gravity
+        double ffVolts = feedforward.calculate(0);
+        setVoltage(ffVolts);
     }
 
     public double getAppliedVolts() {

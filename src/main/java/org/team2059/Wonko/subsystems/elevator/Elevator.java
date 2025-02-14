@@ -3,6 +3,7 @@ package org.team2059.Wonko.subsystems.elevator;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
@@ -14,6 +15,14 @@ public class Elevator extends SubsystemBase {
     public Elevator(ElevatorIO io) {
         this.io = io;
         io.resetEncoder();
+
+        setDefaultCommand(Commands.run(() -> io.hold(), this));
+    }
+
+    public Command setGoalPosition(double position) {
+        return Commands.runOnce(() -> io.setGoal(position), this)
+            .andThen(Commands.run(() -> io.updateMotionProfile(), this))
+            .withTimeout(2.5); // Makes it timuout after 2.5 seconds
     }
 
     public void setPosition(double position) {
@@ -38,7 +47,7 @@ public class Elevator extends SubsystemBase {
 
     // public boolean getLimitSwitch(int level) {
     //     return inputs.limitSwitches[level];
-    // }
+    // }s
 
     public Command goToLevelCommand(int level) {
         return this.startEnd(() -> this.setLevel(level), () -> this.stop());

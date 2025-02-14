@@ -14,6 +14,10 @@ public interface ElevatorIO {
 
         public double motorTemp = 0.0;
 
+        public double setpointPosition = 0.0;
+        public double setpointVelocity = 0.0;
+        public double goalPosition = 0.0;
+
         // public boolean[] limitSwitches = new boolean[5];
     }
 
@@ -30,5 +34,11 @@ public interface ElevatorIO {
     public void setPosition(double positionMeters);
 
     public void setVelocity(double velocityMps);
+
+    public void setGoal(double position);
+
+    public void updateMotionProfile();
+    
+    public void hold();
     
 }

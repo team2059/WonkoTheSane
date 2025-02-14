@@ -223,5 +223,12 @@ public final class Constants {
 
     public static final int[] limitSwitchDIO = {0, 1, 2, 3, 4};
     public static final double[] levels = {0.1, 0.5, 1, 1.5, 2};
+
+    public static final double MAX_VELOCITY = 1.0;
+    public static final double MAX_ACCELERATION = 1.0;
+
+    public static final double ks = 0.0;
+    public static final double kg = 0.0;
+    public static final double kv = 0.0;
   }
 }
