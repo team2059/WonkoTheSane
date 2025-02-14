@@ -11,6 +11,8 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -22,6 +24,8 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     private SparkMax tiltMotor;
 
     private DutyCycleEncoder tiltEncoder;
+
+    private final PIDController tiltPidController; 
 
     // Debouncer requires a condition to occur for a certain amount of time in order
     // for the boolean to change
@@ -61,6 +65,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         tiltEncoder.setDutyCycleRange(AlgaeCollectorConstants.tiltEncoderMin, AlgaeCollectorConstants.tiltEncoderMax);
 
         debouncer.calculate(false); // Start debouncer at false
+        tiltPidController = new PIDController(AlgaeCollectorConstants.kPAlgae, AlgaeCollectorConstants.kIAlgae, AlgaeCollectorConstants.kDAlgae);
     }
 
     @Override
@@ -72,7 +77,9 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     @Override
     public void setTiltPosition(double positionRadians) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setTiltPosition'");
+        //throw new UnsupportedOperationException("Unimplemented method 'setTiltPosition'");
+        double output = tiltPidController.calculate(tiltMotor.getEncoder().getPosition(), positionRadians); // fix in radians
+        tiltMotor.setVoltage(MathUtil.clamp(output, -12, 12)); // do outputs need to adjusted
     }
 
     @Override

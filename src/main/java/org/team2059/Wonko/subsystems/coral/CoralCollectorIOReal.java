@@ -11,6 +11,8 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
@@ -23,6 +25,8 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
     
     // IR sensor - detects whether coral is present by light signal on or off
     private DigitalInput irSensor;
+
+    private final PIDController tiltPidController; 
 
     public CoralCollectorIOReal() {
         intakeMotor = new SparkFlex(CoralCollectorConstants.intakeMotorId, MotorType.kBrushless);
@@ -48,6 +52,7 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
         tiltEncoder.setDutyCycleRange(CoralCollectorConstants.tiltEncoderMin, CoralCollectorConstants.tiltEncoderMax);
 
         irSensor = new DigitalInput(CoralCollectorConstants.irSensorDio);
+        tiltPidController = new PIDController(CoralCollectorConstants.kPCoral, CoralCollectorConstants.kICoral, CoralCollectorConstants.kDCoral);
     }
 
     @Override
@@ -71,7 +76,9 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
     @Override
     public void setTiltPosition(double position) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setTiltPosition'");
+        //throw new UnsupportedOperationException("Unimplemented method 'setTiltPosition'");
+        double output = tiltPidController.calculate(tiltMotor.getEncoder().getPosition(), position); 
+        tiltMotor.setVoltage(MathUtil.clamp(output, -12, 12)); // do outputs need to adjusted
     }
 
     @Override
