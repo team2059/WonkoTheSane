@@ -187,13 +187,13 @@ public final class Constants {
         new Rotation3d(0,0,0)
       );
 
-    public static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 0.1);
-    public static final Matrix<N3, N1> measurementStdDevs = VecBuilder.fill(0.9, 0.9, 0.9);
+    public static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 10);
+    public static final Matrix<N3, N1> measurementStdDevs = VecBuilder.fill(5, 5, 500);
   }
 
   public static class AlgaeCollectorConstants {
-    public static final int motor1Id = 10;
-    public static final int motor2Id = 11;
+    public static final int motor1Id = 11;
+    public static final int motor2Id = 12;
     public static final int tiltMotorId = 13;
 
     public static final int tiltEncoderDio = 5;
@@ -216,7 +216,7 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final int motorId = 12;
+    public static final int motorId = 16;
 
     public static final double positionConversionFactor = 0.0354650904;
     public static final double velocityConversionFactor = positionConversionFactor / 60;
