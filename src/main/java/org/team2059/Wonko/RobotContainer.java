@@ -56,7 +56,9 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    vision = new Vision(RobotBase.isReal() ? new VisionIOReal() : new VisionIOSim());
+    boolean isReal = RobotBase.isReal();
+
+    vision = new Vision(isReal ? new VisionIOReal() : new VisionIOSim());
 
     drivetrain = new Drivetrain(
       vision,
