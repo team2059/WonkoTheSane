@@ -204,6 +204,11 @@ public final class Constants {
 
     public static final double holdSpeed = 0.02;
 
+    // TODO: Tune values
+    public static final double kPAlgae = 0.0;
+    public static final double kIAlgae = 0.0;
+    public static final double kDAlgae = 0.0;
+
   }
 
   public static class CoralCollectorConstants {
@@ -213,6 +218,11 @@ public final class Constants {
     public static final int thruBoreDio = 7;
     public static final double tiltEncoderMin = 0.02;
     public static final double tiltEncoderMax = 0.98;
+
+    // TODO: tune values
+    public static final double kPCoral = 0.0;
+    public static final double kICoral = 0.0;
+    public static final double kDCoral = 0.0;
   }
 
   public static class ElevatorConstants {
