@@ -10,6 +10,8 @@ import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
+import org.team2059.Wonko.subsystems.climber.Climber;
+import org.team2059.Wonko.subsystems.climber.ClimberIOReal;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollectorIOReal;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
@@ -51,6 +53,7 @@ public class RobotContainer {
   // private static final CoralIntake coralIntake = new CoralIntake();
   // private static AlgaeCollector algaeCollector;
   private static CoralCollector coralCollector;
+  private static Climber climber;
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
@@ -72,6 +75,8 @@ public class RobotContainer {
 
     // algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
     coralCollector = new CoralCollector(new CoralCollectorIOReal());
+
+    climber = new Climber(new ClimberIOReal());
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -146,6 +151,13 @@ public class RobotContainer {
 
     // new JoystickButton(buttonBox, 4)
     //   .whileTrue(new CoralTiltCmd(coralCollector, 200));
+
+    /* Climber */
+    new JoystickButton(buttonBox, 11)
+      .whileTrue(climber.climberDownCommand()); 
+
+    new JoystickButton(buttonBox, 12)
+      .whileTrue(climber.climberUpCommand());
   }
   
   /**
