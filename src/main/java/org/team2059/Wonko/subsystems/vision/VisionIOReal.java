@@ -35,7 +35,9 @@ public class VisionIOReal implements VisionIO {
     private PhotonPoseEstimator lowerPoseEstimator;
     
     public VisionIOReal() {
-        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+
+        // AndyMark or welded field layout?
+        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
         upperCamera = new PhotonCamera(VisionConstants.upperCameraName);
         lowerCamera = new PhotonCamera(VisionConstants.lowerCameraName);

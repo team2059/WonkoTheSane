@@ -74,13 +74,13 @@ public class SparkConfigurationUtility {
 
       config.closedLoop.pid(p, i, d);
 
-      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
     public static void setPID(SparkFlex spark, double p, double i, double d) {
       SparkFlexConfig config = new SparkFlexConfig();
 
       config.closedLoop.pid(p, i, d);
 
-      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
+      spark.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 }

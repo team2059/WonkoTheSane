@@ -1,53 +1,41 @@
 package org.team2059.Wonko.subsystems.elevator;
 
 import org.team2059.Wonko.Constants.ElevatorConstants;
-import org.team2059.Wonko.util.LoggedTunableNumber;
-import org.team2059.Wonko.util.SparkConfigurationUtility;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ElevatorFeedforward;
 // import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ElevatorIOReal implements ElevatorIO {
 
     private final SparkMax motor;
     private final RelativeEncoder encoder;
-    private SparkClosedLoopController pidController;
-    private ElevatorFeedforward feedforward;
+    private SparkMaxConfig config = new SparkMaxConfig();
     
     // Limit switches
     // private final DigitalInput[] limitSwitches = new DigitalInput[5];
 
-    // Tunable numbers
-    private LoggedTunableNumber kP = new LoggedTunableNumber("Elevator/kP", 0.1);
-    private LoggedTunableNumber kI = new LoggedTunableNumber("Elevator/kI", 0);
-    private LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", 0);
-
     public ElevatorIOReal() {
         motor = new SparkMax(ElevatorConstants.motorId, MotorType.kBrushless);
 
-        feedforward = new ElevatorFeedforward(0, 0, 0);
+        config
+            .inverted(true)
+            .idleMode(IdleMode.kBrake);
         
-        SparkConfigurationUtility.configureSpark(
-            motor,
-            true,
-            IdleMode.kBrake,
-            ElevatorConstants.positionConversionFactor,
-            ElevatorConstants.velocityConversionFactor
-        );
+        config.encoder
+            .positionConversionFactor(ElevatorConstants.positionConversionFactor)
+            .velocityConversionFactor(ElevatorConstants.velocityConversionFactor);
+
+        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         encoder = motor.getEncoder();
-        pidController = motor.getClosedLoopController();
-
-        SparkConfigurationUtility.setPID(motor, kP.get(), kI.get(), kD.get());
 
         // for (int i = 0; i < limitSwitches.length; i++) {
         //     limitSwitches[i] = new DigitalInput(ElevatorConstants.limitSwitchDIO[i]);
@@ -56,10 +44,6 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        // Update tunables
-        if (kP.hasChanged(hashCode()) || kI.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
-            SparkConfigurationUtility.setPID(motor, kP.get(), kI.get(), kD.get());
-        }
 
         // Update all logged input values
         inputs.positionMeters = encoder.getPosition();
@@ -91,31 +75,4 @@ public class ElevatorIOReal implements ElevatorIO {
     public void resetEncoder() {
         encoder.setPosition(0);
     }
-
-    @Override
-    public void setLevel(int level) {
-        pidController.setReference(
-            ElevatorConstants.levels[level], 
-            ControlType.kPosition
-        );
-    }
-
-    @Override
-    public void setPosition(double setpointPositionMeters) {
-        pidController.setReference(
-            setpointPositionMeters, 
-            ControlType.kPosition
-        );
-    }
-
-    @Override
-    public void setVelocity(double velocitySetpointMps) {
-        pidController.setReference(
-            velocitySetpointMps, 
-            ControlType.kVelocity,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(velocitySetpointMps)
-        );
-    }
-    
 }

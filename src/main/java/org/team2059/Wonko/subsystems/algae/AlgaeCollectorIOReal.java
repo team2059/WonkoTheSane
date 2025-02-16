@@ -23,7 +23,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
 
     private DutyCycleEncoder tiltEncoder;
 
-    // Debouncer requires a condition to occur for a certain amount of time in order
+    // A debouncer requires a condition to occur for a certain amount of time in order
     // for the boolean to change
     // kRising: false->true
     private Debouncer debouncer = new Debouncer(0.33, DebounceType.kRising);
@@ -34,31 +34,27 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         motor2 = new SparkFlex(AlgaeCollectorConstants.motor2Id, MotorType.kBrushless);
         tiltMotor = new SparkMax(AlgaeCollectorConstants.tiltMotorId, MotorType.kBrushless);
 
-        motor1.configure(
-            new SparkFlexConfig()
-                .inverted(false)
-                .idleMode(IdleMode.kBrake), 
-            ResetMode.kResetSafeParameters, 
-            PersistMode.kPersistParameters
-        );
-        motor2.configure(
-            new SparkFlexConfig()
-                .inverted(true)
-                .idleMode(IdleMode.kBrake), 
-            ResetMode.kResetSafeParameters, 
-            PersistMode.kPersistParameters
-        );
-        tiltMotor.configure(
-            new SparkMaxConfig()
-                .inverted(false)
-                .idleMode(IdleMode.kBrake),
-            ResetMode.kResetSafeParameters, 
-            PersistMode.kPersistParameters
-        );
+        SparkFlexConfig motor1Config = new SparkFlexConfig();
+        motor1Config
+            .inverted(false)
+            .idleMode(IdleMode.kBrake);
+        motor1.configure(motor1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        // Create thru-bore encoder and configure max/min values
+        SparkFlexConfig motor2Config = new SparkFlexConfig();
+        motor2Config
+            .inverted(true)
+            .idleMode(IdleMode.kBrake);
+        motor2.configure(motor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        SparkMaxConfig tiltConfig = new SparkMaxConfig();
+        tiltConfig
+            .inverted(false)
+            .idleMode(IdleMode.kBrake);
+        tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        // Create thru-bore encoder
         tiltEncoder = new DutyCycleEncoder(AlgaeCollectorConstants.tiltEncoderDio);
-        tiltEncoder.setDutyCycleRange(AlgaeCollectorConstants.tiltEncoderMin, AlgaeCollectorConstants.tiltEncoderMax);
+        tiltEncoder.setInverted(false);
 
         debouncer.calculate(false); // Start debouncer at false
     }
@@ -67,12 +63,6 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     public void setIntakeSpeed(double speed) {
         motor1.set(speed);
         motor2.set(speed);
-    }
-
-    @Override
-    public void setTiltPosition(double positionRadians) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setTiltPosition'");
     }
 
     @Override
@@ -110,6 +100,11 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         inputs.hasAlgae = debouncer.calculate(inputs.motor1CurrentAmps > AlgaeCollectorConstants.stallDetectionAmps);
 
         inputs.thruBoreConnected = tiltEncoder.isConnected();
-        inputs.thruBorePosition = tiltEncoder.get();
+        inputs.thruBorePositionDegrees = tiltEncoder.get() * 360;
+    }
+
+    @Override
+    public void setTiltSpeed(double speed) {
+       tiltMotor.set(speed);
     }
 }

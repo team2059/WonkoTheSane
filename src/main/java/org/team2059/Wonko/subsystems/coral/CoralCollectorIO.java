@@ -13,22 +13,25 @@ public interface CoralCollectorIO {
 
         public double intakeMotorTemp = 0.0;
         public double tiltMotorTemp = 0.0;
+        public double tiltMotorPos = 0.0;
 
         public boolean thruBoreConnected = false;
-        public double thruBorePos = 0.0;
+        public double thruBorePositionDegrees = 0.0;
 
         public boolean hasCoral = false;
     }
 
-    public void updateInputs(CoralCollectorIOInputs inputs);
+    default void updateInputs(CoralCollectorIOInputs inputs) {};
 
-    public void setIntakeSpeed(double speed);
+    default void setIntakeSpeed(double speed) {};
 
-    public void setTiltPosition(double position);
+    default void setTiltSpeed(double speed) {};
 
-    public void stopIntake();
+    default void setTiltVolts(double volts) {};
 
-    public void stopTilt();
+    default void stopIntake() {};
 
-    public void stopAll();
+    default void stopTilt() {};
+
+    default void stopAll() {};
 }

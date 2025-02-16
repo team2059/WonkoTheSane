@@ -216,8 +216,8 @@ public final class Constants {
     public static final int tiltMotorId = 15;
     public static final int irSensorDio = 6;
     public static final int thruBoreDio = 7;
-    public static final double tiltEncoderMin = 0.02;
-    public static final double tiltEncoderMax = 0.98;
+    public static final double tiltEncoderMin = 0.148; // UPPER MAX POSITION
+    public static final double tiltEncoderMax = 0.717; // LOWER MAX POSITION
 
     // TODO: tune values
     public static final double kPCoral = 0.0;

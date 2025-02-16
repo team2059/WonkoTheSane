@@ -4,8 +4,10 @@
 
 package org.team2059.Wonko;
 
+import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.Constants.OperatorConstants;
-import org.team2059.Wonko.commands.TeleopDriveCmd;
+import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
+import org.team2059.Wonko.commands.elevator.ElevateCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
@@ -14,6 +16,7 @@ import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.drive.GyroIONavX;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.subsystems.elevator.ElevatorIOReal;
+import org.team2059.Wonko.subsystems.elevator.ElevatorIOSim;
 import org.team2059.Wonko.subsystems.vision.Vision;
 import org.team2059.Wonko.subsystems.vision.VisionIOReal;
 import org.team2059.Wonko.subsystems.vision.VisionIOSim;
@@ -47,7 +50,7 @@ public class RobotContainer {
   private static Elevator elevator;
   // private static final CoralIntake coralIntake = new CoralIntake();
   // private static AlgaeCollector algaeCollector;
-  // private static CoralCollector coralCollector;
+  private static CoralCollector coralCollector;
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
@@ -65,10 +68,10 @@ public class RobotContainer {
       new GyroIONavX()
     );
 
-    elevator = new Elevator(new ElevatorIOReal());
+    elevator = new Elevator(isReal ? new ElevatorIOReal() : new ElevatorIOSim());
 
     // algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
-    // coralCollector = new CoralCollector(new CoralCollectorIOReal());
+    coralCollector = new CoralCollector(new CoralCollectorIOReal());
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -122,8 +125,8 @@ public class RobotContainer {
     //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
 
     /* ELEVATOR */
-    new JoystickButton(buttonBox, 2) // level 2
-      .whileTrue(elevator.goToLevelCommand(2));
+    new JoystickButton(buttonBox, 2)
+      .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[1]));
 
     // /* ALGAE COLLECTOR */
     // new JoystickButton(buttonBox, 5) // intake
@@ -133,11 +136,16 @@ public class RobotContainer {
     //   .whileTrue(algaeCollector.outtakeCommand());
 
     // /* CORAL COLLECTOR */
-    // new JoystickButton(buttonBox, 7) // Intake
-    //   .whileTrue(coralCollector.intakeCommand());
+    new JoystickButton(buttonBox, 7) // Intake
+      .whileTrue(coralCollector.intakeCommand());
     
-    // new JoystickButton(buttonBox, 8) // Outtake
-    //   .whileTrue(coralCollector.outtakeCommand());
+    new JoystickButton(buttonBox, 8) // Outtake
+      .whileTrue(coralCollector.outtakeCommand());
+    // new JoystickButton(buttonBox, 3)
+    //   .whileTrue(new CoralTiltCmd(coralCollector, 275));
+
+    // new JoystickButton(buttonBox, 4)
+    //   .whileTrue(new CoralTiltCmd(coralCollector, 200));
   }
   
   /**

@@ -17,18 +17,8 @@ public interface ElevatorIO {
         // public boolean[] limitSwitches = new boolean[5];
     }
 
-    public void updateInputs(ElevatorIOInputs inputs);
-
-    public void stop();
-
-    public void setVoltage(double volts);
-
-    public void resetEncoder();
-
-    public void setLevel(int level);
-
-    public void setPosition(double positionMeters);
-
-    public void setVelocity(double velocityMps);
-    
+    default void updateInputs(ElevatorIOInputs inputs) {};
+    default void stop() {};
+    default void setVoltage(double volts) {};
+    default void resetEncoder() {};
 }

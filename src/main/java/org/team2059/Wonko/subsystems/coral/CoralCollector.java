@@ -3,30 +3,25 @@ package org.team2059.Wonko.subsystems.coral;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralCollector extends SubsystemBase {
 
-    private CoralCollectorIO io;
-    private CoralCollectorIOInputsAutoLogged inputs;
+    public CoralCollectorIO io;
+    public CoralCollectorIOInputsAutoLogged inputs;
 
     public CoralCollector(CoralCollectorIO io) {
         this.io = io;
         inputs = new CoralCollectorIOInputsAutoLogged();
     }
 
-    public Command tiltCommand() {
-        return new InstantCommand();
-    }
-
     public Command intakeCommand() {
-        return this.startEnd(() -> io.setIntakeSpeed(0.25), () -> io.stopIntake())
-            .until(() -> inputs.hasCoral);
+        return this.startEnd(() -> io.setIntakeSpeed(0.1), () -> io.stopIntake());
+            // .until(() -> inputs.hasCoral);
     }
 
     public Command outtakeCommand() {
-        return this.startEnd(() -> io.setIntakeSpeed(-0.25), () -> io.stopIntake());
+        return this.startEnd(() -> io.setIntakeSpeed(-0.1), () -> io.stopIntake());
     }
 
     @Override

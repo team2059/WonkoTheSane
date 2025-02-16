@@ -3,12 +3,10 @@ package org.team2059.Wonko.subsystems.coral;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -16,7 +14,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class CoralCollectorIOReal implements CoralCollectorIO {
     private SparkFlex intakeMotor;
-    private SparkMax tiltMotor;
+    private SparkFlex tiltMotor;
 
     // Through bore encoder is a DutyCycleEncoder, goes from 0 - 1
     private DutyCycleEncoder tiltEncoder;
@@ -26,27 +24,26 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
 
     public CoralCollectorIOReal() {
         intakeMotor = new SparkFlex(CoralCollectorConstants.intakeMotorId, MotorType.kBrushless);
-        tiltMotor = new SparkMax(CoralCollectorConstants.tiltMotorId, MotorType.kBrushless);
+        tiltMotor = new SparkFlex(CoralCollectorConstants.tiltMotorId, MotorType.kBrushless);
 
-        intakeMotor.configure(
-            new SparkFlexConfig()  
-                .inverted(false)
-                .idleMode(IdleMode.kBrake),
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
+        // Configure both Spark motor controllers
+        SparkFlexConfig intakeConfig = new SparkFlexConfig();
+        intakeConfig
+            .inverted(false)
+            .idleMode(IdleMode.kBrake);
+        intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        tiltMotor.configure(
-            new SparkMaxConfig()
-                .inverted(false)
-                .idleMode(IdleMode.kBrake),
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
+        SparkFlexConfig tiltConfig = new SparkFlexConfig();
+        tiltConfig
+            .inverted(true)
+            .idleMode(IdleMode.kBrake);
+        tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
+        // Configure thru-bore encoder
         tiltEncoder = new DutyCycleEncoder(CoralCollectorConstants.thruBoreDio);
-        tiltEncoder.setDutyCycleRange(CoralCollectorConstants.tiltEncoderMin, CoralCollectorConstants.tiltEncoderMax);
+        tiltEncoder.setInverted(true);
 
+        // Configure IR sensor - reports presence of coral
         irSensor = new DigitalInput(CoralCollectorConstants.irSensorDio);
     }
 
@@ -57,21 +54,16 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
         inputs.intakeMotorCurrentAmps = intakeMotor.getOutputCurrent();
         inputs.tiltMotorCurrentAmps = tiltMotor.getOutputCurrent();
         inputs.intakeMotorTemp = intakeMotor.getMotorTemperature();
+        inputs.tiltMotorPos = tiltMotor.getEncoder().getPosition();
         inputs.tiltMotorTemp = tiltMotor.getMotorTemperature();
         inputs.thruBoreConnected = tiltEncoder.isConnected();
-        inputs.thruBorePos = tiltEncoder.get();
+        inputs.thruBorePositionDegrees = tiltEncoder.get() * 360;
         inputs.hasCoral = irSensor.get();
     }
 
     @Override
     public void setIntakeSpeed(double speed) {
         intakeMotor.set(speed);
-    }
-
-    @Override
-    public void setTiltPosition(double position) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setTiltPosition'");
     }
 
     @Override
@@ -88,5 +80,15 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
     public void stopAll() {
         stopTilt();
         stopIntake();
+    }
+
+    @Override
+    public void setTiltSpeed(double speed) {
+        tiltMotor.set(speed);
+    }
+
+    @Override
+    public void setTiltVolts(double volts) {
+        tiltMotor.setVoltage(volts);
     }
 }

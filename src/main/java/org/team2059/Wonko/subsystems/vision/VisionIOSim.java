@@ -45,7 +45,9 @@ public class VisionIOSim implements VisionIO {
     private PhotonCameraSim lowerCamSim;
     
     public VisionIOSim() {
-        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+        
+        // AndyMark or welded field layout?
+        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
         upperCamera = new PhotonCamera(VisionConstants.upperCameraName);
         lowerCamera = new PhotonCamera(VisionConstants.lowerCameraName);

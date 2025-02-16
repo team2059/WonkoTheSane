@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeCollector extends SubsystemBase {
 
-    private AlgaeCollectorIO io;
+    public AlgaeCollectorIO io;
     
-    private AlgaeCollectorIOInputsAutoLogged inputs = new AlgaeCollectorIOInputsAutoLogged();
+    public AlgaeCollectorIOInputsAutoLogged inputs = new AlgaeCollectorIOInputsAutoLogged();
 
     public AlgaeCollector(AlgaeCollectorIO io) {
         this.io = io;
