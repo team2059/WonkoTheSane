@@ -58,6 +58,11 @@ public final class Constants {
     public static final int JoystickReleaseAlgae = 0;
   }
 
+  public static class ClimberConstants {
+    public static final int motor1ID = 17;
+    public static final int motor2ID = 18; 
+  }
+
   public static class DrivetrainConstants {
 
     public static final double wheelBase = Units.inchesToMeters(25.125); // distance between front wheels (like train track)
