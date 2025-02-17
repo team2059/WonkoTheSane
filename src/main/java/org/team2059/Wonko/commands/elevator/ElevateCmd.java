@@ -4,6 +4,7 @@
 
 package org.team2059.Wonko.commands.elevator;
 
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.util.LoggedTunableNumber;
 
@@ -25,6 +26,7 @@ public class ElevateCmd extends Command {
   private LoggedTunableNumber kS = new LoggedTunableNumber("ElevateCmd/kS", 0.0);
   private LoggedTunableNumber kG = new LoggedTunableNumber("ElevateCmd/kG", 0.0);
   private LoggedTunableNumber kV = new LoggedTunableNumber("ElevateCmd/kV", 0.0);
+  private LoggedTunableNumber kA = new LoggedTunableNumber("ElevateCmd/kA", 0.0);
 
   private ProfiledPIDController controller;
   private ElevatorFeedforward feedforward;
@@ -49,7 +51,7 @@ public class ElevateCmd extends Command {
     controller.setGoal(new State(goal, 0));
     
     // Create a feedforward model, this gives a best estimate for required voltage, must be well tuned
-    feedforward = new ElevatorFeedforward(kS.get(), kG.get(), kV.get());
+    feedforward = new ElevatorFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
 
     // This prevents two commands from running on the same subsytem at the same time
     addRequirements(elevator);
@@ -76,31 +78,37 @@ public class ElevateCmd extends Command {
       || kS.hasChanged(hashCode())
       || kG.hasChanged(hashCode())
       || kV.hasChanged(hashCode())
+      || kA.hasChanged(hashCode())
     ) {
       controller.setPID(kP.get(), 0.0, kD.get());
 
       feedforward.setKs(kS.get());
       feedforward.setKg(kG.get());
       feedforward.setKv(kV.get());
+      feedforward.setKa(kA.get());
     }
 
     // Record current position of elevator
     currentPosition = elevator.inputs.positionMeters;
 
+    double setpointVelocity = controller.getSetpoint().velocity;
+
     // Get output for next setpoint state
     // PID output is the required output to the next setpoint
     double pidOutput = controller.calculate(currentPosition, goal);
     // FF output is the best-estimate output for the target velocity
-    double ffOutput = feedforward.calculate(controller.getSetpoint().velocity);
+    double ffOutput = feedforward.calculate(setpointVelocity);
 
     // Plumb voltage to motor, making sure output is between [-12, 12]
     elevator.io.setVoltage(MathUtil.clamp(pidOutput + ffOutput, -12.0, 12.0));
+
+    Logger.recordOutput("Desired motion", controller.getSetpoint().position);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    // elevator.io.setVoltage(0);
+    elevator.io.setVoltage(0);
   }
 
   // Returns true when the command should end.
@@ -108,6 +116,7 @@ public class ElevateCmd extends Command {
   public boolean isFinished() {
     // If the controller says that we are within the tolerance we specified in initialize(),
     // return true to stop the command.
-    return controller.atGoal();
+    // return controller.atGoal();
+    return false;
   }
 }

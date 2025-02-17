@@ -19,7 +19,7 @@ public class TiltCoralCollectorCmd extends Command {
   private PIDController controller;
 
   // Tunable numbers - can be changed on the fly from a dashboard
-  private LoggedTunableNumber kP = new LoggedTunableNumber("TiltCoralCollectorCmd/kP", 0.0);
+  private LoggedTunableNumber kP = new LoggedTunableNumber("TiltCoralCollectorCmd/kP", 0.005);
   private LoggedTunableNumber kI = new LoggedTunableNumber("TiltCoralCollectorCmd/kI", 0.0);
   private LoggedTunableNumber kD = new LoggedTunableNumber("TiltCoralCollectorCmd/kD", 0.0);
 
@@ -41,7 +41,7 @@ public class TiltCoralCollectorCmd extends Command {
   public void initialize() {
     // Conditions and settings for the PID controller
     controller.reset();
-    controller.setTolerance(1.0); // Allow 1 degree of error
+    controller.setTolerance(0.02); // Allow 1 degree of error
     controller.setSetpoint(setpoint); // Specify our setpoint
   }
 
@@ -62,8 +62,8 @@ public class TiltCoralCollectorCmd extends Command {
     coralCollector.io.setTiltSpeed(
       MathUtil.clamp(
         controller.calculate(coralCollector.inputs.thruBorePositionDegrees), 
-        -1.0, 
-        1.0
+        -0.1, 
+        0.1
       )
     );
   }
@@ -78,6 +78,7 @@ public class TiltCoralCollectorCmd extends Command {
   @Override
   public boolean isFinished() {
     // Returns true when we're at the setpoint to end the command
-    return controller.atSetpoint();
+    // return controller.atSetpoint();
+    return false;
   }
 }

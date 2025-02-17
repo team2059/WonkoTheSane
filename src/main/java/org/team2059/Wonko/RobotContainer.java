@@ -6,6 +6,7 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.commands.coral.TiltCoralCollectorCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
@@ -50,7 +51,6 @@ public class RobotContainer {
   private static Vision vision;
   public static Drivetrain drivetrain;
   private static Elevator elevator;
-  // private static final CoralIntake coralIntake = new CoralIntake();
   // private static AlgaeCollector algaeCollector;
   private static CoralCollector coralCollector;
   private static Climber climber;
@@ -130,8 +130,19 @@ public class RobotContainer {
     //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
 
     /* ELEVATOR */
+    new JoystickButton(buttonBox, 1)
+      .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[3]));
+
     new JoystickButton(buttonBox, 2)
-      .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[1]));
+      .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[0]));
+
+    new JoystickButton(buttonBox, 11)
+      .whileTrue(new InstantCommand(() -> elevator.io.setSpeed(0.25)))
+      .onFalse(new InstantCommand(() -> elevator.io.setSpeed(0)));
+
+    new JoystickButton(buttonBox, 12)
+      .whileTrue(new InstantCommand(() -> elevator.io.setSpeed(-0.25)))
+      .onFalse(new InstantCommand(() -> elevator.io.setSpeed(0)));
 
     // /* ALGAE COLLECTOR */
     // new JoystickButton(buttonBox, 5) // intake
@@ -143,21 +154,19 @@ public class RobotContainer {
     // /* CORAL COLLECTOR */
     new JoystickButton(buttonBox, 7) // Intake
       .whileTrue(coralCollector.intakeCommand());
-    
     new JoystickButton(buttonBox, 8) // Outtake
       .whileTrue(coralCollector.outtakeCommand());
-    // new JoystickButton(buttonBox, 3)
-    //   .whileTrue(new CoralTiltCmd(coralCollector, 275));
-
-    // new JoystickButton(buttonBox, 4)
-    //   .whileTrue(new CoralTiltCmd(coralCollector, 200));
-
+    new JoystickButton(buttonBox, 3)
+      .whileTrue(new TiltCoralCollectorCmd(coralCollector, 260));
+    new JoystickButton(buttonBox, 4)
+      .whileTrue(new TiltCoralCollectorCmd(coralCollector, 175));
+    
     /* Climber */
-    new JoystickButton(buttonBox, 11)
-      .whileTrue(climber.climberDownCommand()); 
+//     new JoystickButton(buttonBox, 11)
+//       .whileTrue(climber.climberDownCommand()); 
 
-    new JoystickButton(buttonBox, 12)
-      .whileTrue(climber.climberUpCommand());
+//     new JoystickButton(buttonBox, 12)
+//       .whileTrue(climber.climberUpCommand());
   }
   
   /**

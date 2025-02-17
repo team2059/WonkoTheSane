@@ -20,7 +20,7 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
 
-        if (inputs.positionMeters > 2.7) {
+        if (inputs.positionMeters > 2.3) {
             io.stop();
         }
     }
