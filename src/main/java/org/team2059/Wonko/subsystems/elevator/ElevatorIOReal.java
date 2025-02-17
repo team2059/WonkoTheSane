@@ -75,4 +75,9 @@ public class ElevatorIOReal implements ElevatorIO {
     public void resetEncoder() {
         encoder.setPosition(0);
     }
+
+    @Override
+    public void setSpeed(double speed) {
+        motor.set(speed);
+    }
 }
