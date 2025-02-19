@@ -33,7 +33,7 @@ public class TiltCoralCollectorCmd extends Command {
 
     // Use addRequirements() here to declare subsystem dependencies.
     // Ensures no two commands run on the coral collector at once
-    addRequirements(coralCollector);
+    // addRequirements(coralCollector);
   }
 
   // Called when the command is initially scheduled.

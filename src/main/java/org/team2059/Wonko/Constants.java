@@ -233,7 +233,7 @@ public final class Constants {
   public static class ElevatorConstants {
     public static final int motorId = 16;
 
-    public static final double positionConversionFactor = 0.0354650904;
+    public static final double positionConversionFactor = 0.0354650904; // 0.1016/(9xpi)
     public static final double velocityConversionFactor = positionConversionFactor / 60;
 
     public static final int[] limitSwitchDIO = {0, 1, 2, 3, 4};

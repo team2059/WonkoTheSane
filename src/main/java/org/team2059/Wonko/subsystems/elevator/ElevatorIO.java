@@ -22,4 +22,5 @@ public interface ElevatorIO {
     default void setVoltage(double volts) {};
     default void resetEncoder() {};
     default void setSpeed(double speed) {};
+    default void setPositionClosedLoopWithFF(double position, double arbFF) {};
 }

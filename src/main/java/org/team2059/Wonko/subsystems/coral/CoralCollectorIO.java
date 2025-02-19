@@ -19,6 +19,8 @@ public interface CoralCollectorIO {
         public double thruBorePositionDegrees = 0.0;
 
         public boolean hasCoral = false;
+
+        public double intakeMotorSpeed = 0.0;
     }
 
     default void updateInputs(CoralCollectorIOInputs inputs) {};

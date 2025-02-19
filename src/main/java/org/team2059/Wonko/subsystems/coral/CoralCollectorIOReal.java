@@ -2,7 +2,10 @@ package org.team2059.Wonko.subsystems.coral;
 
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -15,6 +18,8 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 public class CoralCollectorIOReal implements CoralCollectorIO {
     private SparkFlex intakeMotor;
     private SparkFlex tiltMotor;
+
+    private SparkClosedLoopController flywheelController;
 
     // Through bore encoder is a DutyCycleEncoder, goes from 0 - 1
     private DutyCycleEncoder tiltEncoder;
@@ -31,8 +36,12 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
         intakeConfig
             .inverted(false)
             .idleMode(IdleMode.kBrake);
+        intakeConfig.closedLoop
+            .pidf(0.0, 0, 0, 0.000155)
+            .outputRange(-1, 1);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+        flywheelController = intakeMotor.getClosedLoopController();
+ 
         SparkFlexConfig tiltConfig = new SparkFlexConfig();
         tiltConfig
             .inverted(true)
@@ -59,11 +68,13 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
         inputs.thruBoreConnected = tiltEncoder.isConnected();
         inputs.thruBorePositionDegrees = tiltEncoder.get() * 360;
         inputs.hasCoral = irSensor.get();
+
+        inputs.intakeMotorSpeed = intakeMotor.getEncoder().getVelocity();
     }
 
     @Override
     public void setIntakeSpeed(double speed) {
-        intakeMotor.set(speed);
+        flywheelController.setReference(speed, ControlType.kVelocity, ClosedLoopSlot.kSlot0);
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.commands.coral.TiltCoralCollectorCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
-import org.team2059.Wonko.commands.elevator.ElevateCmd;
+import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.climber.Climber;
@@ -53,7 +53,7 @@ public class RobotContainer {
   private static Elevator elevator;
   // private static AlgaeCollector algaeCollector;
   private static CoralCollector coralCollector;
-  private static Climber climber;
+  // private static Climber climber;
 
   /* CONTROLLERS */
   public final static Joystick logitech = new Joystick(OperatorConstants.logitechControllerPort);
@@ -76,7 +76,7 @@ public class RobotContainer {
     // algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
     coralCollector = new CoralCollector(new CoralCollectorIOReal());
 
-    climber = new Climber(new ClimberIOReal());
+    // climber = new Climber(new ClimberIOReal());
 
     // Builds auto chooser and sets default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
@@ -116,57 +116,13 @@ public class RobotContainer {
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
       .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
     
-    // Bind full set of SysId routine tests to buttons; a complete routine should run each of these once.
-    // new JoystickButton(buttonBox, 1)
-    //   .whileTrue(drivetrain.drivetrainRoutine.quasistaticForward());
-
-    // new JoystickButton(buttonBox, 2)
-    //   .whileTrue(drivetrain.drivetrainRoutine.quasistaticReverse());
-
-    // new JoystickButton(buttonBox, 3)
-    //   .whileTrue(drivetrain.drivetrainRoutine.dynamicForward());
-      
-    // new JoystickButton(buttonBox, 4)
-    //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
-
-    /* ELEVATOR */
+    /* Elevator */
     new JoystickButton(buttonBox, 1)
-      .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[3]));
+      .whileTrue(new ElevateToSetpointCmd(elevator, ElevatorConstants.levels[1]));
 
-    new JoystickButton(buttonBox, 2)
-      .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[0]));
-
-    new JoystickButton(buttonBox, 11)
-      .whileTrue(new InstantCommand(() -> elevator.io.setSpeed(0.25)))
-      .onFalse(new InstantCommand(() -> elevator.io.setSpeed(0)));
-
-    new JoystickButton(buttonBox, 12)
-      .whileTrue(new InstantCommand(() -> elevator.io.setSpeed(-0.25)))
-      .onFalse(new InstantCommand(() -> elevator.io.setSpeed(0)));
-
-    // /* ALGAE COLLECTOR */
-    // new JoystickButton(buttonBox, 5) // intake
-    //   .whileTrue(algaeCollector.intakeCommand());
-
-    // new JoystickButton(buttonBox, 6) // outtake
-    //   .whileTrue(algaeCollector.outtakeCommand());
-
-    // /* CORAL COLLECTOR */
-    new JoystickButton(buttonBox, 7) // Intake
-      .whileTrue(coralCollector.intakeCommand());
-    new JoystickButton(buttonBox, 8) // Outtake
-      .whileTrue(coralCollector.outtakeCommand());
-    new JoystickButton(buttonBox, 3)
-      .whileTrue(new TiltCoralCollectorCmd(coralCollector, 260));
-    new JoystickButton(buttonBox, 4)
-      .whileTrue(new TiltCoralCollectorCmd(coralCollector, 175));
-    
-    /* Climber */
-//     new JoystickButton(buttonBox, 11)
-//       .whileTrue(climber.climberDownCommand()); 
-
-//     new JoystickButton(buttonBox, 12)
-//       .whileTrue(climber.climberUpCommand());
+    /* Coral Collector */
+    new JoystickButton(buttonBox, 5)
+      .whileFalse(new TiltCoralCollectorCmd(coralCollector, 260));
   }
   
   /**

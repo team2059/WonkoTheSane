@@ -16,12 +16,12 @@ public class CoralCollector extends SubsystemBase {
     }
 
     public Command intakeCommand() {
-        return this.startEnd(() -> io.setIntakeSpeed(0.1), () -> io.stopIntake());
+        return this.startEnd(() -> io.setIntakeSpeed(1000), () -> io.stopIntake());
             // .until(() -> inputs.hasCoral);
     }
 
     public Command outtakeCommand() {
-        return this.startEnd(() -> io.setIntakeSpeed(-0.1), () -> io.stopIntake());
+        return this.startEnd(() -> io.setIntakeSpeed(0), () -> io.stopIntake());
     }
 
     @Override
