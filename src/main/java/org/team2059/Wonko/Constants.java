@@ -61,6 +61,15 @@ public final class Constants {
   public static class ClimberConstants {
     public static final int motor1ID = 17;
     public static final int motor2ID = 18; 
+
+    public static final double kP = 0.0;
+    public static final double kI = 0.0; 
+    public static final double kD = 0.0; 
+    
+    public static final int climbThroughBoreDIO = 8; 
+
+    public static final double uplimit = 330; 
+    public static final double downLimit = 195;
   }
 
   public static class DrivetrainConstants {

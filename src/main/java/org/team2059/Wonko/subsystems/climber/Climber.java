@@ -1,5 +1,7 @@
 package org.team2059.Wonko.subsystems.climber;
 
+import org.littletonrobotics.junction.Logger;
+import org.team2059.Wonko.Constants.ClimberConstants;
 import org.team2059.Wonko.subsystems.climber.ClimberIO;
 import org.team2059.Wonko.subsystems.climber.ClimberIOInputsAutoLogged;
 
@@ -16,10 +18,18 @@ public class Climber extends SubsystemBase{
     }
 
     public Command climberDownCommand() {
-        return this.startEnd(() -> io.setClimbSpeed(0.05), () -> io.stopClimb());                            
+        return this.startEnd(() -> io.setClimbSpeed(0.3), () -> io.stopClimb())
+            .until(() -> inputs.tiltThroughborePosition <= ClimberConstants.downLimit);                         
     }
 
     public Command climberUpCommand() {
-        return this.startEnd(() -> io.setClimbSpeed(-0.05), () -> io.stopClimb());
+        return this.startEnd(() -> io.setClimbSpeed(-0.3), () -> io.stopClimb())
+            .until(() -> inputs.tiltThroughborePosition >= ClimberConstants.uplimit);
+    }
+
+    @Override 
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("Climber", inputs);
     }
 }

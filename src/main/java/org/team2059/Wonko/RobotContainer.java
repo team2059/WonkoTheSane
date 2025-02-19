@@ -6,6 +6,7 @@ package org.team2059.Wonko;
 
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.commands.climber.tiltClimberPIDCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
@@ -129,9 +130,9 @@ public class RobotContainer {
     // new JoystickButton(buttonBox, 4)
     //   .whileTrue(drivetrain.drivetrainRoutine.dynamicReverse());
 
-    /* ELEVATOR */
-    new JoystickButton(buttonBox, 2)
-      .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[1]));
+    // /* ELEVATOR */
+    // new JoystickButton(buttonBox, 2)
+    //   .whileTrue(new ElevateCmd(elevator, ElevatorConstants.levels[1]));
 
     // /* ALGAE COLLECTOR */
     // new JoystickButton(buttonBox, 5) // intake
@@ -140,24 +141,30 @@ public class RobotContainer {
     // new JoystickButton(buttonBox, 6) // outtake
     //   .whileTrue(algaeCollector.outtakeCommand());
 
-    // /* CORAL COLLECTOR */
-    new JoystickButton(buttonBox, 7) // Intake
-      .whileTrue(coralCollector.intakeCommand());
+    // // /* CORAL COLLECTOR */
+    // new JoystickButton(buttonBox, 7) // Intake
+    //   .whileTrue(coralCollector.intakeCommand());
     
-    new JoystickButton(buttonBox, 8) // Outtake
-      .whileTrue(coralCollector.outtakeCommand());
+    // new JoystickButton(buttonBox, 8) // Outtake
+    //   .whileTrue(coralCollector.outtakeCommand());
     // new JoystickButton(buttonBox, 3)
     //   .whileTrue(new CoralTiltCmd(coralCollector, 275));
 
     // new JoystickButton(buttonBox, 4)
     //   .whileTrue(new CoralTiltCmd(coralCollector, 200));
 
-    /* Climber */
-    new JoystickButton(buttonBox, 11)
+    /* Climber */ // TODO: Find values for throughbore up and down 
+    new JoystickButton(buttonBox, 1)
       .whileTrue(climber.climberDownCommand()); 
 
-    new JoystickButton(buttonBox, 12)
+    new JoystickButton(buttonBox, 2)
       .whileTrue(climber.climberUpCommand());
+
+    new JoystickButton(buttonBox, 3) 
+      .whileTrue(new tiltClimberPIDCmd(climber, 0));
+
+    new JoystickButton(buttonBox, 4)
+      .whileTrue(new tiltClimberPIDCmd(climber, 0));
   }
   
   /**
