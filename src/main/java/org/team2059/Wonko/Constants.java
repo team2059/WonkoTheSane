@@ -4,6 +4,8 @@
 
 package org.team2059.Wonko;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -15,6 +17,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -34,7 +39,7 @@ public final class Constants {
     /* PORTS */
     /* ===== */
 
-    public static final int logitechControllerPort = 0;
+    public static final int logitechPort = 0;
     public static final int buttonBoxPort = 1;
 
     /* ==== */
@@ -52,15 +57,16 @@ public final class Constants {
 
     public static final int JoystickResetHeading = 5;
     public static final int JoystickRobotRelative = 3;
-    public static final int JoystickIntakeCoral = 6;
-    public static final int JoystickReleaseCoral = 4;
-    public static final int JoystickIntakeAlgae = 0;
-    public static final int JoystickReleaseAlgae = 0;
   }
 
   public static class ClimberConstants {
     public static final int motor1ID = 17;
     public static final int motor2ID = 18; 
+
+    public static final int climbThroughBoreDIO = 8; 
+
+    public static final double uplimit = 330; 
+    public static final double downLimit = 195;
   }
 
   public static class DrivetrainConstants {
@@ -202,17 +208,18 @@ public final class Constants {
     public static final int tiltMotorId = 13;
 
     public static final int tiltEncoderDio = 5;
-    public static final double tiltEncoderMin = 0.02;
-    public static final double tiltEncoderMax = 0.98;
 
     public static final double stallDetectionAmps = 20.0;
 
     public static final double holdSpeed = 0.02;
 
-    // TODO: Tune values
-    public static final double kPAlgae = 0.0;
-    public static final double kIAlgae = 0.0;
-    public static final double kDAlgae = 0.0;
+    public static final double horizontalOffset = 0.97282;
+
+    public static final double tiltMotorPositionConvFactor = 0.1396263402;
+    public static final double tiltMotorVelocityConvFactor = 0.00232710567;
+
+    public static final Angle thruBoreMinimum = Angle.ofBaseUnits(2.57 - 0.97282, Radians);
+    public static final Angle thruBoreMaxmimum = Angle.ofBaseUnits(3.96 - 0.97282, Radians);
 
   }
 
@@ -221,22 +228,70 @@ public final class Constants {
     public static final int tiltMotorId = 15;
     public static final int irSensorDio = 6;
     public static final int thruBoreDio = 7;
-    public static final double tiltEncoderMin = 0.148; // UPPER MAX POSITION
-    public static final double tiltEncoderMax = 0.717; // LOWER MAX POSITION
 
-    // TODO: tune values
-    public static final double kPCoral = 0.0;
-    public static final double kICoral = 0.0;
-    public static final double kDCoral = 0.0;
+    // Conv. factors
+    // 2pi/GR
+    public static final double tiltPositionConversionFactor = 0.2513274123; // Rotations -> radians w/ 9:1 g.r.
+    public static final double tiltVelocityConversionFactor = 0.004188790205; // RPM -> rad/sec "
+
+    // Constants for motion control
+    public static final double kPIntake = 0.000019;
+    public static final double kFIntake = 0.000149;
+    public static final double kPTilt = 1;
+    public static final double kITilt = 0.0;
+    public static final double kDTilt = 0.0;
+    public static final double kSTilt = 0.29014;
+    public static final double kVTilt = 1.7634;
+    public static final double kATilt = 0.23605;
+    public static final double kGTilt = 0.6436;
+
+    public static final double tiltMaxVelocity = 7;
+    public static final double tiltMaxAccel = 5;
+
+    public static final double horizontalOffset = -2.0745; // radians
+
+    public static final Current tiltCurrentLimit = Current.ofBaseUnits(30, Amps);
+
+    public static final Angle thruBoreMinimum = Angle.ofBaseUnits(2.6, Radians);
+    public static final Angle thruBoreMaxmimum = Angle.ofBaseUnits(5.7, Radians);
+
+    public static final double restingCoralCollectorPos = 6.6;
+    public static final double[] levelCoralTiltAngle = 
+      {restingCoralCollectorPos, 6.0, restingCoralCollectorPos, 4.8745, 5.1745};
+
+    public static final Angle humanPlayerAngle = Radians.of(6.10);
+
   }
 
   public static class ElevatorConstants {
     public static final int motorId = 16;
 
+    public static final Current currentLimit = Current.ofBaseUnits(40, Amps);
+
+    public static final Distance maxHeight = Distance.ofBaseUnits(2.3, Meters);
+    public static final Distance minHeight = Distance.ofBaseUnits(0.1, Meters);
+
+    public static final double kMaxVelocity = 3;
+    public static final double kMaxAcceleration = 2;
+
     public static final double positionConversionFactor = 0.0354650904; // 0.1016/(9xpi)
     public static final double velocityConversionFactor = positionConversionFactor / 60;
 
-    public static final int[] limitSwitchDIO = {0, 1, 2, 3, 4};
-    public static final double[] levels = {0.1, 0.5, 1, 1.5, 2};
+    // the limit switches and correspondign levels
+    public static final int[] limitSwitchDIO = {0,    1,    2,    3,    4};
+
+    // Level data storage (index is the level, begins at 0)
+    public static final double[] levelHeights = {0.1,  0.01,  0.1,  1.51,  2.375};
+    
+    public static final double kS = 0.05701;
+    public static final double kG = 0.99688;
+    public static final double kV = 3.5529;
+    public static final double kA = 1.0786;
+    public static final double kP = 2.0;
+    public static final double kI = 0.0;
+    public static final double kD = 0.0;
+
+    public static final Distance humanPlayerHeight = Meters.of(0.6);
+    public static final Distance processorHeight = Meters.of(0.4);
   }
 }

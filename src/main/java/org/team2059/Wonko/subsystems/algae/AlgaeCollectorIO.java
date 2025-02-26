@@ -20,7 +20,10 @@ public interface AlgaeCollectorIO {
         public boolean hasAlgae;
 
         public boolean thruBoreConnected = false;
-        public double thruBorePositionDegrees = 0.0;
+        public double thruBorePositionRadians = 0.0;
+
+        public double integratedTiltPosRadians = 0.0;
+        public double integratedTiltVelRadPerSec = 0.0;
     }
 
     default void updateInputs(AlgaeCollectorIOInputs inputs) {};
@@ -29,9 +32,13 @@ public interface AlgaeCollectorIO {
 
     default void setTiltSpeed(double speed) {};
 
+    default void setTiltVolts(double volts) {};
+
     default void stopIntake() {};
 
     default void stopTilt() {};
 
     default void stopAll() {};
+
+    default void setTiltPos(double posRadians, double arbFF) {};
 }

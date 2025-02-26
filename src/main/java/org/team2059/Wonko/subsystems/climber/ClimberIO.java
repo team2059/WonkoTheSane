@@ -14,6 +14,9 @@ public interface ClimberIO {
         public double climbMotor1Temp = 0.0;
         public double climbMotor2Temp = 0.0; 
 
+        public boolean tiltThroughboreConnected = false; 
+        public double tiltThroughborePosition = 0.0; 
+
     }
 
     default void updateInputs(ClimberIOInputs inputs) {};

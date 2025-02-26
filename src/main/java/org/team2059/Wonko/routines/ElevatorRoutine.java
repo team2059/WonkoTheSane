@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class ElevatorRoutine {
+    private final Elevator elevator;
+
     private final SysIdRoutine sysIdRoutine;
 
     private final MutVoltage appliedVoltage = Volts.mutable(0);
@@ -20,6 +22,8 @@ public class ElevatorRoutine {
     private final MutLinearVelocity linearVelocity = MetersPerSecond.mutable(0);
 
     public ElevatorRoutine(Elevator elevator) {
+        this.elevator = elevator;
+
         sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
                 Volts.of(1).per(Units.Second), // Ramp rate in volts per second
@@ -44,17 +48,17 @@ public class ElevatorRoutine {
 
     // Quasistatic tests in given direction
     public Command quasistaticForward() {
-        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward);
+        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> elevator.inputs.positionMeters >= 2.2);
     }
     public Command quasistaticReverse() {
-        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse);
+        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> elevator.inputs.positionMeters <= 0.2);
     }
 
     // Dynamic tests in given direction
     public Command dynamicForward() {
-        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward);
+        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(() -> elevator.inputs.positionMeters >= 2.2);
     }
     public Command dynamicReverse() {
-        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse);
+        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> elevator.inputs.positionMeters <= 0.2);
     }
 }

@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -32,15 +33,19 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+
+    // Switch thread to high priority to improve loop timing
+    Threads.setCurrentThreadPriority(true, 5);
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
 
     // AdvantageKit logging setup...
-    Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
+    Logger.recordMetadata("ProjectName", "WonkoTheSane"); // Set a metadata value
 
     if (isReal()) {
-        // Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+        Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         new PowerDistribution(9, ModuleType.kRev); // Enables power distribution logging
     } else {

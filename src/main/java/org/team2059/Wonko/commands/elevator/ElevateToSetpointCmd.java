@@ -5,21 +5,28 @@
 package org.team2059.Wonko.commands.elevator;
 
 import org.littletonrobotics.junction.Logger;
+import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.util.LoggedTunableNumber;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class ElevateToSetpointCmd extends Command {
-  private LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", 0.0);
-  private LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", 0.0);
-  private LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", 0.0);
-  private LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", 0.0);
+  private LoggedTunableNumber kG = new LoggedTunableNumber("Elevator/kG", ElevatorConstants.kG);
+  private LoggedTunableNumber kS = new LoggedTunableNumber("Elevator/kS", ElevatorConstants.kS);
+  private LoggedTunableNumber kV = new LoggedTunableNumber("Elevator/kV", ElevatorConstants.kV);
+  private LoggedTunableNumber kA = new LoggedTunableNumber("Elevator/kA", ElevatorConstants.kA);
 
-  private final TrapezoidProfile profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(1, 0.3));
+  private final TrapezoidProfile profile = new TrapezoidProfile(
+    new TrapezoidProfile.Constraints(
+      ElevatorConstants.kMaxVelocity, 
+      ElevatorConstants.kMaxAcceleration
+    )
+  );
   private TrapezoidProfile.State goal = new TrapezoidProfile.State();
   private TrapezoidProfile.State setpoint = new TrapezoidProfile.State();
 
@@ -44,7 +51,7 @@ public class ElevateToSetpointCmd extends Command {
   @Override
   public void initialize() {
     goal = new TrapezoidProfile.State(userGoal, 0);
-    setpoint = new TrapezoidProfile.State();
+    setpoint = new TrapezoidProfile.State(elevator.inputs.positionMeters, elevator.inputs.velocityMetersPerSecond);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -70,7 +77,7 @@ public class ElevateToSetpointCmd extends Command {
     // Send setpoint to offboard controller PID
     elevator.io.setPositionClosedLoopWithFF(
       setpoint.position, 
-      feedforward.calculate(setpoint.velocity)
+      MathUtil.clamp(feedforward.calculate(setpoint.velocity), -12, 12)
     );
 
     Logger.recordOutput("Desired motion", setpoint.position);
@@ -79,7 +86,7 @@ public class ElevateToSetpointCmd extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    elevator.io.stop();
+    elevator.io.setVoltage(0);
   }
 
   // Returns true when the command should end.
