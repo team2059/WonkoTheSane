@@ -24,12 +24,14 @@ public class ClimberIOReal implements ClimberIO{
             .inverted(true)
             .idleMode(IdleMode.kBrake);
         motor1.configure(motor1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor1.clearFaults();
 
         SparkMaxConfig motor2Config = new SparkMaxConfig();
         motor2Config    
             .inverted(false)
             .idleMode(IdleMode.kBrake);
         motor2.configure(motor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor2.clearFaults();
     }
 
     @Override

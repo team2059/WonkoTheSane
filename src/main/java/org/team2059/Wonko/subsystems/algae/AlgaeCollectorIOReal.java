@@ -39,18 +39,21 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
             .inverted(false)
             .idleMode(IdleMode.kBrake);
         motor1.configure(motor1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor1.clearFaults();
 
         SparkFlexConfig motor2Config = new SparkFlexConfig();
         motor2Config
             .inverted(true)
             .idleMode(IdleMode.kBrake);
         motor2.configure(motor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor2.clearFaults();
 
         SparkMaxConfig tiltConfig = new SparkMaxConfig();
         tiltConfig
             .inverted(false)
             .idleMode(IdleMode.kBrake);
         tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        tiltMotor.clearFaults();
 
         // Create thru-bore encoder
         tiltEncoder = new DutyCycleEncoder(AlgaeCollectorConstants.tiltEncoderDio);

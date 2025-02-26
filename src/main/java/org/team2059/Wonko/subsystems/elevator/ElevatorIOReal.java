@@ -34,6 +34,7 @@ public class ElevatorIOReal implements ElevatorIO {
             .velocityConversionFactor(ElevatorConstants.velocityConversionFactor);
 
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor.clearFaults();
 
         encoder = motor.getEncoder();
 

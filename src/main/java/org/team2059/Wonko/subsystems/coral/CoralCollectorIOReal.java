@@ -32,12 +32,14 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
             .inverted(false)
             .idleMode(IdleMode.kBrake);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeMotor.clearFaults(); 
 
         SparkFlexConfig tiltConfig = new SparkFlexConfig();
         tiltConfig
             .inverted(true)
             .idleMode(IdleMode.kBrake);
         tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        tiltMotor.clearFaults();
 
         // Configure thru-bore encoder
         tiltEncoder = new DutyCycleEncoder(CoralCollectorConstants.thruBoreDio);
