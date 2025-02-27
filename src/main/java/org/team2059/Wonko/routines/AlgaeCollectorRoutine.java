@@ -49,7 +49,7 @@ public class AlgaeCollectorRoutine {
     // Quasistatic tests in given direction
     public Command quasistaticForward() {
         return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward)
-            .until(() -> algaeCollector.inputs.thruBorePositionRadians >= AlgaeCollectorConstants.thruBoreMaxmimum.in(Radians) - 0.1);
+            .until(() -> algaeCollector.inputs.thruBorePositionRadians >= AlgaeCollectorConstants.thruBoreMaximum.in(Radians) - 0.1);
     }
     public Command quasistaticReverse() {
         return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse)
@@ -59,7 +59,7 @@ public class AlgaeCollectorRoutine {
     // Dynamic tests in given direction
     public Command dynamicForward() {
         return sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward)
-            .until(() -> algaeCollector.inputs.thruBorePositionRadians >= AlgaeCollectorConstants.thruBoreMaxmimum.in(Radians) - 0.1);
+            .until(() -> algaeCollector.inputs.thruBorePositionRadians >= AlgaeCollectorConstants.thruBoreMaximum.in(Radians) - 0.1);
     }
     public Command dynamicReverse() {
         return sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)

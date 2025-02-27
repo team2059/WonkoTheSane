@@ -16,8 +16,6 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
@@ -30,12 +28,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     
     private RelativeEncoder tiltMotorIntegratedEncoder;
 
-    // A debouncer requires a condition to occur for a certain amount of time in order
-    // for the boolean to change
-    // kRising: false->true
-    private Debouncer debouncer = new Debouncer(0.33, DebounceType.kRising);
-
-    private LoggedTunableNumber kP = new LoggedTunableNumber("AlgaeCollector/Tilt/kP", 0.6);
+    private LoggedTunableNumber kP = new LoggedTunableNumber("AlgaeCollector/Tilt/kP", 0.5);
     private LoggedTunableNumber kI = new LoggedTunableNumber("AlgaeCollector/Tilt/kI", 0.0);
     private LoggedTunableNumber kD = new LoggedTunableNumber("AlgaeCollector/Tilt/kD", 0.0);
 
@@ -61,7 +54,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
 
         SparkFlexConfig tiltConfig = new SparkFlexConfig();
         tiltConfig
-            .inverted(true)
+            .inverted(false)
             .idleMode(IdleMode.kBrake);
         tiltConfig.encoder
             .positionConversionFactor(AlgaeCollectorConstants.tiltMotorPositionConvFactor)
@@ -74,11 +67,9 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
 
         // Create thru-bore encoder
         tiltEncoder = new DutyCycleEncoder(AlgaeCollectorConstants.tiltEncoderDio);
-        tiltEncoder.setInverted(true);
+        tiltEncoder.setInverted(false);
 
         tiltController = tiltMotor.getClosedLoopController();
-
-        debouncer.calculate(false); // Start debouncer at false
 
         tiltMotorIntegratedEncoder = tiltMotor.getEncoder();
 
@@ -134,10 +125,8 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         inputs.motor2Temp = motor2.getMotorTemperature();
         inputs.tiltMotorTemp = tiltMotor.getMotorTemperature();
 
-        inputs.hasAlgae = debouncer.calculate(inputs.motor1CurrentAmps > AlgaeCollectorConstants.stallDetectionAmps);
-
         inputs.thruBoreConnected = tiltEncoder.isConnected();
-        inputs.thruBorePositionRadians = tiltEncoder.get() * 2.0 * Math.PI - AlgaeCollectorConstants.horizontalOffset;
+        inputs.thruBorePositionRadians = tiltEncoder.get() * 2.0 * Math.PI + AlgaeCollectorConstants.horizontalOffset;
 
         if (Math.abs(inputs.thruBorePositionRadians - tiltMotorIntegratedEncoder.getPosition()) >= 0.01) {
             tiltMotorIntegratedEncoder.setPosition(inputs.thruBorePositionRadians);

@@ -16,7 +16,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -55,33 +54,39 @@ public final class Constants {
     /* BUTTONS */
     /* ======= */
 
+    // We'll add these later once the button box is finalized
     public static final int JoystickResetHeading = 5;
     public static final int JoystickRobotRelative = 3;
   }
 
   public static class ClimberConstants {
+    // CAN IDs 
+    // (one left, one right motor, they are supposed to behave exactly the same but INVERTED!)
     public static final int motor1ID = 17;
     public static final int motor2ID = 18; 
 
+    // REV thrubore encoder port
     public static final int climbThroughBoreDIO = 8; 
 
-    public static final double uplimit = 330; 
-    public static final double downLimit = 195;
+    // Hard limits, as reported by thrubore
+    public static final Angle upperLimit = Radians.of(5.76);
+    public static final Angle lowerLimit = Radians.of(3.4);
   }
 
   public static class DrivetrainConstants {
 
-    public static final double wheelBase = Units.inchesToMeters(25.125); // distance between front wheels (like train track)
-    public static final double trackWidth = Units.inchesToMeters(21.25); // distance from center of wheels on side
+    public static final Distance wheelBase = Inches.of(25.125); // distance between front wheels (like train track)
+    public static final Distance trackWidth = Inches.of(21.25); // distance from center of wheels on side
 
-    public static final double wheelDiameter = Units.inchesToMeters(4.0 / 1.0);
+    // Diameter of swerve module wheel
+    public static final Distance wheelDiameter = Inches.of(4.0);
 
-    // Kinematics gets each module relative to center. X is forward/backward and Y is left/right
+    // Kinematics gets each module relative to center. X is forward/backward and Y is left/right.
     public static final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
-      new Translation2d(wheelBase / 2.0, trackWidth / 2.0), // front right (+,+)
-      new Translation2d(wheelBase / 2.0, -trackWidth / 2.0), // back right (+,-)
-      new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), // front left (-,+)
-      new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0) // back left (-,-)
+      new Translation2d(wheelBase.in(Meters) / 2.0, trackWidth.in(Meters) / 2.0), // front right (+,+)
+      new Translation2d(wheelBase.in(Meters) / 2.0, -trackWidth.in(Meters) / 2.0), // back right (+,-)
+      new Translation2d(-wheelBase.in(Meters) / 2.0, trackWidth.in(Meters) / 2.0), // front left (-,+)
+      new Translation2d(-wheelBase.in(Meters) / 2.0, -trackWidth.in(Meters) / 2.0) // back left (-,-)
     );
 
     /* =========== */
@@ -203,29 +208,33 @@ public final class Constants {
   }
 
   public static class AlgaeCollectorConstants {
+
+    // CAN IDs
     public static final int motor1Id = 11;
     public static final int motor2Id = 12;
     public static final int tiltMotorId = 13;
 
+    // DIO IDs
     public static final int tiltEncoderDio = 5;
 
-    public static final double stallDetectionAmps = 20.0;
+    public static final double horizontalOffset = -2.16; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
 
-    public static final double holdSpeed = 0.02;
-
-    public static final double horizontalOffset = 0.97282;
-
+    // Conv. factors (2pi/GR to get Radians)
     public static final double tiltMotorPositionConvFactor = 0.1396263402;
     public static final double tiltMotorVelocityConvFactor = 0.00232710567;
 
-    public static final Angle thruBoreMinimum = Angle.ofBaseUnits(2.57 - 0.97282, Radians);
-    public static final Angle thruBoreMaxmimum = Angle.ofBaseUnits(3.96 - 0.97282, Radians);
-
+    // Hard limits
+    public static final Angle thruBoreMinimum = Radians.of(0);
+    public static final Angle thruBoreMaximum = Radians.of(Math.PI / 2.0);
   }
 
   public static class CoralCollectorConstants {
+
+    // CAN IDs
     public static final int intakeMotorId = 14;
     public static final int tiltMotorId = 15;
+
+    // DIO port IDs
     public static final int irSensorDio = 6;
     public static final int thruBoreDio = 7;
 
@@ -234,55 +243,77 @@ public final class Constants {
     public static final double tiltPositionConversionFactor = 0.2513274123; // Rotations -> radians w/ 9:1 g.r.
     public static final double tiltVelocityConversionFactor = 0.004188790205; // RPM -> rad/sec "
 
-    // Constants for motion control
+    // PID & FF gains
     public static final double kPIntake = 0.000019;
     public static final double kFIntake = 0.000149;
-    public static final double kPTilt = 1;
+    public static final double kPTilt = 0.5;
     public static final double kITilt = 0.0;
     public static final double kDTilt = 0.0;
-    public static final double kSTilt = 0.29014;
-    public static final double kVTilt = 1.7634;
-    public static final double kATilt = 0.23605;
-    public static final double kGTilt = 0.6436;
+    public static final double kSTilt = 0.0; // Note concerning FF values: following mechanical changes, constants no longer needed.
+    public static final double kVTilt = 0.0; //  , center of gravity has shifted requiring not as much control complication
+    public static final double kATilt = 0.0;
+    public static final double kGTilt = 0.0;
 
+    // Trapezoidal constraints
     public static final double tiltMaxVelocity = 7;
     public static final double tiltMaxAccel = 5;
 
-    public static final double horizontalOffset = -2.0745; // radians
+    public static final double horizontalOffset = -2.1717; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
 
+    // Smart current limit for Spark controller
     public static final Current tiltCurrentLimit = Current.ofBaseUnits(30, Amps);
 
-    public static final Angle thruBoreMinimum = Angle.ofBaseUnits(2.6, Radians);
-    public static final Angle thruBoreMaxmimum = Angle.ofBaseUnits(5.7, Radians);
+    // Hard limits
+    public static final Angle thruBoreMinimum = Radians.of(-1.6);
+    public static final Angle thruBoreMaxmimum = Radians.of(Math.PI / 2.0);
 
-    public static final double restingCoralCollectorPos = 6.6;
-    public static final double[] levelCoralTiltAngle = 
-      {restingCoralCollectorPos, 6.0, restingCoralCollectorPos, 4.8745, 5.1745};
-
-    public static final Angle humanPlayerAngle = Radians.of(6.10);
+    // Angular setpoints
+    public static final Angle restingCoralCollectorPos = Radians.of(1.36);
+    public static final Angle[] levelCoralTiltAngle = {
+      restingCoralCollectorPos,  // L0
+      restingCoralCollectorPos,  // L1
+      Radians.of(-0.657),        // L2
+      Radians.of(-0.500),        // L3
+      Radians.of(-1.100)         // L4
+    };
+    public static final Angle humanPlayerAngle = Radians.of(0.56);
 
   }
 
   public static class ElevatorConstants {
+
+    // CAN ID
     public static final int motorId = 16;
 
+    // Smart current limit for Spark motor
     public static final Current currentLimit = Current.ofBaseUnits(40, Amps);
 
-    public static final Distance maxHeight = Distance.ofBaseUnits(2.3, Meters);
+    // MAX HEIGHT IS A HARD LIMIT! DO NOT GO TOO CLOSE
+    public static final Distance maxHeight = Distance.ofBaseUnits(2.38, Meters);
     public static final Distance minHeight = Distance.ofBaseUnits(0.1, Meters);
 
+    // Trapezoidal constraints
     public static final double kMaxVelocity = 3;
     public static final double kMaxAcceleration = 2;
 
+    // Conversion factors
     public static final double positionConversionFactor = 0.0354650904; // 0.1016/(9xpi)
     public static final double velocityConversionFactor = positionConversionFactor / 60;
 
-    // the limit switches and correspondign levels
-    public static final int[] limitSwitchDIO = {0,    1,    2,    3,    4};
-
-    // Level data storage (index is the level, begins at 0)
-    public static final double[] levelHeights = {0.1,  0.01,  0.1,  1.51,  2.375};
+    // Level heights (index is the level, begins at 0, which is ground)
+    public static final Distance[] levelHeights = {
+      Meters.of(0.100), // L0
+      Meters.of(0.010), // L1
+      Meters.of(0.654), // L2
+      Meters.of(1.250), // L3
+      Meters.of(2.390)  // L4
+    };
     
+    // Heights for misc. other tasks
+    public static final Distance humanPlayerHeight = Meters.of(0.6);
+    public static final Distance processorHeight = Meters.of(0.4);
+    
+    // PID & FF gains
     public static final double kS = 0.05701;
     public static final double kG = 0.99688;
     public static final double kV = 3.5529;
@@ -290,8 +321,5 @@ public final class Constants {
     public static final double kP = 2.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
-
-    public static final Distance humanPlayerHeight = Meters.of(0.6);
-    public static final Distance processorHeight = Meters.of(0.4);
   }
 }

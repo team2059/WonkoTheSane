@@ -1,7 +1,6 @@
 package org.team2059.Wonko.subsystems.climber;
 
 import org.team2059.Wonko.Constants.ClimberConstants;
-import org.team2059.Wonko.Constants.CoralCollectorConstants;
 
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
@@ -11,7 +10,6 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class ClimberIOReal implements ClimberIO{
@@ -51,7 +49,7 @@ public class ClimberIOReal implements ClimberIO{
         inputs.climbMotor2Temp = motor2.getMotorTemperature();
 
         inputs.tiltThroughboreConnected = climberThroughbore.isConnected();
-        inputs.tiltThroughborePosition = climberThroughbore.get() * 360;
+        inputs.tiltThroughborePosition = climberThroughbore.get() * 2.0 * Math.PI;
     }
 
     @Override

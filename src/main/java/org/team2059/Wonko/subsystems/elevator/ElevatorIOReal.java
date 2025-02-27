@@ -73,13 +73,15 @@ public class ElevatorIOReal implements ElevatorIO {
         );
 
         // Update all logged input values
-        inputs.positionMeters = encoder.getPosition();
         inputs.velocityMetersPerSecond = encoder.getVelocity();
         inputs.appliedVolts = getAppliedVolts();
         inputs.currentAmps = motor.getOutputCurrent();
         inputs.motorTemp = motor.getMotorTemperature();
-
         inputs.zeroLimit = !zeroLimit.get();
+
+        if (inputs.zeroLimit) resetEncoder();
+        inputs.positionMeters = encoder.getPosition();
+
     }
 
     // local helper method

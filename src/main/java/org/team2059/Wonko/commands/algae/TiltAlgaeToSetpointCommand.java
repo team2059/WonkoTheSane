@@ -4,12 +4,15 @@
 
 package org.team2059.Wonko.commands.algae;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.util.LoggedTunableNumber;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -24,8 +27,8 @@ public class TiltAlgaeToSetpointCommand extends Command {
   // This profile holds constraints and allows you to get the next setpoint for motion profiling.
   private final TrapezoidProfile profile = new TrapezoidProfile(
     new TrapezoidProfile.Constraints(
-      7.0, 
-      5.0
+      7, 
+      5
     )
   );
 
@@ -35,12 +38,12 @@ public class TiltAlgaeToSetpointCommand extends Command {
 
   private AlgaeCollector algaeCollector;
 
-  private double userGoal;
+  private Angle userGoal;
 
   private ArmFeedforward feedforward;
 
   /** Creates a new TiltAlgaeToSetpointCommand. */
-  public TiltAlgaeToSetpointCommand(AlgaeCollector algaeCollector, double userGoal) {
+  public TiltAlgaeToSetpointCommand(AlgaeCollector algaeCollector, Angle userGoal) {
     this.algaeCollector = algaeCollector;
     this.userGoal = userGoal;
     feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
@@ -53,7 +56,7 @@ public class TiltAlgaeToSetpointCommand extends Command {
   @Override
   public void initialize() {
     // Set goal that was specified by the object creator (assume endpoint is stopped)
-    goal = new TrapezoidProfile.State(userGoal, 0);
+    goal = new TrapezoidProfile.State(userGoal.in(Radians), 0);
 
     // Set the setpoint as the current real position
     setpoint = new TrapezoidProfile.State(

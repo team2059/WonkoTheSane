@@ -63,7 +63,7 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
  
         SparkFlexConfig tiltConfig = new SparkFlexConfig();
         tiltConfig
-            .inverted(true)
+            .inverted(false)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(((int)CoralCollectorConstants.tiltCurrentLimit.in(Amps)));
         tiltConfig.encoder
@@ -125,7 +125,7 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
         inputs.tiltMotorPos = tiltIntegratedEncoder.getPosition();
         inputs.tiltMotorTemp = tiltMotor.getMotorTemperature();
         inputs.thruBoreConnected = tiltEncoder.isConnected();
-        inputs.thruBorePositionRadians = tiltEncoder.get() * 2.0 * Math.PI - CoralCollectorConstants.horizontalOffset;
+        inputs.thruBorePositionRadians = tiltEncoder.get() * 2.0 * Math.PI + CoralCollectorConstants.horizontalOffset;
         inputs.hasCoral = !irSensor.get();
         if (Math.abs(inputs.thruBorePositionRadians - tiltIntegratedEncoder.getPosition()) >= 0.01) {
             tiltIntegratedEncoder.setPosition(inputs.thruBorePositionRadians);

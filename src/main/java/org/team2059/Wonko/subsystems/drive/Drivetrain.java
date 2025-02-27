@@ -110,7 +110,7 @@ public class Drivetrain extends SubsystemBase {
 
   private final Vision vision;
 
-  public final DrivetrainRoutine drivetrainRoutine;
+  public final DrivetrainRoutine routine;
 
   public Drivetrain(Vision vision, GyroIO gyro) {
 
@@ -164,7 +164,7 @@ public class Drivetrain extends SubsystemBase {
     //   }
     // });
 
-    drivetrainRoutine = new DrivetrainRoutine(this);
+    routine = new DrivetrainRoutine(this);
 
     poseEstimator = new SwerveDrivePoseEstimator(
       DrivetrainConstants.kinematics, 

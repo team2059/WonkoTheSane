@@ -1,5 +1,7 @@
 package org.team2059.Wonko.commands.coral;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
@@ -7,6 +9,7 @@ import org.team2059.Wonko.util.LoggedTunableNumber;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class TiltCoralToSetpointCmd extends Command {
@@ -30,11 +33,11 @@ public class TiltCoralToSetpointCmd extends Command {
 
   private CoralCollector coralCollector;
 
-  private double userGoal;
+  private Angle userGoal;
 
   private ArmFeedforward feedforward; // tried to use Arm... didn't work well.
 
-  public TiltCoralToSetpointCmd(CoralCollector coralCollector, double userGoal) {
+  public TiltCoralToSetpointCmd(CoralCollector coralCollector, Angle userGoal) {
     this.coralCollector = coralCollector;
     this.userGoal = userGoal;
     feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
@@ -45,11 +48,11 @@ public class TiltCoralToSetpointCmd extends Command {
   @Override
   public void initialize() {
     // Set goal that was specified by the object creator (assume endpoint is stopped)
-    goal = new TrapezoidProfile.State(userGoal, 0);
+    goal = new TrapezoidProfile.State(userGoal.in(Radians), 0);
 
     // Set the setpoint as the current real position
     setpoint = new TrapezoidProfile.State(
-      coralCollector.inputs.tiltMotorPositionRad, 
+      coralCollector.inputs.thruBorePositionRadians, 
       coralCollector.inputs.tiltMotorVelocityRadPerSec
     );
   }
@@ -77,7 +80,6 @@ public class TiltCoralToSetpointCmd extends Command {
       setpoint.position,
       feedforward.calculate(setpoint.position, setpoint.velocity)
     );
-
 
     Logger.recordOutput("SETPOINT TILT", setpoint.position);
   }

@@ -31,8 +31,8 @@ public class CoralCollectorRoutine {
 
         sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(0.3).per(Units.Second), // Ramp rate in volts per second
-                Volts.of(1), // Dynamic step voltage
+                Volts.of(0.5).per(Units.Second), // Ramp rate in volts per second
+                Volts.of(2), // Dynamic step voltage
                 Time.ofBaseUnits(4, Units.Second), // Test duration in seconds
                 null
             ),

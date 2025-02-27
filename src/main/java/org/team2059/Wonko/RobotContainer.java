@@ -4,8 +4,7 @@
 
 package org.team2059.Wonko;
 
-import static edu.wpi.first.units.Units.*;
-
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
@@ -72,29 +71,31 @@ public class RobotContainer {
 
     boolean isReal = RobotBase.isReal();
 
+    // Subsystem creation
     vision = new Vision(isReal ? new VisionIOReal() : new VisionIOSim());
-
-    drivetrain = new Drivetrain(
-      vision,
-      new GyroIONavX()
-    );
-
+    drivetrain = new Drivetrain(vision, new GyroIONavX());
     elevator = new Elevator(new ElevatorIOReal());
-
     algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
     coralCollector = new CoralCollector(new CoralCollectorIOReal());
-
     climber = new Climber(new ClimberIOReal());
 
-    // Builds auto chooser and sets default auto (you don't have to set a default)
+    // Build auto chooser and set default auto (you don't have to set a default)
     autoChooser = AutoBuilder.buildAutoChooser("New Auto");
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    // Allow viewing of command queue in dashboards 
+    // Allow viewing of command scheduler queue in dashboards 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
+    // Publish subsystem status to dashboard
+    SmartDashboard.putData(vision);
+    SmartDashboard.putData(drivetrain);
+    SmartDashboard.putData(elevator);
+    SmartDashboard.putData(algaeCollector);
+    SmartDashboard.putData(coralCollector);
+    SmartDashboard.putData(climber);
+
     /*
-     * Send axes and buttons from joystick to TeleopSwerveCmd,
+     * Send axes and buttons from joystick to TeleopDriveCmd,
      * which will govern the drivetrain during teleop
      */
     drivetrain.setDefaultCommand(new TeleopDriveCmd(
@@ -106,6 +107,24 @@ public class RobotContainer {
     ));
 
     configureBindings();
+
+    // Log build details to dashboard
+    SmartDashboard.putString("ProjectName", "WonkoTheSane");
+    SmartDashboard.putString("BuildDate", BuildConstants.BUILD_DATE);
+    SmartDashboard.putString("GitSHA", BuildConstants.GIT_SHA);
+    SmartDashboard.putString("GitDate", BuildConstants.GIT_DATE);
+    SmartDashboard.putString("GitBranch", BuildConstants.GIT_BRANCH);
+    switch (BuildConstants.DIRTY) {
+      case 0:
+        SmartDashboard.putString("GitDirty", "All changes committed");
+        break;
+      case 1:
+        SmartDashboard.putString("GitDirty", "Uncommitted changes");
+        break;
+      default:
+        SmartDashboard.putString("GitDirty", "Unknown");
+        break;
+    }
   }
 
   /**
@@ -131,72 +150,45 @@ public class RobotContainer {
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
       .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
     
+    // Drivetrain translation sysID routine (just drive motors) (wheels must be locked straight for this)
+    // new JoystickButton(buttonBox, 1)
+    //   .whileTrue(drivetrain.routine.quasistaticForward());
+    // new JoystickButton(buttonBox, 2)
+    //   .whileTrue(drivetrain.routine.quasistaticReverse());
+    // new JoystickButton(buttonBox, 3)
+    //   .whileTrue(drivetrain.routine.dynamicForward());
+    // new JoystickButton(buttonBox, 4)
+    //   .whileTrue(drivetrain.routine.dynamicReverse());
+
     /* ======== */
     /* Elevator */
     /* ======== */
 
     // Reef levels
-    // new JoystickButton(buttonBox, 1) // L1
-    //   .whileTrue(new ElevateToReefLevelCmd(1, coralCollector, elevator));
-    // new JoystickButton(buttonBox, 2) // L2
-    //   .whileTrue(new ElevateToReefLevelCmd(2, coralCollector, elevator));
-    // new JoystickButton(buttonBox, 3) // L3
-    //   .whileTrue(new ElevateToReefLevelCmd(3, coralCollector, elevator));
-    // new JoystickButton(buttonBox, 4) // L4
-    //   .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
+    new JoystickButton(buttonBox, 1) // L1
+      .whileTrue(new ElevateToReefLevelCmd(1, coralCollector, elevator));
+    new JoystickButton(buttonBox, 2) // L2
+      .whileTrue(new ElevateToReefLevelCmd(2, coralCollector, elevator));
+    new JoystickButton(buttonBox, 3) // L3
+      .whileTrue(new ElevateToReefLevelCmd(3, coralCollector, elevator));
+    new JoystickButton(buttonBox, 4) // L4
+      .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
     
     // Human player station
     new JoystickButton(buttonBox, 8)
       .whileTrue(Commands.parallel(
-        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight.in(Meters)),
-        new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.humanPlayerAngle.in(Radians))
+        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
+        new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.humanPlayerAngle)
       ));    
 
     // Processor
     new JoystickButton(buttonBox, 7)
       .whileTrue(Commands.parallel(
-        new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight.in(Meters)),
-        new TiltAlgaeToSetpointCommand(algaeCollector, AlgaeCollectorConstants.thruBoreMinimum.in(Radians))
+        new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight),
+        new TiltAlgaeToSetpointCommand(algaeCollector, AlgaeCollectorConstants.thruBoreMinimum)
       ));
 
-    // new JoystickButton(buttonBox, 3) // Run elevator down to lowest position
-    //   .whileTrue(new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0]));
-
-    // // Test score sequence for level 4 (max level)
-    // new JoystickButton(buttonBox, 5)
-    //   .whileTrue(
-    //     new ParallelRaceGroup(
-    //         new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.restingCoralCollectorPos)
-    //             .until(() -> elevator.inputs.positionMeters >= ElevatorConstants.levelHeights[4] - 0.1)
-    //             .andThen(Commands.parallel(
-    //                 new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.levelCoralTiltAngle[4]),
-    //                 new WaitCommand(1).andThen(coralCollector.outtakeCommand().withTimeout(1))
-    //             )).withTimeout(5),
-    //         new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[4])
-    //     ).andThen(Commands.parallel(
-    //         new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.restingCoralCollectorPos),
-    //         new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0])
-    //     ))
-    //   );
-
-    // //   // Test score sequence for level 3
-    //   new JoystickButton(buttonBox, 6)
-    //   .whileTrue(
-    //     new ParallelRaceGroup(
-    //         new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.restingCoralCollectorPos)
-    //             .until(() -> elevator.inputs.positionMeters >= ElevatorConstants.levelHeights[3] - 0.1)
-    //             .andThen(Commands.parallel(
-    //                 new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.levelCoralTiltAngle[3]),
-    //                 new WaitCommand(1).andThen(coralCollector.outtakeCommand().withTimeout(1))
-    //             )).withTimeout(5),
-    //         new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[3])
-    //     ).andThen(Commands.parallel(
-    //         new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.restingCoralCollectorPos),
-    //         new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0])
-    //     ))
-    //   );
-
-    // Elevator SysID routine
+    // Elevator sysID routine
     // new JoystickButton(buttonBox, 5)
     //   .whileTrue(elevator.routine.quasistaticForward());
     // new JoystickButton(buttonBox, 6)
@@ -220,14 +212,14 @@ public class RobotContainer {
       .whileTrue(new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.restingCoralCollectorPos));
 
     // Coral collector sysID routine
-    new JoystickButton(buttonBox, 1)
-      .whileTrue(coralCollector.routine.quasistaticForward());
-    new JoystickButton(buttonBox, 2)
-      .whileTrue(coralCollector.routine.quasistaticReverse());
-    new JoystickButton(buttonBox, 3)
-      .whileTrue(coralCollector.routine.dynamicForward());
-    new JoystickButton(buttonBox, 4)
-      .whileTrue(coralCollector.routine.dynamicReverse());
+    // new JoystickButton(buttonBox, 1)
+    //   .whileTrue(coralCollector.routine.quasistaticForward());
+    // new JoystickButton(buttonBox, 2)
+    //   .whileTrue(coralCollector.routine.quasistaticReverse());
+    // new JoystickButton(buttonBox, 3)
+    //   .whileTrue(coralCollector.routine.dynamicForward());
+    // new JoystickButton(buttonBox, 4)
+    //   .whileTrue(coralCollector.routine.dynamicReverse());
 
     /* =============== */
     /* Algae Collector */
@@ -240,9 +232,9 @@ public class RobotContainer {
 
     // Tilt up/down
     new JoystickButton(buttonBox, 5)
-      .whileTrue(new TiltAlgaeToSetpointCommand(algaeCollector, AlgaeCollectorConstants.thruBoreMaxmimum.in(Radians) - 0.1));
+      .whileTrue(new TiltAlgaeToSetpointCommand(algaeCollector, AlgaeCollectorConstants.thruBoreMaximum));
     new JoystickButton(buttonBox, 6)
-      .whileTrue(new TiltAlgaeToSetpointCommand(algaeCollector, AlgaeCollectorConstants.thruBoreMinimum.in(Radians) + 0.1));
+      .whileTrue(new TiltAlgaeToSetpointCommand(algaeCollector, AlgaeCollectorConstants.thruBoreMinimum));
 
     // Algae sysID routine
     // new JoystickButton(buttonBox, 5)
