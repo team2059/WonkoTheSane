@@ -4,7 +4,6 @@
 
 package org.team2059.Wonko;
 
-import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
