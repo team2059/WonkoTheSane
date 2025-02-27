@@ -14,7 +14,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
-public class ClimberIOReal implements ClimberIO{
+public class ClimberIOReal implements ClimberIO {
     private SparkMax motor1; 
     private SparkMax motor2; 
 
@@ -39,6 +39,7 @@ public class ClimberIOReal implements ClimberIO{
             motor2.clearFaults(); 
     
             climberThroughbore = new DutyCycleEncoder(ClimberConstants.climbThroughBoreDIO);
+        }
 
     @Override
     public void updateInputs(ClimberIOInputs inputs) {
@@ -71,4 +72,5 @@ public class ClimberIOReal implements ClimberIO{
         motor1.set(MathUtil.clamp(volts, -12, 12));
         motor2.set(MathUtil.clamp(volts, -12, 12));
     }
-}
+    }
+
