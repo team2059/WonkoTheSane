@@ -59,6 +59,9 @@ public class SwerveModuleIOVortex implements SwerveModuleIO {
             DrivetrainConstants.rotationEncoderVelocityConversionFactor
         );
 
+        driveMotor.clearFaults();
+        rotationMotor.clearFaults();
+
         rotationPidController = new PIDController(DrivetrainConstants.kPRotation, 0, 0);
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
 

@@ -59,8 +59,9 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
             .pidf(kPIntake.get(), 0, 0, kFIntake.get())
             .outputRange(-1, 1);
         intakeMotor.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        flywheelController = intakeMotor.getClosedLoopController();
- 
+        flywheelController = intakeMotor.getClosedLoopController(); 
+        intakeMotor.clearFaults(); 
+
         SparkFlexConfig tiltConfig = new SparkFlexConfig();
         tiltConfig
             .inverted(false)
@@ -74,7 +75,8 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
             .pid(kPTilt.get(), kITilt.get(), kDTilt.get())
             .outputRange(-1, 1);
         tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        tiltController = tiltMotor.getClosedLoopController();
+        tiltController = tiltMotor.getClosedLoopController(); 
+        tiltMotor.clearFaults(); 
 
         // Configure thru-bore encoder
         tiltEncoder = new DutyCycleEncoder(CoralCollectorConstants.thruBoreDio);

@@ -51,6 +51,7 @@ public class ElevatorIOReal implements ElevatorIO {
             .outputRange(-1.0, 1.0)
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
         motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor.clearFaults();
 
         encoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
