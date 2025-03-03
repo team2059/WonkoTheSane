@@ -13,6 +13,7 @@ import org.team2059.Wonko.commands.algae.TiltAlgaeToSetpointCommand;
 import org.team2059.Wonko.commands.coral.TiltCoralToSetpointCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
+import org.team2059.Wonko.commands.vision.PathfindToTagCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.climber.Climber;
@@ -25,19 +26,22 @@ import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.subsystems.elevator.ElevatorIOReal;
 import org.team2059.Wonko.subsystems.vision.Vision;
 import org.team2059.Wonko.subsystems.vision.VisionIOReal;
-import org.team2059.Wonko.subsystems.vision.VisionIOSim;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -50,10 +54,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-  /* SENDABLES */
   SendableChooser<Command> autoChooser;
 
-  /* SUBSYSTEMS */
   public static Vision vision;
   public static Drivetrain drivetrain;
   public static Elevator elevator;
@@ -61,53 +63,100 @@ public class RobotContainer {
   public static CoralCollector coralCollector;
   public static Climber climber;
 
-  /* CONTROLLERS */
-  public final static Joystick logitech = new Joystick(OperatorConstants.logitechPort);
-  public final static GenericHID buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
+  public static Joystick logitech;
+  public static GenericHID buttonBox;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    boolean isReal = RobotBase.isReal();
+    /* ========== */
+    /* SUBSYSTEMS */
+    /* ========== */
 
-    // Subsystem creation
-    vision = new Vision(isReal ? new VisionIOReal() : new VisionIOSim());
+    vision = new Vision(new VisionIOReal());
     drivetrain = new Drivetrain(vision, new GyroIONavX());
     elevator = new Elevator(new ElevatorIOReal());
     algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
     coralCollector = new CoralCollector(new CoralCollectorIOReal());
     climber = new Climber(new ClimberIOReal());
 
-    // Build auto chooser and set default auto (you don't have to set a default)
-    autoChooser = AutoBuilder.buildAutoChooser("New Auto");
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+    /* =========== */
+    /* CONTROLLERS */
+    /* =========== */
 
-    // Allow viewing of command scheduler queue in dashboards 
-    SmartDashboard.putData(CommandScheduler.getInstance());
+    logitech = new Joystick(OperatorConstants.logitechPort);
+    buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
 
-    // Publish subsystem status to dashboard
-    SmartDashboard.putData(vision);
-    SmartDashboard.putData(drivetrain);
-    SmartDashboard.putData(elevator);
-    SmartDashboard.putData(algaeCollector);
-    SmartDashboard.putData(coralCollector);
-    SmartDashboard.putData(climber);
+    /* ================ */
+    /* DEFAULT COMMANDS */
+    /* ================ */
 
-    /*
-     * Send axes and buttons from joystick to TeleopDriveCmd,
-     * which will govern the drivetrain during teleop
-     */
-    drivetrain.setDefaultCommand(new TeleopDriveCmd(
-      drivetrain, 
-      () -> -logitech.getRawAxis(OperatorConstants.JoystickTranslationAxis), // forwardX
-      () -> -logitech.getRawAxis(OperatorConstants.JoystickStrafeAxis), // forwardY
-      () -> -logitech.getRawAxis(OperatorConstants.JoystickRotationAxis), // rotation
-      () -> logitech.getRawAxis(OperatorConstants.JoystickSliderAxis) // slider
-    ));
+    // Default commands run when the subsystem in question has no scheduled commands requiring it.
+    
+    drivetrain.setDefaultCommand(
+      new TeleopDriveCmd(
+        drivetrain, 
+        () -> -logitech.getRawAxis(OperatorConstants.JoystickTranslationAxis), // forwardX
+        () -> -logitech.getRawAxis(OperatorConstants.JoystickStrafeAxis), // forwardY
+        () -> -logitech.getRawAxis(OperatorConstants.JoystickRotationAxis), // rotation
+        () -> logitech.getRawAxis(OperatorConstants.JoystickSliderAxis) // slider
+      )
+    );
 
-    configureBindings();
+    elevator.setDefaultCommand(
+      new ElevateToReefLevelCmd(0, coralCollector, elevator)
+    );
 
-    // Log build details to dashboard
+
+    /* ========== */
+    /* AUTONOMOUS */
+    /* ========== */
+
+    // Throw all NamedCommands here.
+
+    // Note: ElevateToReefLevelCmd is itself a SequentialCommandGroup, 
+    // which elevates to specified level 0-4 and tilts the collector 
+    // once within 0.1 m (3.9 in) of the setpoint
+    NamedCommands.registerCommand(
+      "ScoreCoralL4",  // name as shown in PathPlanner GUI
+      new SequentialCommandGroup(
+
+        // Up sequence - ends when error is <= 1%
+        new ElevateToReefLevelCmd(4, coralCollector, elevator)
+          .withTimeout(3),
+        
+        // Deposit - holds elevator while running outtake
+        new ParallelCommandGroup(
+          new ElevateToReefLevelCmd(4, coralCollector, elevator),
+          coralCollector.outtakeCommand()
+        ).withTimeout(1),
+
+        // Run elevator back to ground. Remains until auto over
+        new ElevateToReefLevelCmd(0, coralCollector, elevator)
+      )
+    );
+
+    // Build auto chooser - you can also set a default.
+    autoChooser = AutoBuilder.buildAutoChooser();
+
+    /* ======= */
+    /* LOGGING */
+    /* ======= */
+
+    // Field for PathPlanner debugging
+    var field = new Field2d();
+    SmartDashboard.putData(field);
+    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> { // current pose
+      field.setRobotPose(pose);
+    });
+    PathPlannerLogging.setLogTargetPoseCallback((pose) -> { // target pose
+      field.getObject("target pose").setPose(pose);
+    });
+    PathPlannerLogging.setLogActivePathCallback((poses) -> { // active path (list of poses)
+      field.getObject("trajectory").setPoses(poses);
+    });
+
+    // Build info
     SmartDashboard.putString("ProjectName", "WonkoTheSane");
     SmartDashboard.putString("BuildDate", BuildConstants.BUILD_DATE);
     SmartDashboard.putString("GitSHA", BuildConstants.GIT_SHA);
@@ -124,6 +173,22 @@ public class RobotContainer {
         SmartDashboard.putString("GitDirty", "Unknown");
         break;
     }
+
+    // Allow viewing of command scheduler queue in dashboards 
+    SmartDashboard.putData(CommandScheduler.getInstance());
+
+    // Publish subsystem status to dashboard
+    SmartDashboard.putData(vision);
+    SmartDashboard.putData(drivetrain);
+    SmartDashboard.putData(elevator);
+    SmartDashboard.putData(algaeCollector);
+    SmartDashboard.putData(coralCollector);
+    SmartDashboard.putData(climber);
+
+    // Publish auto chooser
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    configureBindings();
   }
 
   /**
@@ -177,7 +242,8 @@ public class RobotContainer {
     new JoystickButton(buttonBox, 8)
       .whileTrue(Commands.parallel(
         new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-        new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.humanPlayerAngle)
+        new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.humanPlayerAngle),
+        coralCollector.intakeCommand()
       ));    
 
     // Processor
@@ -200,6 +266,7 @@ public class RobotContainer {
     /* =============== */
     /* Coral Collector */
     /* =============== */
+    
     // Intake/Outtake (on Joystick)
     new JoystickButton(logitech, 9)
       .whileTrue(coralCollector.intakeCommand());
@@ -223,6 +290,7 @@ public class RobotContainer {
     /* =============== */
     /* Algae Collector */
     /* =============== */
+
     // Intake/Outtake (on Joystick)
     new JoystickButton(logitech, 11)
       .whileTrue(algaeCollector.intakeCommand());
@@ -248,12 +316,19 @@ public class RobotContainer {
     /* ======= */
     /* Climber */
     /* ======= */
+
     // Up/down
     new JoystickButton(buttonBox, 9)
       .whileTrue(climber.climberUpCommand());
     new JoystickButton(buttonBox, 10)
       .whileTrue(climber.climberDownCommand());
 
+    /* ====== */
+    /* Vision */
+    /* ====== */
+
+    new JoystickButton(buttonBox, 12)
+      .whileTrue(new PathfindToTagCmd(drivetrain, vision, 21, 40));
   }
   
   /**

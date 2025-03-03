@@ -31,13 +31,14 @@ public class ElevateToReefLevelCmd extends ParallelCommandGroup {
      */
     addCommands(
       // Hold coral tilt at resting position 
-      //  until elevator is within 0.1m of setpoint,
+      //  until elevator is within 95% of setpoint,
       //  then hold coral tilt at the outtake level
       new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.restingCoralCollectorPos)
-        .until(() -> elevator.inputs.positionMeters >= ElevatorConstants.levelHeights[targetLevel].in(Meters) - 0.1)
+        .until(() -> elevator.inputs.positionMeters >= ElevatorConstants.levelHeights[targetLevel].in(Meters) * 0.95)
         .andThen(new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.levelCoralTiltAngle[targetLevel])),
       // Elevate to the target level
       new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[targetLevel])
     );
+    addRequirements(elevator);
   }
 }

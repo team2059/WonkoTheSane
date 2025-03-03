@@ -15,10 +15,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-public class SwerveModuleIOVortex implements SwerveModuleIO {
+public class SwerveModuleIOReal implements SwerveModuleIO {
     private final SparkFlex driveMotor;
     private final SparkFlex rotationMotor;
 
@@ -30,13 +31,21 @@ public class SwerveModuleIOVortex implements SwerveModuleIO {
 
     private final PIDController rotationPidController;
 
-    public SwerveModuleIOVortex(
+    private final PIDController drivePidController;
+
+    private final SimpleMotorFeedforward driveFF;
+
+    public SwerveModuleIOReal(
         int driveMotorId,
         int rotationMotorId,
         int canCoderId,
         double canCoderOffsetRadians,
         boolean isDriveInverted,
-        boolean isRotationInverted
+        boolean isRotationInverted,
+        double kS,
+        double kV,
+        double kA,
+        double kP
     ) {
         // Motor controllers
         driveMotor = new SparkFlex(driveMotorId, MotorType.kBrushless);
@@ -64,6 +73,10 @@ public class SwerveModuleIOVortex implements SwerveModuleIO {
 
         rotationPidController = new PIDController(DrivetrainConstants.kPRotation, 0, 0);
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
+
+        drivePidController = new PIDController(kP, 0, 0);
+
+        driveFF = new SimpleMotorFeedforward(kS, kV, kA);
 
         canCoder = new CANcoder(canCoderId);
         offset = new Rotation2d(canCoderOffsetRadians);
@@ -247,13 +260,19 @@ public class SwerveModuleIOVortex implements SwerveModuleIO {
       // PID-controlled rotation
       rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
 
-      if (isClosedLoop) {
-        // Feedforward-controlled translation
-        driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond));
-      } else {
-        // Direct set, won't be as accurate
-        driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
-      }
+    //   if (isClosedLoop) {
+    //     // Feedforward-controlled translation
+    //     driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond));
+    //   } else {
+    //     // Direct set, won't be as accurate
+    //     driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
+    //   }
+      driveMotor.setVoltage(driveFF.calculate(state.speedMetersPerSecond) + drivePidController.calculate(state.speedMetersPerSecond));
+    }
+
+    @Override
+    public void setRotationMotorAnglePID(double angleRadians) {
+        rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), angleRadians));
     }
 
     /**

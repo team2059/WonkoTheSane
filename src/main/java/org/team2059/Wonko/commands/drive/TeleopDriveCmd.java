@@ -70,8 +70,8 @@ public class TeleopDriveCmd extends Command {
     ySpeed *= sliderVal;
     rot *= sliderVal;
 
-    xSpeed = -MathUtil.applyDeadband(xSpeed, 0.1, 0.75);
-    ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 0.75);
+    xSpeed = -MathUtil.applyDeadband(xSpeed, 0.1, 1);
+    ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 1);
     rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
 
     drivetrain.drive(

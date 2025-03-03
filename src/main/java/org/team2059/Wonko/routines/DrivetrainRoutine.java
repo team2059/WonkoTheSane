@@ -28,39 +28,40 @@ public class DrivetrainRoutine {
         sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
                 Volts.of(1).per(Units.Second), // Ramp rate in V/s
-                Volts.of(2), // Reduce dynamic step voltage to 4 to prevent brownout
-                Time.ofBaseUnits(2, Units.Second), // Use default timeout of 10 sec
+                Volts.of(4), // Reduce dynamic step voltage to 4 to prevent brownout
+                Time.ofBaseUnits(7, Units.Second), // Use default timeout of 10 sec
                 null
             ),
             new SysIdRoutine.Mechanism(
                 // Tell SysID how to plumb the driving voltage to the motors
                 voltage -> {
-                drivetrain.frontLeft.setDriveVoltage(voltage.in(Volts));
-                drivetrain.frontRight.setDriveVoltage(voltage.in(Volts));
-                drivetrain.backLeft.setDriveVoltage(voltage.in(Volts));
-                drivetrain.backRight.setDriveVoltage(voltage.in(Volts));
+                    drivetrain.setModulesToZeroRadPID();
+                    drivetrain.frontLeft.setDriveVoltage(voltage.in(Volts));
+                    drivetrain.frontRight.setDriveVoltage(voltage.in(Volts));
+                    drivetrain.backLeft.setDriveVoltage(voltage.in(Volts));
+                    drivetrain.backRight.setDriveVoltage(voltage.in(Volts));
                 }, 
                 // Tell SysID how to record a frame of data for each motor on the mechanism
                 log -> {
-                log.motor("drive-frontleft")
-                    .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.frontLeft.getDriveAppliedVoltage(), Volts))
-                    .linearPosition(driveRoutineDistance.mut_replace(drivetrain.frontLeft.getDrivePositionMeters(), Meters))
-                    .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.frontLeft.getDriveVelocity(), MetersPerSecond));
+                    log.motor("drive-frontleft")
+                        .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.frontLeft.getDriveAppliedVoltage(), Volts))
+                        .linearPosition(driveRoutineDistance.mut_replace(drivetrain.frontLeft.getDrivePositionMeters(), Meters))
+                        .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.frontLeft.getDriveVelocity(), MetersPerSecond));
 
-                log.motor("drive-frontright")
-                    .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.frontRight.getDriveAppliedVoltage(), Volts))
-                    .linearPosition(driveRoutineDistance.mut_replace(drivetrain.frontRight.getDrivePositionMeters(), Meters))
-                    .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.frontRight.getDriveVelocity(), MetersPerSecond));
+                    log.motor("drive-frontright")
+                        .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.frontRight.getDriveAppliedVoltage(), Volts))
+                        .linearPosition(driveRoutineDistance.mut_replace(drivetrain.frontRight.getDrivePositionMeters(), Meters))
+                        .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.frontRight.getDriveVelocity(), MetersPerSecond));
 
-                log.motor("drive-backleft")
-                    .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.backLeft.getDriveAppliedVoltage(), Volts))
-                    .linearPosition(driveRoutineDistance.mut_replace(drivetrain.backLeft.getDrivePositionMeters(), Meters))
-                    .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.backLeft.getDriveVelocity(), MetersPerSecond));
+                    log.motor("drive-backleft")
+                        .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.backLeft.getDriveAppliedVoltage(), Volts))
+                        .linearPosition(driveRoutineDistance.mut_replace(drivetrain.backLeft.getDrivePositionMeters(), Meters))
+                        .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.backLeft.getDriveVelocity(), MetersPerSecond));
 
-                log.motor("drive-backright")
-                    .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.backRight.getDriveAppliedVoltage(), Volts))
-                    .linearPosition(driveRoutineDistance.mut_replace(drivetrain.backRight.getDrivePositionMeters(), Meters))
-                    .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.backRight.getDriveVelocity(), MetersPerSecond));
+                    log.motor("drive-backright")
+                        .voltage(driveRoutineAppliedVoltage.mut_replace(drivetrain.backRight.getDriveAppliedVoltage(), Volts))
+                        .linearPosition(driveRoutineDistance.mut_replace(drivetrain.backRight.getDrivePositionMeters(), Meters))
+                        .linearVelocity(driveRoutineVelocity.mut_replace(drivetrain.backRight.getDriveVelocity(), MetersPerSecond));
                 }, 
                 // Tell SysId to make generated commands require this subsystem, suffix test state in
                 // WPILog with this subsystem's name

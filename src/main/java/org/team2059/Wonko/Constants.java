@@ -32,6 +32,7 @@ public final class Constants {
   
   public static class OperatorConstants {
 
+    // Sets whether or not tunable numbers can be changed. If false, only defaults will be used.
     public static final boolean tuningMode = true;
 
     /* ===== */
@@ -75,8 +76,8 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final Distance wheelBase = Inches.of(25.125); // distance between front wheels (like train track)
-    public static final Distance trackWidth = Inches.of(21.25); // distance from center of wheels on side
+    public static final Distance wheelBase = Inches.of(25.125); // Distance from center of wheels on side
+    public static final Distance trackWidth = Inches.of(21.25); // Distance between front wheels (like train track)
 
     // Diameter of swerve module wheel
     public static final Distance wheelDiameter = Inches.of(4.0);
@@ -119,7 +120,7 @@ public final class Constants {
     /*
      * CAN IDs: found and set via REV hardware client
      * CANcoder Offsets: found in Phoenix Tuner X as "Absolute position"
-     *  after manually straightening wheel (converted to radians here)
+     *  after manually straightening wheel (converted to radians here by multiplying by 2pi)
      */
 
     // front left
@@ -153,8 +154,8 @@ public final class Constants {
     public static final double maxAngularVelocity = 2 * Math.PI; // rad/sec
     public static final double maxAngularAcceleration = 4 * Math.PI; // rad/sec^2
     // Teleop max speeds
-    public static final double kTeleDriveMaxSpeed = 7.5 / 4.0;
-    public static final double kTeleDriveMaxAngularSpeed = 3;
+    public static final double kTeleDriveMaxSpeed = 4;
+    public static final double kTeleDriveMaxAngularSpeed = Math.PI;
 
     /* =============================== */
     /* SWERVE MODULE CONTROL CONSTANTS */
@@ -166,44 +167,62 @@ public final class Constants {
     // kA: voltage needed to accelerate
     public static final SimpleMotorFeedforward driveFF = new SimpleMotorFeedforward(0.17821, 1.9047, 0.14686);
     public static final SimpleMotorFeedforward turnFF = new SimpleMotorFeedforward(0, 0, 0);
-
-    /* FOR ROBOTCONFIG AUTO STUFF... */
-    public static final double kMass = 30;
-    public static final double kMomentOfIntertia = 3;
-    
-    // CoF taken from https://www.chiefdelphi.com/t/coefficient-of-friction/467778
-    public static final double kWheelCoF = 1.542; // Coefficient of friction of wheels
-    public static final int driveCurrentLimit = 40;
-    public static final int turnCurrentLimit = 20;
   }
 
   public static class AutoConstants {
 
+    // Feedback constants for x & y translation in auto.
     public static final double kAutoTranslationP = 5.0;
     public static final double kAutoTranslationD = 0;
 
+    // Feedback constants for theta (rotation) in auto.
     public static final double kAutoRotationP = 5.0;
     public static final double kAutoRotationD = 0.0;
+
+    /* FOR ROBOTCONFIG AUTO STUFF... */
+    /* Not used right now. */
+    // public static final double kMass = 30;
+    // public static final double kMomentOfIntertia = 3;
+    
+    // // CoF taken from https://www.chiefdelphi.com/t/coefficient-of-friction/467778
+    // public static final double kWheelCoF = 1.542; // Coefficient of friction of wheels
+    // public static final int driveCurrentLimit = 40;
+    // public static final int turnCurrentLimit = 20;
   }
 
   public static class VisionConstants {
+
+    // Cam names set using Arducam serial number utility. On DS PC.
     public static final String upperCameraName = "Bcam9782";
     public static final String lowerCameraName = "Acam9782";
     
-    // example below: Cam mounted facing forward, half a meter forward of center, half a meter up from center.
     public static final Transform3d upperCameraToRobot = 
       new Transform3d(
-        new Translation3d(0.5, 0.0, 0.5), 
-        new Rotation3d(0,0,0)
+        new Translation3d(0.2159, 0.2159, 1.024), 
+        new Rotation3d(0,0.43,0)
       );
     
     public static final Transform3d lowerCameraToRobot = 
       new Transform3d(
-        new Translation3d(0.5, 0.0, 0.5), 
-        new Rotation3d(0,0,0)
+        new Translation3d(0.34, 0, 0.17), 
+        new Rotation3d(0, 0.4, 0)
       );
 
+
+    // Standard deviations below are from Team Spectrum 3847’s X-Ray robot
+
+    /**
+     * Standard deviations of model states. Increase these numbers to trust your
+     * model's state estimates less. This matrix is in the form [x, y, theta]ᵀ,
+     * with units in meters and radians, then meters.
+     */
     public static final Matrix<N3, N1> stateStdDevs = VecBuilder.fill(0.1, 0.1, 10);
+
+    /**
+     * Standard deviations of the vision measurements. Increase these numbers to
+     * trust global measurements from vision less. This matrix is in the form
+     * [x, y, theta]ᵀ, with units in meters and radians.
+     */
     public static final Matrix<N3, N1> measurementStdDevs = VecBuilder.fill(5, 5, 500);
   }
 
@@ -224,8 +243,8 @@ public final class Constants {
     public static final double tiltMotorVelocityConvFactor = 0.00232710567;
 
     // Hard limits
-    public static final Angle thruBoreMinimum = Radians.of(0);
-    public static final Angle thruBoreMaximum = Radians.of(Math.PI / 2.0);
+    public static final Angle thruBoreMinimum = Radians.of(0.2);
+    public static final Angle thruBoreMaximum = Radians.of(Math.PI / 2);
   }
 
   public static class CoralCollectorConstants {
@@ -261,7 +280,7 @@ public final class Constants {
     public static final double horizontalOffset = -2.1717; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
 
     // Smart current limit for Spark controller
-    public static final Current tiltCurrentLimit = Current.ofBaseUnits(30, Amps);
+    public static final Current tiltCurrentLimit = Amps.of(30);
 
     // Hard limits
     public static final Angle thruBoreMinimum = Radians.of(-1.6);
@@ -274,7 +293,7 @@ public final class Constants {
       restingCoralCollectorPos,  // L1
       Radians.of(-0.657),        // L2
       Radians.of(-0.500),        // L3
-      Radians.of(-1.100)         // L4
+      Radians.of(-0.750)         // L4
     };
     public static final Angle humanPlayerAngle = Radians.of(0.56);
 
@@ -286,7 +305,7 @@ public final class Constants {
     public static final int motorId = 16;
 
     // Smart current limit for Spark motor
-    public static final Current currentLimit = Current.ofBaseUnits(40, Amps);
+    public static final Current currentLimit = Amps.of(40);
 
     // MAX HEIGHT IS A HARD LIMIT! DO NOT GO TOO CLOSE
     public static final Distance maxHeight = Distance.ofBaseUnits(2.38, Meters);
@@ -311,7 +330,7 @@ public final class Constants {
     
     // Heights for misc. other tasks
     public static final Distance humanPlayerHeight = Meters.of(0.6);
-    public static final Distance processorHeight = Meters.of(0.4);
+    public static final Distance processorHeight = Meters.of(0.2);
     
     // PID & FF gains
     public static final double kS = 0.05701;

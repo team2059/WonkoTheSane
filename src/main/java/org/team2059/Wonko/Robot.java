@@ -8,6 +8,10 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team2059.Wonko.util.LocalADStarAK;
+
+import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -33,6 +37,9 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+
+    // Define a pathfinding algorithm - must do this first
+    Pathfinding.setPathfinder(new LocalADStarAK());
 
     // Switch thread to high priority to improve loop timing
     Threads.setCurrentThreadPriority(true, 5);
@@ -72,6 +79,9 @@ public class Robot extends LoggedRobot {
 
     // for the drivercam: attach USB camera to Rio
     // CameraServer.startAutomaticCapture();
+
+    // DO THIS AFTER CONFIGURATION OF YOUR DESIRED PATHFINDER
+    PathfindingCommand.warmupCommand().schedule();
   }
 
   /**

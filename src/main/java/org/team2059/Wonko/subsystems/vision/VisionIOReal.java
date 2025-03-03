@@ -36,7 +36,7 @@ public class VisionIOReal implements VisionIO {
     
     public VisionIOReal() {
 
-        // AndyMark or welded field layout?
+        // AndyMark or welded field layout? Check at competition.
         aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
 
         upperCamera = new PhotonCamera(VisionConstants.upperCameraName);
@@ -60,6 +60,11 @@ public class VisionIOReal implements VisionIO {
     // Update vision inputs with latest target info from each camera
     @Override
     public void updateInputs(VisionIOInputs inputs) {
+
+        // Update connectivity status
+        inputs.upperIsConnected = upperCamera.isConnected();
+        inputs.lowerIsConnected = lowerCamera.isConnected();
+
         // Update camera readings
         upperCameraResults = upperCamera.getAllUnreadResults();
         lowerCameraResults = lowerCamera.getAllUnreadResults();
@@ -68,16 +73,27 @@ public class VisionIOReal implements VisionIO {
             // Get latest results from list of results
             upperCameraResult = upperCameraResults.get(upperCameraResults.size() - 1);
 
-            // Set boolean value
             inputs.hasUpperTarget = upperCameraResult.hasTargets();
-            if (inputs.hasUpperTarget) inputs.upperBestTargetID = upperCameraResult.getBestTarget().getFiducialId();
+            if (inputs.hasUpperTarget) { // If we have any targets, get the best one.
+                inputs.upperBestTarget = upperCameraResult.getBestTarget();
+                inputs.upperBestTargetID = inputs.upperBestTarget.getFiducialId();
+            } else { // If we don't have any targets, set null values.
+                inputs.upperBestTargetID = -1;
+                inputs.upperBestTarget = null;
+            }
         }
 
         if (!lowerCameraResults.isEmpty()) {
             lowerCameraResult = lowerCameraResults.get(lowerCameraResults.size() - 1);
 
             inputs.hasLowerTarget = lowerCameraResult.hasTargets();
-            if (inputs.hasLowerTarget) inputs.lowerBestTargetID = lowerCameraResult.getBestTarget().getFiducialId();
+            if (inputs.hasLowerTarget) {
+                inputs.lowerBestTarget = lowerCameraResult.getBestTarget();
+                inputs.lowerBestTargetID = inputs.lowerBestTarget.getFiducialId();
+            } else {
+                inputs.lowerBestTargetID = -1;
+                inputs.lowerBestTarget = null;
+            }
         }
     }
 

@@ -4,10 +4,7 @@
 
 package org.team2059.Wonko.subsystems.drive;
 
-import java.util.Optional;
-
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
 import org.team2059.Wonko.Constants;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
@@ -37,6 +34,17 @@ public class Drivetrain extends SubsystemBase {
 
     /*
      * Create four SwerveModules
+     * 
+     * Arguments: ID, then SwerveModuleIO:
+     *  - Drive motor can ID
+     *  - Rotation motor can ID
+     *  - Cancoder can ID
+     *  - Cancoder offset in radians
+     *  - Boolean drive inverter
+     *  - Boolean rotation inverter
+     *  - kS, kV, kA constants for drive feedforward (velocity control)
+     *  - kP constant for drive (velocity control)
+     * 
      * 1 frontLeft
      * 2 frontRight
      * 3 backLeft
@@ -45,67 +53,74 @@ public class Drivetrain extends SubsystemBase {
 
     public final SwerveModule frontLeft = new SwerveModule(
       1,
-      (RobotBase.isReal())
-      ? new SwerveModuleIOVortex(
+      new SwerveModuleIOReal(
           DrivetrainConstants.frontLeftDriveMotorId, 
           DrivetrainConstants.frontLeftRotationMotorId, 
           DrivetrainConstants.frontLeftCanCoderId, 
           DrivetrainConstants.frontLeftOffsetRad, 
           false, 
-          true
+          true,
+          0.18707,
+          1.972,
+          0.2846,
+          0.0
         )
-      : new SwerveModuleIOSim()
-
     );
 
     public final SwerveModule frontRight = new SwerveModule(
       2,
-      (RobotBase.isReal()) 
-      ? new SwerveModuleIOVortex(
+      new SwerveModuleIOReal(
         DrivetrainConstants.frontRightDriveMotorId, 
         DrivetrainConstants.frontRightRotationMotorId, 
         DrivetrainConstants.frontRightCanCoderId, 
         DrivetrainConstants.frontRightOffsetRad, 
         true, 
-        true
+        true,
+        0.17367,
+        2.0218,
+        0.30097,
+        0.0
       )
-      : new SwerveModuleIOSim()
     );
 
     public final SwerveModule backLeft = new SwerveModule(
       3,
-      (RobotBase.isReal())
-      ? new SwerveModuleIOVortex(
+      new SwerveModuleIOReal(
         DrivetrainConstants.backLeftDriveMotorId, 
         DrivetrainConstants.backLeftRotationMotorId, 
         DrivetrainConstants.backLeftCanCoderId, 
         DrivetrainConstants.backLeftOffsetRad, 
         false, 
-        true
+        true,
+        0.1846,
+        1.9744,
+        0.28488,
+        0.0
       )
-      : new SwerveModuleIOSim()
     );
 
     public final SwerveModule backRight = new SwerveModule(
       4,
-      (RobotBase.isReal())
-      ? new SwerveModuleIOVortex(
+      new SwerveModuleIOReal(
         DrivetrainConstants.backRightDriveMotorId, 
         DrivetrainConstants.backRightRotationMotorId, 
         DrivetrainConstants.backRightCanCoderId, 
         DrivetrainConstants.backRightOffsetRad, 
         false, 
-        true
+        true,
+        0.16226,
+        2.0166,
+        0.27832,
+        0.0
       )
-      : new SwerveModuleIOSim()
     );
 
+  // Gyro keeps track of field-relative rotation
   private GyroIO gyro;
-  private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+  private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged(); // inputs allow for us to get values from the gyro
   
-  // Create swerve drive odometry engine, used to track robot on field
-  // private final SwerveDriveOdometry odometry = new SwerveDriveOdometry(Constants.DrivetrainConstants.kinematics, new Rotation2d(), getModulePositions());
-
+  // Estimates our pose on the field using vision, if available.
+  // Behaves just like SwerveDriveOdometry, just with optional vision measurements.
   private SwerveDrivePoseEstimator poseEstimator;
 
   private final Vision vision;
@@ -274,7 +289,7 @@ public class Drivetrain extends SubsystemBase {
     // makes it never go above specified max velocity
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DrivetrainConstants.maxVelocity);
 
-    // Logger.recordOutput("Desired States", desiredStates);
+    Logger.recordOutput("Desired States", desiredStates);
 
     // Sets the speed and rotation of each module
     frontLeft.setState(desiredStates[0], false);
@@ -374,6 +389,14 @@ public class Drivetrain extends SubsystemBase {
     backRight.stop();
   }
 
+  // For drivetrain translation routine. Must lock wheels, so instead we use PID
+  public void setModulesToZeroRadPID() {
+    frontLeft.io.setRotationMotorAnglePID(0);
+    frontRight.io.setRotationMotorAnglePID(0);
+    backLeft.io.setRotationMotorAnglePID(0);
+    backRight.io.setRotationMotorAnglePID(0);
+  }
+
   @Override
   public void periodic() {
 
@@ -386,20 +409,17 @@ public class Drivetrain extends SubsystemBase {
       stopAllMotors();
     }
 
-    // This method will be called once per scheduler run
-    // odometry.update(getHeading(), getModulePositions());    
-
     // Add vision measurements from both cameras
-    final Optional<EstimatedRobotPose> upperOptional = vision.getEstimatedUpperGlobalPose();
-    final Optional<EstimatedRobotPose> lowerOptional = vision.getEstimatedLowerGlobalPose();
+    var upperOptional = vision.io.getEstimatedUpperGlobalPose();
+    var lowerOptional = vision.io.getEstimatedLowerGlobalPose();
 
-    if (upperOptional.isPresent() && RobotBase.isReal()) {
+    if (upperOptional.isPresent() && RobotBase.isReal() && !DriverStation.isAutonomous()) {
       poseEstimator.addVisionMeasurement(
         upperOptional.get().estimatedPose.toPose2d(),
         upperOptional.get().timestampSeconds
       );
     }
-    if (lowerOptional.isPresent() && RobotBase.isReal()) {
+    if (lowerOptional.isPresent() && RobotBase.isReal() && !DriverStation.isAutonomous()) {
       poseEstimator.addVisionMeasurement(
         lowerOptional.get().estimatedPose.toPose2d(), 
         lowerOptional.get().timestampSeconds

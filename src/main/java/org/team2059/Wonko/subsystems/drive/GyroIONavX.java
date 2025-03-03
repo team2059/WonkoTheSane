@@ -4,7 +4,6 @@ import com.studica.frc.AHRS;
 
 public class GyroIONavX implements GyroIO{
 
-
     private final AHRS gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     public GyroIONavX() {

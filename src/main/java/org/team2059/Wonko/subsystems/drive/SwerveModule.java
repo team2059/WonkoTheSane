@@ -8,10 +8,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class SwerveModule extends SubsystemBase {
 
-    private final SwerveModuleIO io;
+    public final SwerveModuleIO io;
     private final int id;
 
-    private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
+    public final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
     public SwerveModule(
         int id,

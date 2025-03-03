@@ -27,16 +27,18 @@ public interface SwerveModuleIO {
         public double rotationMotorTemp = 0.0;
     }
 
-    public void updateInputs(SwerveModuleIOInputs inputs);
+    default public void updateInputs(SwerveModuleIOInputs inputs) {};
 
-    public void initRotationOffset();
+    default public void initRotationOffset() {};
 
-    public void resetEncoders();
+    default public void resetEncoders() {};
 
-    public void setState(SwerveModuleState state, boolean isClosedLoop);
+    default public void setState(SwerveModuleState state, boolean isClosedLoop) {};
 
-    public void stop();
+    default public void stop() {};
 
-    public void setDriveVoltage(double volts);
-    public void setRotationVoltage(double volts);
+    default public void setDriveVoltage(double volts) {};
+    default public void setRotationVoltage(double volts) {};
+
+    default public void setRotationMotorAnglePID(double angleRadians) {};
 }
