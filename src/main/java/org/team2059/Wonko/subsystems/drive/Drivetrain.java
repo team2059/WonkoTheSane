@@ -32,8 +32,24 @@ public class Drivetrain extends SubsystemBase {
 
   public static boolean fieldRelativeStatus = true;
 
+  public final SwerveModule frontLeft;
+  public final SwerveModule frontRight;
+  public final SwerveModule backLeft;
+  public final SwerveModule backRight;
+
+  private GyroIO gyro;
+  private GyroIOInputsAutoLogged gyroInputs;
+  
+  private SwerveDrivePoseEstimator poseEstimator;
+
+  private final Vision vision;
+
+  public final DrivetrainRoutine routine;
+
+  public Drivetrain(Vision vision, GyroIO gyro) {
+
     /*
-     * Create four SwerveModules
+     * Construct four SwerveModules
      * 
      * Arguments: ID, then SwerveModuleIO:
      *  - Drive motor can ID
@@ -51,7 +67,7 @@ public class Drivetrain extends SubsystemBase {
      * 4 backRight
      */
 
-    public final SwerveModule frontLeft = new SwerveModule(
+    frontLeft = new SwerveModule(
       1,
       new SwerveModuleIOReal(
           DrivetrainConstants.frontLeftDriveMotorId, 
@@ -66,8 +82,7 @@ public class Drivetrain extends SubsystemBase {
           0.0
         )
     );
-
-    public final SwerveModule frontRight = new SwerveModule(
+    frontRight = new SwerveModule(
       2,
       new SwerveModuleIOReal(
         DrivetrainConstants.frontRightDriveMotorId, 
@@ -82,8 +97,7 @@ public class Drivetrain extends SubsystemBase {
         0.0
       )
     );
-
-    public final SwerveModule backLeft = new SwerveModule(
+    backLeft = new SwerveModule(
       3,
       new SwerveModuleIOReal(
         DrivetrainConstants.backLeftDriveMotorId, 
@@ -98,8 +112,7 @@ public class Drivetrain extends SubsystemBase {
         0.0
       )
     );
-
-    public final SwerveModule backRight = new SwerveModule(
+    backRight = new SwerveModule(
       4,
       new SwerveModuleIOReal(
         DrivetrainConstants.backRightDriveMotorId, 
@@ -115,25 +128,12 @@ public class Drivetrain extends SubsystemBase {
       )
     );
 
-  // Gyro keeps track of field-relative rotation
-  private GyroIO gyro;
-  private GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged(); // inputs allow for us to get values from the gyro
-  
-  // Estimates our pose on the field using vision, if available.
-  // Behaves just like SwerveDriveOdometry, just with optional vision measurements.
-  private SwerveDrivePoseEstimator poseEstimator;
-
-  private final Vision vision;
-
-  public final DrivetrainRoutine routine;
-
-  public Drivetrain(Vision vision, GyroIO gyro) {
-
     this.vision = vision;
-    this.gyro = gyro;
 
-    // gyro may need an extra second to start...
-    new Thread(() -> {
+    // Gyro keeps track of field-relative rotation
+    this.gyro = gyro;
+    gyroInputs = new GyroIOInputsAutoLogged(); // these inputs allow for us to get values from the gyro
+    new Thread(() -> { // gyro may need an extra second to start...
       try {
         Thread.sleep(1000);
         gyro.reset();
@@ -154,33 +154,11 @@ public class Drivetrain extends SubsystemBase {
     backLeft.resetEncoders();
     backRight.resetEncoders();
 
-    // Configure auto builder last
-    configureAutoBuilder();
-
-    // Elastic widget for swerve chassis visualization
-    // SmartDashboard.putData("Swerve Drive", new Sendable() {
-    //   @Override
-    //   public void initSendable(SendableBuilder builder) {
-    //     builder.setSmartDashboardType("SwerveDrive");
-
-    //     builder.addDoubleProperty("Front Left Angle", () -> frontLeft.getRotationAbsolutePosition(), null);
-    //     builder.addDoubleProperty("Front Left Velocity", () -> frontLeft.getDriveVelocity(), null);
-
-    //     builder.addDoubleProperty("Front Right Angle", () -> frontRight.getRotationAbsolutePosition(), null);
-    //     builder.addDoubleProperty("Front Right Velocity", () -> frontRight.getDriveVelocity(), null);
-
-    //     builder.addDoubleProperty("Back Left Angle", () -> backLeft.getRotationAbsolutePosition(), null);
-    //     builder.addDoubleProperty("Back Left Velocity", () -> backLeft.getDriveVelocity(), null);
-
-    //     builder.addDoubleProperty("Back Right Angle", () -> backRight.getRotationAbsolutePosition(), null);
-    //     builder.addDoubleProperty("Back Right Velocity", () -> backRight.getDriveVelocity(), null);
-
-    //     builder.addDoubleProperty("Robot Angle", () -> getHeading().getRadians(), null);
-    //   }
-    // });
-
+    // SysID routine
     routine = new DrivetrainRoutine(this);
 
+    // Estimates our pose on the field using vision, if available.
+    // Behaves just like SwerveDriveOdometry, just with optional vision measurements.
     poseEstimator = new SwerveDrivePoseEstimator(
       DrivetrainConstants.kinematics, 
       getHeading(), 
@@ -189,6 +167,8 @@ public class Drivetrain extends SubsystemBase {
       VisionConstants.stateStdDevs,
       VisionConstants.measurementStdDevs);
 
+    // Configure auto builder last
+    configureAutoBuilder();
   }
 
   /**
