@@ -40,5 +40,9 @@ public interface SwerveModuleIO {
     default public void setDriveVoltage(double volts) {};
     default public void setRotationVoltage(double volts) {};
 
+    default public SwerveModuleState getState() {
+        return new SwerveModuleState();
+    }
+
     default public void setRotationMotorAnglePID(double angleRadians) {};
 }

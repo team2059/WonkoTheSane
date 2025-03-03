@@ -237,6 +237,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
     /**
      * @return Current SwerveModuleState of a module
      */
+    @Override
     public SwerveModuleState getState() {
         return new SwerveModuleState(getDriveVelocity(), getCANcoderRad());
     }
