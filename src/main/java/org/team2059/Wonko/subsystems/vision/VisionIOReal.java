@@ -37,7 +37,7 @@ public class VisionIOReal implements VisionIO {
     public VisionIOReal() {
 
         // AndyMark or welded field layout? Check at competition.
-        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+        aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
 
         upperCamera = new PhotonCamera(VisionConstants.upperCameraName);
         lowerCamera = new PhotonCamera(VisionConstants.lowerCameraName);

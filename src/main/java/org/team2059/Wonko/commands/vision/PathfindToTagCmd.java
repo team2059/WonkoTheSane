@@ -14,7 +14,9 @@ import org.team2059.Wonko.subsystems.vision.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -89,7 +91,13 @@ public class PathfindToTagCmd extends SequentialCommandGroup {
 
       Logger.recordOutput("goalPose", goalPose);
 
-      return AutoBuilder.pathfindToPose(
+      PathPlannerLogging.setLogActivePathCallback(poses -> {
+          for (Pose2d pose : poses) {
+            Logger.recordOutput("AutoPath pose", pose); 
+          }
+      });
+
+      Command pathFind = AutoBuilder.pathfindToPose(
         goalPose,
         new PathConstraints(
           2, 
@@ -98,6 +106,8 @@ public class PathfindToTagCmd extends SequentialCommandGroup {
           Units.degreesToRadians(720)
         )
       );
+
+      return pathFind; 
     } else {
       return new InstantCommand();
     }
