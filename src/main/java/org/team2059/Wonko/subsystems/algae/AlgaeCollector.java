@@ -4,7 +4,7 @@ import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.routines.AlgaeCollectorRoutine;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeCollector extends SubsystemBase {
@@ -21,17 +21,12 @@ public class AlgaeCollector extends SubsystemBase {
         routine = new AlgaeCollectorRoutine(this);
     }
 
-    public Command tiltCommand() {
-        return new InstantCommand();
-    }
-
     public Command intakeCommand() {
-        return this.startEnd(() -> io.setIntakeSpeed(0.25), () -> io.setIntakeSpeed(0));
-            // .until(() -> inputs.hasAlgae);
+        return Commands.startEnd(() -> io.setIntakeSpeed(0.25), () -> io.setIntakeSpeed(0));
     }
 
     public Command outtakeCommand() {
-        return this.startEnd(() -> io.setIntakeSpeed(-0.25), () -> io.stopIntake());
+        return Commands.startEnd(() -> io.setIntakeSpeed(-0.25), () -> io.stopIntake());
     }
 
     @Override

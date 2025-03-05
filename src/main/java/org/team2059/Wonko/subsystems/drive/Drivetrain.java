@@ -390,16 +390,16 @@ public class Drivetrain extends SubsystemBase {
       stopAllMotors();
     }
 
-    // Add vision measurements from both cameras
+    // // Add vision measurements from both cameras
     var upperOptional = vision.io.getEstimatedUpperGlobalPose();
     var lowerOptional = vision.io.getEstimatedLowerGlobalPose();
 
-    if (upperOptional.isPresent() && RobotBase.isReal() && !DriverStation.isAutonomous()) {
+    if (upperOptional.isPresent() && RobotBase.isReal()) {
       poseEstimator.addVisionMeasurement(
           upperOptional.get().estimatedPose.toPose2d(),
           upperOptional.get().timestampSeconds);
     }
-    if (lowerOptional.isPresent() && RobotBase.isReal() && !DriverStation.isAutonomous()) {
+    if (lowerOptional.isPresent() && RobotBase.isReal()) {
       poseEstimator.addVisionMeasurement(
           lowerOptional.get().estimatedPose.toPose2d(),
           lowerOptional.get().timestampSeconds);

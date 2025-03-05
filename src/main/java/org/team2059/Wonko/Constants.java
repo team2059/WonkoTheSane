@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
@@ -76,8 +77,8 @@ public final class Constants {
 
   public static class DrivetrainConstants {
 
-    public static final Distance wheelBase = Inches.of(25.125); // Distance from center of wheels on side
-    public static final Distance trackWidth = Inches.of(21.25); // Distance between front wheels (like train track)
+    public static final Distance wheelBase = Inches.of(24.75); // Distance from center of wheels on side
+    public static final Distance trackWidth = Inches.of(20.75); // Distance between front wheels (like train track)
 
     // Diameter of swerve module wheel
     public static final Distance wheelDiameter = Inches.of(4.0);
@@ -204,8 +205,8 @@ public final class Constants {
     
     public static final Transform3d lowerCameraToRobot = 
       new Transform3d(
-        new Translation3d(0.34, 0, 0.17), 
-        new Rotation3d(0, 0.4, 0)
+        new Translation3d(Units.inchesToMeters(14), Units.inchesToMeters(-0.5), Units.inchesToMeters(10.5)), 
+        new Rotation3d(0, 0, 0)
       );
 
 
@@ -321,7 +322,7 @@ public final class Constants {
 
     // Level heights (index is the level, begins at 0, which is ground)
     public static final Distance[] levelHeights = {
-      Meters.of(0.100), // L0
+      Meters.of(0.010), // L0
       Meters.of(0.010), // L1
       Meters.of(0.654), // L2
       Meters.of(1.250), // L3

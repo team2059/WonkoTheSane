@@ -4,6 +4,8 @@
 
 package org.team2059.Wonko;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
@@ -13,7 +15,7 @@ import org.team2059.Wonko.commands.algae.TiltAlgaeToSetpointCommand;
 import org.team2059.Wonko.commands.coral.TiltCoralToSetpointCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.PathfindToTagCmd;
+import org.team2059.Wonko.commands.vision.PathfindToAnyTagCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.climber.Climber;
@@ -41,6 +43,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -105,8 +108,8 @@ public class RobotContainer {
 
     elevator.setDefaultCommand(
       new ElevateToReefLevelCmd(0, coralCollector, elevator)
+        .until(() -> elevator.inputs.zeroLimit)
     );
-
 
     /* ========== */
     /* AUTONOMOUS */
@@ -123,7 +126,7 @@ public class RobotContainer {
 
         // Up sequence - ends when error is <= 1%
         new ElevateToReefLevelCmd(4, coralCollector, elevator)
-          .withTimeout(3),
+          .withTimeout(5),
         
         // Deposit - holds elevator while running outtake
         new ParallelCommandGroup(
@@ -133,6 +136,24 @@ public class RobotContainer {
 
         // Run elevator back to ground. Remains until auto over
         new ElevateToReefLevelCmd(0, coralCollector, elevator)
+      )
+    );
+
+    NamedCommands.registerCommand(
+      "GoToTag20Left", 
+      new PathfindToAnyTagCmd(drivetrain, vision, 20, 20, -5)
+    );
+
+    NamedCommands.registerCommand(
+      "GoToTag20Center", 
+      new PathfindToAnyTagCmd(drivetrain, vision, 20, 20, 0)
+    );
+
+    NamedCommands.registerCommand(
+      "ElevateAndCollectAlgae", 
+      new ParallelCommandGroup(
+        new ElevateToSetpointCmd(elevator, Meters.of(1.13)),
+        algaeCollector.intakeCommand().withTimeout(1)
       )
     );
 
@@ -303,6 +324,14 @@ public class RobotContainer {
     new JoystickButton(buttonBox, 6)
       .whileTrue(new TiltAlgaeToSetpointCommand(algaeCollector, AlgaeCollectorConstants.thruBoreMinimum));
 
+    // Elevate & intake
+    new JoystickButton(buttonBox, 12)
+      .whileTrue(new ParallelCommandGroup(
+        new ElevateToSetpointCmd(elevator, Meters.of(1.13)),
+        algaeCollector.intakeCommand()
+      )
+    );
+
     // Algae sysID routine
     // new JoystickButton(buttonBox, 5)
     //   .whileTrue(algaeCollector.routine.quasistaticForward());
@@ -327,9 +356,14 @@ public class RobotContainer {
     /* Vision */
     /* ====== */
 
-    new JoystickButton(buttonBox, 12)
-      .whileTrue(new PathfindToTagCmd(drivetrain, vision, 21, 40));
-  }
+    // new JoystickButton(buttonBox, 12)
+    //   .whileTrue(new RepeatCommand(new PathfindToTagCmd(drivetrain, vision, 20, 25)));
+    // new JoystickButton(buttonBox, 12)
+    //   .whileTrue(new RepeatCommand(new PathfindToAnyTagCmd(drivetrain, vision, 20, 21, 0)));
+    // new JoystickButton(logitech, 8)
+    //   .whileTrue(new RepeatCommand(new PathfindToAnyTagCmd(drivetrain, vision, 21, 40, 0)));
+
+   }
   
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

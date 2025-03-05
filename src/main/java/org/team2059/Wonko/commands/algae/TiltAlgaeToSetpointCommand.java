@@ -49,7 +49,7 @@ public class TiltAlgaeToSetpointCommand extends Command {
     feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
     
     // Use addRequirements() here to declare subsystem dependencies.
-    // addRequirements(algaeCollector);
+    addRequirements(algaeCollector);
   }
 
   // Called when the command is initially scheduled.

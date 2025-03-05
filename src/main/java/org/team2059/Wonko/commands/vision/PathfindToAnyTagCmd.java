@@ -7,14 +7,14 @@ package org.team2059.Wonko.commands.vision;
 import java.util.Set;
 
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.targeting.PhotonTrackedTarget;
-import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.vision.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -28,24 +28,25 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class PathfindToTagCmd extends SequentialCommandGroup {
+public class PathfindToAnyTagCmd extends SequentialCommandGroup {
 
   // Dependent subsystems
   Drivetrain drivetrain;
   Vision vision;
 
-  PhotonTrackedTarget targetToUse;
-
   Transform3d tagToGoal;
 
   private int idTagToChase;
 
-  /** Creates a new PathfindToTagCmd. */
-  public PathfindToTagCmd(
+  private static AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+
+  /** Creates a new PathfindToAnyTagCmd. */
+  public PathfindToAnyTagCmd(
     Drivetrain drivetrain,
     Vision vision, 
     int idTagToChase, 
-    double frontOffsetInches
+    double frontOffsetInches,
+    double yOffsetInches
   ) {
 
     this.drivetrain = drivetrain;
@@ -55,7 +56,7 @@ public class PathfindToTagCmd extends SequentialCommandGroup {
 
     // Center of robot to tag transform.
     this.tagToGoal = new Transform3d(
-      new Translation3d(Units.inchesToMeters(frontOffsetInches), 0, 0),
+      new Translation3d(Units.inchesToMeters(frontOffsetInches), Units.inchesToMeters(yOffsetInches), 0),
       new Rotation3d(0, 0, Math.PI)
     );
 
@@ -79,32 +80,49 @@ public class PathfindToTagCmd extends SequentialCommandGroup {
       new Rotation3d(0, 0, robotPose2d.getRotation().getRadians())
     );
 
-    if (vision.inputs.lowerBestTargetID == idTagToChase) {
-      targetToUse = vision.inputs.lowerBestTarget;
+    if (vision.inputs.hasLowerTarget) {
 
-      // Get the transformation from the camera to the tag
-      var camToTarget = targetToUse.getBestCameraToTarget();
+        // grab pose of tag
+        var targetPose = aprilTagFieldLayout.getTagPose(idTagToChase);
 
-      // Transform the robot's pose to to find the tag's pose
-      var cameraPose = robotPose3d.transformBy(VisionConstants.lowerCameraToRobot);
-      var targetPose = cameraPose.transformBy(camToTarget);
+        var goalPose = targetPose.get().transformBy(tagToGoal).toPose2d();
 
-      // Transform the tag's pose to set the goal
-      var goalPose = targetPose.transformBy(tagToGoal).toPose2d();
+        Logger.recordOutput("goalPose", goalPose);
 
-      // goalPose.rotateAround(goalPose.getTranslation(), new Rotation2d(-Math.PI));
-
-      Logger.recordOutput("goalPose", goalPose);
-
-      return AutoBuilder.pathfindToPose(
-        goalPose,
-        new PathConstraints(
-          1, 
-          0.5, 
+        return AutoBuilder.pathfindToPose(
+            goalPose,
+            new PathConstraints(
+          1.5, 
+          1.0, 
           Units.degreesToRadians(540), 
           Units.degreesToRadians(720)
         )
       );
+    //   targetToUse = vision.inputs.lowerBestTarget;
+
+    //   // Get the transformation from the camera to the tag
+    //   var camToTarget = targetToUse.getBestCameraToTarget();
+
+    //   // Transform the robot's pose to to find the tag's pose
+    //   var cameraPose = robotPose3d.transformBy(VisionConstants.lowerCameraToRobot);
+    //   var targetPose = cameraPose.transformBy(camToTarget);
+
+    //   // Transform the tag's pose to set the goal
+    //   var goalPose = targetPose.transformBy(tagToGoal).toPose2d();
+
+    //   // goalPose.rotateAround(goalPose.getTranslation(), new Rotation2d(-Math.PI));
+
+    //   Logger.recordOutput("goalPose", goalPose);
+
+    //   return AutoBuilder.pathfindToPose(
+    //     goalPose,
+    //     new PathConstraints(
+    //       1, 
+    //       0.5, 
+    //       Units.degreesToRadians(540), 
+    //       Units.degreesToRadians(720)
+    //     )
+    //   );
     } else {
       return new InstantCommand();
     }

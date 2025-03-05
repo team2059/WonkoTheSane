@@ -42,7 +42,7 @@ public class TiltCoralToSetpointCmd extends Command {
     this.userGoal = userGoal;
     feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get(), kA.get());
 
-    // addRequirements(coralCollector);
+    addRequirements(coralCollector);
   }
 
   @Override
