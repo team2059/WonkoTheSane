@@ -7,7 +7,49 @@
         {
           "type": "named",
           "data": {
-            "name": "GoToTag20Center"
+            "name": "GoToTag18Left"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoralL3"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "PathfinderTestPath"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GoToHPStation"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ElevateAndIntakeCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New Path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "GoToTag18Left"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreCoralL3"
           }
         }
       ]

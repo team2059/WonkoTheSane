@@ -1,5 +1,7 @@
 package org.team2059.Wonko.subsystems.algae;
 
+import static edu.wpi.first.units.Units.Amps;
+
 import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.util.LoggedTunableNumber;
 
@@ -16,6 +18,8 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
@@ -33,6 +37,10 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     private LoggedTunableNumber kD = new LoggedTunableNumber("AlgaeCollector/Tilt/kD", 0.0);
 
     private SparkClosedLoopController tiltController;
+
+    // Debouncer requires a condition to hold true for a certain amt of time
+    // kRising: false->true
+    private Debouncer debouncer = new Debouncer(0.33, DebounceType.kRising);
 
     public AlgaeCollectorIOReal() {
         // Create intake and tilt motors and configure them
@@ -88,6 +96,8 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         //         e.printStackTrace();
         //     }
         //   }).start();
+
+        debouncer.calculate(false); // Start debouncer at false
     }
 
     @Override
@@ -148,6 +158,8 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
             }, 
             kP, kI, kD
         );
+
+        inputs.hasAlgae = debouncer.calculate(inputs.motor1CurrentAmps > AlgaeCollectorConstants.stallDetection.in(Amps));
     }
 
     @Override

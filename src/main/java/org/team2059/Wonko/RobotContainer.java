@@ -43,7 +43,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -121,16 +120,16 @@ public class RobotContainer {
     // which elevates to specified level 0-4 and tilts the collector 
     // once within 0.1 m (3.9 in) of the setpoint
     NamedCommands.registerCommand(
-      "ScoreCoralL4",  // name as shown in PathPlanner GUI
+      "ScoreCoralL3",  // name as shown in PathPlanner GUI
       new SequentialCommandGroup(
 
         // Up sequence - ends when error is <= 1%
-        new ElevateToReefLevelCmd(4, coralCollector, elevator)
-          .withTimeout(5),
+        new ElevateToReefLevelCmd(3, coralCollector, elevator)
+          .withTimeout(4),
         
         // Deposit - holds elevator while running outtake
         new ParallelCommandGroup(
-          new ElevateToReefLevelCmd(4, coralCollector, elevator),
+          new ElevateToReefLevelCmd(3, coralCollector, elevator),
           coralCollector.outtakeCommand()
         ).withTimeout(1),
 
@@ -140,13 +139,13 @@ public class RobotContainer {
     );
 
     NamedCommands.registerCommand(
-      "GoToTag20Left", 
-      new PathfindToAnyTagCmd(drivetrain, vision, 20, 20, -5)
+      "GoToTag18Left", 
+      new PathfindToAnyTagCmd(drivetrain, vision, 18, 19, -5)
     );
 
     NamedCommands.registerCommand(
-      "GoToTag20Center", 
-      new PathfindToAnyTagCmd(drivetrain, vision, 20, 20, 0)
+      "GoToTag18Center", 
+      new PathfindToAnyTagCmd(drivetrain, vision, 18, 20, 0)
     );
 
     NamedCommands.registerCommand(
@@ -154,6 +153,20 @@ public class RobotContainer {
       new ParallelCommandGroup(
         new ElevateToSetpointCmd(elevator, Meters.of(1.13)),
         algaeCollector.intakeCommand().withTimeout(1)
+      )
+    );
+
+    NamedCommands.registerCommand(
+      "GoToHPStation", 
+      new PathfindToAnyTagCmd(drivetrain, vision, 12, 19, 4)
+    );
+
+    NamedCommands.registerCommand(
+      "ElevateAndIntakeCoral", 
+      Commands.parallel(
+        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
+        new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.humanPlayerAngle),
+        coralCollector.intakeCommand().withTimeout(3)
       )
     );
 

@@ -80,7 +80,7 @@ public class PathfindToAnyTagCmd extends SequentialCommandGroup {
       new Rotation3d(0, 0, robotPose2d.getRotation().getRadians())
     );
 
-    if (vision.inputs.hasLowerTarget) {
+    if (vision.hasTargets()) {
 
         // grab pose of tag
         var targetPose = aprilTagFieldLayout.getTagPose(idTagToChase);

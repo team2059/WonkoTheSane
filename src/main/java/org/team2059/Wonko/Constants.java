@@ -199,8 +199,8 @@ public final class Constants {
     
     public static final Transform3d upperCameraToRobot = 
       new Transform3d(
-        new Translation3d(0.2159, 0.2159, 1.024), 
-        new Rotation3d(0,0.43,0)
+        new Translation3d(Units.inchesToMeters(6.75), Units.inchesToMeters(8.5), Units.inchesToMeters(42)), 
+        new Rotation3d(0, Units.degreesToRadians(-24), Units.degreesToRadians(-2))
       );
     
     public static final Transform3d lowerCameraToRobot = 
@@ -246,6 +246,8 @@ public final class Constants {
     // Hard limits
     public static final Angle thruBoreMinimum = Radians.of(0.2);
     public static final Angle thruBoreMaximum = Radians.of(Math.PI / 2);
+
+    public static final Current stallDetection = Amps.of(10);
   }
 
   public static class CoralCollectorConstants {
