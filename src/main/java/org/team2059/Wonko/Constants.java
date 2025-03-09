@@ -38,6 +38,7 @@ public final class Constants {
 
     // Sets whether or not tunable numbers can be changed. If false, only defaults will be used.
     public static final boolean tuningMode = true;
+    public static boolean right = false; 
 
     /* ===== */
     /* PORTS */
@@ -62,6 +63,9 @@ public final class Constants {
     // We'll add these later once the button box is finalized
     public static final int JoystickResetHeading = 5;
     public static final int JoystickRobotRelative = 3;
+    
+    public static final int goToHPStation = 7; 
+    public static final int alignReef = 8; 
   }
 
   public static class ClimberConstants {
@@ -307,7 +311,7 @@ public final class Constants {
     public static final Current tiltCurrentLimit = Amps.of(30);
 
     // Hard limits
-    public static final Angle thruBoreMinimum = Radians.of(-1.6);
+    public static final Angle thruBoreMinimum = Radians.of(-1.68);
     public static final Angle thruBoreMaxmimum = Radians.of(Math.PI / 2.0);
 
     // Angular setpoints

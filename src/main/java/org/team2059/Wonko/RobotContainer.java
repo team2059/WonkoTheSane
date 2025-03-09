@@ -16,6 +16,7 @@ import org.team2059.Wonko.commands.algae.TiltAlgaeToSetpointCommand;
 import org.team2059.Wonko.commands.coral.TiltCoralToSetpointCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
+import org.team2059.Wonko.commands.vision.PathfindReefOffset;
 import org.team2059.Wonko.commands.vision.PathfindToAnyTagCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
@@ -69,7 +70,6 @@ public class RobotContainer {
   public static Joystick logitech;
   public static GenericHID buttonBox;
   public static boolean isRed = false; 
-  public static boolean right = false; 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -162,13 +162,13 @@ public class RobotContainer {
         new ParallelCommandGroup(
           new ElevateToReefLevelCmd(4, coralCollector, elevator),
           coralCollector.outtakeCommand()
-        ).withTimeout(0.3)
+        ).withTimeout(0.5)
       )
     );
 
     NamedCommands.registerCommand(
       "GoToStartingReefLeft", 
-      new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.reefTags.get(3), 17.5, -10)
+      new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.reefTags.get(3), 16.5, -10.8)
     );
 
     NamedCommands.registerCommand(
@@ -185,8 +185,8 @@ public class RobotContainer {
     );
 
     NamedCommands.registerCommand(
-      "GoToRightHPStation", 
-      new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.HPTags.get(1), 15, 4)
+      "GoToHPStation", 
+      new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.HPTags.get(1), 14, 4)
     );
 
     NamedCommands.registerCommand(
@@ -421,6 +421,16 @@ public class RobotContainer {
     /* ====== */
     /* Vision */
     /* ====== */
+
+    new JoystickButton(buttonBox, 15)
+    .whileTrue(new InstantCommand(() -> OperatorConstants.right = true))
+    .whileFalse(new InstantCommand(() -> OperatorConstants.right = false)); 
+
+    new JoystickButton(logitech, OperatorConstants.goToHPStation) 
+      .whileTrue(new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.HPTags.get(1), 15, 4));
+
+    new JoystickButton(logitech, OperatorConstants.alignReef) 
+      .whileTrue(new PathfindReefOffset(drivetrain, vision, VisionConstants.reefTags, OperatorConstants.right)); 
 
      
 

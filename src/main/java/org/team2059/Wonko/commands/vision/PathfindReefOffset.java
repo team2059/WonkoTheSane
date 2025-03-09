@@ -24,13 +24,11 @@ public class PathfindReefOffset extends SequentialCommandGroup {
   Vision vision;
   ArrayList<Integer> reefIDS;  
 
-  private int tagToChase;
   private boolean right; 
 
   public PathfindReefOffset(
     Drivetrain drivetrain,
     Vision vision, 
-    int tagToChase,
     ArrayList<Integer> reefIDS,
     boolean right 
   ) {  
@@ -52,6 +50,7 @@ public class PathfindReefOffset extends SequentialCommandGroup {
   }
   
   public Command getCommand() {
+    System.out.println(right);
     if (vision.inputs.hasLowerTarget && reefIDS.contains(vision.inputs.lowerBestTargetID)) {
       if (right) {
         return new PathfindToAnyTagCmd

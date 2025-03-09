@@ -44,12 +44,12 @@ public class VisionIOReal implements VisionIO {
 
         upperPoseEstimator = new PhotonPoseEstimator(
             aprilTagFieldLayout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+            PoseStrategy.LOWEST_AMBIGUITY, 
             VisionConstants.upperCameraToRobot
         );
-        lowerPoseEstimator = new PhotonPoseEstimator(
+        lowerPoseEstimator = new PhotonPoseEstimator(   
             aprilTagFieldLayout, 
-            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+            PoseStrategy.LOWEST_AMBIGUITY, 
             VisionConstants.lowerCameraToRobot
         );
 

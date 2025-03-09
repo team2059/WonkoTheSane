@@ -10,6 +10,7 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team2059.Wonko.Constants.OperatorConstants;
 import org.team2059.Wonko.util.LocalADStarAK;
 
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -111,7 +113,6 @@ public class Robot extends LoggedRobot {
         if (ally.get() == Alliance.Blue) {
           RobotContainer.isRed = false;
         }
-        System.out.println("NO COLOR YET"); 
       } 
     } catch (NullPointerException ex) {
       System.out.println("error");
@@ -157,7 +158,10 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    SmartDashboard.putBoolean("Alliance", RobotContainer.isRed);
+    SmartDashboard.putBoolean("Offset", OperatorConstants.right);
+  }
 
   @Override
   public void testInit() {
