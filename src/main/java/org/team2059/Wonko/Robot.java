@@ -4,6 +4,8 @@
 
 package org.team2059.Wonko;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
@@ -13,6 +15,8 @@ import org.team2059.Wonko.util.LocalADStarAK;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
@@ -97,6 +101,22 @@ public class Robot extends LoggedRobot {
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
+
+    try {
+      Optional<Alliance> ally = DriverStation.getAlliance();
+      if (ally.isPresent()) {
+        if (ally.get() == Alliance.Red) {
+          RobotContainer.isRed = true;
+        }
+        if (ally.get() == Alliance.Blue) {
+          RobotContainer.isRed = false;
+        }
+        System.out.println("NO COLOR YET"); 
+      } 
+    } catch (NullPointerException ex) {
+      System.out.println("error");
+    }
+
     CommandScheduler.getInstance().run();
   }
 

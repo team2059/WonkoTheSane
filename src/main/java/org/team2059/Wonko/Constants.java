@@ -6,6 +6,9 @@ package org.team2059.Wonko;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -215,15 +218,18 @@ public final class Constants {
      * Starts at the side closest to the driver station
      * Goes clockwise (relative to driver station)
      */
-    public static final int[] redReefTags = new int[]{7,6,11,10,9,8};
-    public static final int[] blueReefTags = new int[]{18,19,20,21,22,17}; 
-    public static final int[] reefTags = new int[6]; 
+    public static final ArrayList<Integer> redReefTags = new ArrayList<>(Arrays.asList(7, 6, 11, 10, 9, 8));
+    public static final ArrayList<Integer> blueReefTags = new ArrayList<>(Arrays.asList(18, 19, 20, 21, 22, 17));
+    public static ArrayList<Integer> reefTags = new ArrayList<>();
 
     // Tags of human player stations 
     // Starts at left human player station from driver POV
-    public static final int[] redHPTags = new int[]{1, 2};
-    public static final int[] blueHPTags = new int[]{13, 12}; 
-    public static final int[] HPTags = new int[2]; 
+    public static final ArrayList<Integer> redHPTags = new ArrayList<>(Arrays.asList(13, 12));
+    public static final ArrayList<Integer> blueHPTags = new ArrayList<>(Arrays.asList(13, 12));
+    public static ArrayList<Integer> HPTags = new ArrayList<>();
+
+    // Offset for left or right coral
+    public static final int reefOffset = 10; 
 
     // Standard deviations below are from Team Spectrum 3847’s X-Ray robot
 

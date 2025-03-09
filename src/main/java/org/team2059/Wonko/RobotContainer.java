@@ -10,6 +10,7 @@ import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.Constants.OperatorConstants;
+import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.algae.TiltAlgaeToSetpointCommand;
 import org.team2059.Wonko.commands.coral.TiltCoralToSetpointCmd;
@@ -67,10 +68,12 @@ public class RobotContainer {
 
   public static Joystick logitech;
   public static GenericHID buttonBox;
+  public static boolean isRed = false; 
+  public static boolean right = false; 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
+    
     /* ========== */
     /* SUBSYSTEMS */
     /* ========== */
@@ -81,6 +84,7 @@ public class RobotContainer {
     algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
     coralCollector = new CoralCollector(new CoralCollectorIOReal());
     climber = new Climber(new ClimberIOReal());
+
 
     /* =========== */
     /* CONTROLLERS */
@@ -109,6 +113,14 @@ public class RobotContainer {
       new ElevateToReefLevelCmd(0, coralCollector, elevator)
         .until(() -> elevator.inputs.zeroLimit)
     );
+
+    if (isRed) {
+      VisionConstants.HPTags = VisionConstants.redHPTags; 
+      VisionConstants.reefTags = VisionConstants.redReefTags; 
+    } else {
+      VisionConstants.HPTags = VisionConstants.blueHPTags; 
+      VisionConstants.reefTags = VisionConstants.blueReefTags; 
+    }
 
     /* ========== */
     /* AUTONOMOUS */
@@ -155,13 +167,13 @@ public class RobotContainer {
     );
 
     NamedCommands.registerCommand(
-      "GoToTag21Left", 
-      new PathfindToAnyTagCmd(drivetrain, vision, 21, 17.5, -10)
+      "GoToStartingReefLeft", 
+      new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.reefTags.get(3), 17.5, -10)
     );
 
     NamedCommands.registerCommand(
-      "GoToTag18Center", 
-      new PathfindToAnyTagCmd(drivetrain, vision, 18, 20, 0)
+      "GoToDriverReefCenter", 
+      new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.reefTags.get(0), 20, 0)
     );
 
     NamedCommands.registerCommand(
@@ -173,8 +185,8 @@ public class RobotContainer {
     );
 
     NamedCommands.registerCommand(
-      "GoToHPStation", 
-      new PathfindToAnyTagCmd(drivetrain, vision, 12, 15, 4)
+      "GoToRightHPStation", 
+      new PathfindToAnyTagCmd(drivetrain, vision, VisionConstants.HPTags.get(1), 15, 4)
     );
 
     NamedCommands.registerCommand(
@@ -409,6 +421,8 @@ public class RobotContainer {
     /* ====== */
     /* Vision */
     /* ====== */
+
+     
 
     // new JoystickButton(buttonBox, 12)
     //   .whileTrue(new RepeatCommand(new PathfindToTagCmd(drivetrain, vision, 20, 25)));
