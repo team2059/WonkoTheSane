@@ -139,8 +139,24 @@ public class RobotContainer {
     );
 
     NamedCommands.registerCommand(
-      "GoToTag18Left", 
-      new PathfindToAnyTagCmd(drivetrain, vision, 18, 19, -5)
+      "ScoreCoralL4",  // name as shown in PathPlanner GUI
+      new SequentialCommandGroup(
+
+        // Up sequence - ends when error is <= 1%
+        new ElevateToReefLevelCmd(4, coralCollector, elevator)
+          .withTimeout(4),
+        
+        // Deposit - holds elevator while running outtake
+        new ParallelCommandGroup(
+          new ElevateToReefLevelCmd(4, coralCollector, elevator),
+          coralCollector.outtakeCommand()
+        ).withTimeout(0.3)
+      )
+    );
+
+    NamedCommands.registerCommand(
+      "GoToTag21Left", 
+      new PathfindToAnyTagCmd(drivetrain, vision, 21, 17.5, -10)
     );
 
     NamedCommands.registerCommand(
@@ -158,16 +174,41 @@ public class RobotContainer {
 
     NamedCommands.registerCommand(
       "GoToHPStation", 
-      new PathfindToAnyTagCmd(drivetrain, vision, 12, 19, 4)
+      new PathfindToAnyTagCmd(drivetrain, vision, 12, 15, 4)
     );
 
     NamedCommands.registerCommand(
       "ElevateAndIntakeCoral", 
       Commands.parallel(
         new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-        new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.humanPlayerAngle),
-        coralCollector.intakeCommand().withTimeout(3)
-      )
+        coralCollector.intakeCommand()
+      ).until(() -> coralCollector.inputs.hasCoral)
+    );
+
+    NamedCommands.registerCommand(
+      "ElevateToHP", 
+      new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight)
+    );
+
+    NamedCommands.registerCommand(
+      "TiltCoralToHP",
+      new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.humanPlayerAngle)
+        .until(() -> coralCollector.inputs.tiltMotorPositionRad >= 0.56 * .95 && coralCollector.inputs.tiltMotorPositionRad <= 0.56 * 1.05) 
+    );
+
+    NamedCommands.registerCommand(
+      "TiltCoralToZero",
+      new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.thruBoreMaxmimum)
+    );
+
+    NamedCommands.registerCommand(
+      "IntakeCoral", 
+      coralCollector.intakeCommand()
+    );
+
+    NamedCommands.registerCommand(
+      "ElevatorZero", 
+      new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0]).withTimeout(3)
     );
 
     // Build auto chooser - you can also set a default.

@@ -199,16 +199,31 @@ public final class Constants {
     
     public static final Transform3d upperCameraToRobot = 
       new Transform3d(
-        new Translation3d(Units.inchesToMeters(6.75), Units.inchesToMeters(8.5), Units.inchesToMeters(42)), 
-        new Rotation3d(0, Units.degreesToRadians(-24), Units.degreesToRadians(-2))
+        new Translation3d(Units.inchesToMeters(6.75), Units.inchesToMeters(8.25), Units.inchesToMeters(38.875)), 
+        new Rotation3d(0, Units.degreesToRadians(-24), Units.degreesToRadians(0))
       );
     
     public static final Transform3d lowerCameraToRobot = 
       new Transform3d(
-        new Translation3d(Units.inchesToMeters(14), Units.inchesToMeters(-0.5), Units.inchesToMeters(10.5)), 
+        new Translation3d(Units.inchesToMeters(14), Units.inchesToMeters(0), Units.inchesToMeters(10.5)), 
         new Rotation3d(0, 0, 0)
       );
 
+
+    /* 
+     * Tags of each reef side. 
+     * Starts at the side closest to the driver station
+     * Goes clockwise (relative to driver station)
+     */
+    public static final int[] redReefTags = new int[]{7,6,11,10,9,8};
+    public static final int[] blueReefTags = new int[]{18,19,20,21,22,17}; 
+    public static final int[] reefTags = new int[6]; 
+
+    // Tags of human player stations 
+    // Starts at left human player station from driver POV
+    public static final int[] redHPTags = new int[]{1, 2};
+    public static final int[] blueHPTags = new int[]{13, 12}; 
+    public static final int[] HPTags = new int[2]; 
 
     // Standard deviations below are from Team Spectrum 3847’s X-Ray robot
 
@@ -332,7 +347,7 @@ public final class Constants {
     };
     
     // Heights for misc. other tasks
-    public static final Distance humanPlayerHeight = Meters.of(0.6);
+    public static final Distance humanPlayerHeight = Meters.of(0.59);
     public static final Distance processorHeight = Meters.of(0.2);
     
     // PID & FF gains
