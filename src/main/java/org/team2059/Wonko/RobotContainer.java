@@ -4,7 +4,7 @@
 
 package org.team2059.Wonko;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meters;
 
 import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
@@ -17,6 +17,7 @@ import org.team2059.Wonko.commands.coral.TiltCoralToSetpointCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.commands.vision.PathfindToAnyTagCmd;
+import org.team2059.Wonko.commands.vision.PathfindtoClosestTag;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.climber.Climber;
@@ -44,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -421,6 +423,18 @@ public class RobotContainer {
     /* ====== */
     /* Vision */
     /* ====== */
+
+    // Center of tag(Trigger)
+    new JoystickButton(logitech, 1)
+      .whileTrue(new RepeatCommand(new PathfindtoClosestTag(drivetrain, vision, 21, 0)));
+    
+    // Left of tag
+    new JoystickButton(logitech, 3)
+      .whileTrue(new RepeatCommand(new PathfindtoClosestTag(drivetrain, vision, 21, -15)));
+    
+    // Right of tag
+    new JoystickButton(logitech, 4)
+      .whileTrue(new RepeatCommand(new PathfindtoClosestTag(drivetrain, vision, 21, 15)));
 
      
 
