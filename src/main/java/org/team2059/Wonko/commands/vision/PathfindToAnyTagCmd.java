@@ -43,7 +43,7 @@ public class PathfindToAnyTagCmd extends SequentialCommandGroup {
   /** Creates a new PathfindToAnyTagCmd. */
   public PathfindToAnyTagCmd(
     Drivetrain drivetrain,
-    Vision vision, 
+    Vision vision,
     int idTagToChase, 
     double frontOffsetInches,
     double yOffsetInches
@@ -92,8 +92,8 @@ public class PathfindToAnyTagCmd extends SequentialCommandGroup {
         return AutoBuilder.pathfindToPose(
             goalPose,
             new PathConstraints(
-          2, 
           1.5, 
+          1.0, 
           Units.degreesToRadians(540), 
           Units.degreesToRadians(720)
         )
