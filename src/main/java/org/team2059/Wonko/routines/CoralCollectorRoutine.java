@@ -43,7 +43,7 @@ public class CoralCollectorRoutine {
                 log -> {
                     log.motor("coralcollector-tiltmotor")
                         .voltage(appliedVoltage.mut_replace(coralCollector.inputs.tiltMotorAppliedVolts, Volts))
-                        .angularPosition(angle.mut_replace(coralCollector.inputs.tiltMotorPositionRad, Radians))
+                        .angularPosition(angle.mut_replace(coralCollector.inputs.tiltAbsPosRadians, Radians))
                         .angularVelocity(angularVelocity.mut_replace(coralCollector.inputs.tiltMotorVelocityRadPerSec, RadiansPerSecond));
                 }, 
                 coralCollector
@@ -54,20 +54,20 @@ public class CoralCollectorRoutine {
     // Quasistatic tests in given direction
     public Command quasistaticForward() {
         return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward)
-            .until(() -> coralCollector.inputs.thruBorePositionRadians >= CoralCollectorConstants.thruBoreMaxmimum.in(Radians));
+            .until(() -> coralCollector.inputs.tiltAbsPosRadians >= CoralCollectorConstants.thruBoreMaxmimum.in(Radians));
     }
     public Command quasistaticReverse() {
         return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse)
-            .until(() -> coralCollector.inputs.thruBorePositionRadians <= CoralCollectorConstants.thruBoreMinimum.in(Radians));
+            .until(() -> coralCollector.inputs.tiltAbsPosRadians <= CoralCollectorConstants.thruBoreMinimum.in(Radians));
     }
 
     // Dynamic tests in given direction
     public Command dynamicForward() {
         return sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward)
-            .until(() -> coralCollector.inputs.thruBorePositionRadians >= CoralCollectorConstants.thruBoreMaxmimum.in(Radians));
+            .until(() -> coralCollector.inputs.tiltAbsPosRadians >= CoralCollectorConstants.thruBoreMaxmimum.in(Radians));
     }
     public Command dynamicReverse() {
         return sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)
-            .until(() -> coralCollector.inputs.thruBorePositionRadians <= CoralCollectorConstants.thruBoreMinimum.in(Radians));
+            .until(() -> coralCollector.inputs.tiltAbsPosRadians <= CoralCollectorConstants.thruBoreMinimum.in(Radians));
     }
 }

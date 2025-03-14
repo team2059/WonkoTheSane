@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.util.LoggedTunableNumber;
 
-import com.revrobotics.RelativeEncoder;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
@@ -19,7 +19,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class CoralCollectorIOReal implements CoralCollectorIO {
     // Our motors...
@@ -30,11 +29,7 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
     private SparkClosedLoopController flywheelController;
     private SparkClosedLoopController tiltController;
 
-    // Through bore encoder is a DutyCycleEncoder, goes from 0 - 1
-    private DutyCycleEncoder tiltEncoder;
-
-    // Integrated Spark controller to do the PID calculations on.
-    private RelativeEncoder tiltIntegratedEncoder;
+    private AbsoluteEncoder tiltAbsoluteEnc;
     
     // IR sensor - detects whether coral is present by light signal on or off
     private DigitalInput irSensor;
@@ -66,39 +61,26 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
         tiltConfig
             .inverted(false)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(((int)CoralCollectorConstants.tiltCurrentLimit.in(Amps)));
-        tiltConfig.encoder
-            .positionConversionFactor(CoralCollectorConstants.tiltPositionConversionFactor)
-            .velocityConversionFactor(CoralCollectorConstants.tiltVelocityConversionFactor);
+            .smartCurrentLimit(((int)CoralCollectorConstants.tiltCurrentLimit.in(Amps)))
+            .closedLoopRampRate(0.5);
+        tiltConfig.absoluteEncoder
+            .zeroOffset(0.638)
+            .inverted(true)
+            .positionConversionFactor(2.0 * Math.PI)
+            .velocityConversionFactor(2.0 * Math.PI / 60)
+            .zeroCentered(true);
         tiltConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .pid(kPTilt.get(), kITilt.get(), kDTilt.get())
             .outputRange(-1, 1);
         tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         tiltController = tiltMotor.getClosedLoopController(); 
         tiltMotor.clearFaults(); 
 
-        // Configure thru-bore encoder
-        tiltEncoder = new DutyCycleEncoder(CoralCollectorConstants.thruBoreDio);
-        tiltEncoder.setInverted(true);
-
-        tiltIntegratedEncoder = tiltMotor.getEncoder();
+        tiltAbsoluteEnc = tiltMotor.getAbsoluteEncoder();
 
         // Configure IR sensor - reports presence of coral
         irSensor = new DigitalInput(CoralCollectorConstants.irSensorDio);
-
-        // Through my testing I found that the thrubore reports the wrong angle
-        // until a few seconds have passed since power up.
-        // new Thread(() -> {
-        //     try {
-        //         Thread.sleep(2500);
-        //         double initialPos = 2.0 * Math.PI * tiltEncoder.get();
-        //         tiltIntegratedEncoder.setPosition(initialPos);
-        //         System.out.println("COR INITIAL POS:"+ initialPos);
-        //     } catch (Exception e) {
-        //         e.printStackTrace();
-        //     }
-        //   }).start();
     }
 
     @Override
@@ -121,19 +103,18 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
 
         inputs.intakeMotorAppliedVolts = (intakeMotor.getAppliedOutput() * intakeMotor.getBusVoltage());
         inputs.tiltMotorAppliedVolts = (tiltMotor.getAppliedOutput() * tiltMotor.getBusVoltage());
+        
         inputs.intakeMotorCurrentAmps = intakeMotor.getOutputCurrent();
         inputs.tiltMotorCurrentAmps = tiltMotor.getOutputCurrent();
+
         inputs.intakeMotorTemp = intakeMotor.getMotorTemperature();
-        inputs.tiltMotorPos = tiltIntegratedEncoder.getPosition();
         inputs.tiltMotorTemp = tiltMotor.getMotorTemperature();
-        inputs.thruBoreConnected = tiltEncoder.isConnected();
-        inputs.thruBorePositionRadians = tiltEncoder.get() * 2.0 * Math.PI + CoralCollectorConstants.horizontalOffset;
+
+        inputs.tiltAbsPosRadians = tiltAbsoluteEnc.getPosition();
+        inputs.tiltMotorVelocityRadPerSec = tiltAbsoluteEnc.getVelocity();
+
         inputs.hasCoral = !irSensor.get();
-        if (Math.abs(inputs.thruBorePositionRadians - tiltIntegratedEncoder.getPosition()) >= 0.01) {
-            tiltIntegratedEncoder.setPosition(inputs.thruBorePositionRadians);
-        }
-        inputs.tiltMotorPositionRad = tiltIntegratedEncoder.getPosition();
-        inputs.tiltMotorVelocityRadPerSec = tiltIntegratedEncoder.getVelocity();
+
         inputs.intakeMotorSpeed = intakeMotor.getEncoder().getVelocity();
     }
 
@@ -173,12 +154,11 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
     }
 
     @Override
-    public void setTiltPos(double posRadians, double arbFF) {
+    public void setTiltPos(double posRadians) {
+        // System.out.println("Target CoralTiltPos: " + posRadians);
         tiltController.setReference(
             posRadians, 
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            arbFF
+            ControlType.kPosition
         );
     }
 }

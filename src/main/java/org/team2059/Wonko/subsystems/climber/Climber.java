@@ -18,12 +18,12 @@ public class Climber extends SubsystemBase{
     }
 
     public Command climberDownCommand() {
-        return this.startEnd(() -> io.setClimbSpeed(0.2), () -> io.stopClimb())
+        return this.startEnd(() -> io.setClimbSpeed(0.3), () -> io.stopClimb())
             .until(() -> inputs.tiltThroughborePosition <= ClimberConstants.lowerLimit.in(Radians));                         
     }
 
     public Command climberUpCommand() {
-        return this.startEnd(() -> io.setClimbSpeed(-0.2), () -> io.stopClimb())
+        return this.startEnd(() -> io.setClimbSpeed(-0.3), () -> io.stopClimb())
             .until(() -> inputs.tiltThroughborePosition >= ClimberConstants.upperLimit.in(Radians));
     }
 

@@ -1,5 +1,6 @@
 package org.team2059.Wonko.subsystems.drive;
 
+import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.util.SwerveUtilities;
 
@@ -18,6 +19,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 
 public class SwerveModuleIOReal implements SwerveModuleIO {
     private final SparkFlex driveMotor;
@@ -73,6 +75,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
         rotationPidController = new PIDController(DrivetrainConstants.kPRotation, 0, 0);
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
+
+        rotationPidController.setTolerance(Units.degreesToRadians(1));
 
         drivePidController = new PIDController(kP, 0, 0);
 
@@ -268,7 +272,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
     //     // Direct set, won't be as accurate
     //     driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
     //   }
-      driveMotor.setVoltage(driveFF.calculate(state.speedMetersPerSecond) + drivePidController.calculate(state.speedMetersPerSecond));
+      driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond) + drivePidController.calculate(state.speedMetersPerSecond));
     }
 
     @Override
@@ -303,6 +307,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
         inputs.driveMotorTemp = getDriveMotorTemp();
         inputs.rotationMotorTemp = getRotationMotorTemp();
+
+        inputs.rotationPidAtSetpoint = rotationPidController.atSetpoint();
     }
 
     @Override

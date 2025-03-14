@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -45,6 +47,7 @@ public final class Constants {
 
     public static final int logitechPort = 0;
     public static final int buttonBoxPort = 1;
+    public static final int xboxControllerPort = 2;
 
     /* ==== */
     /* AXES */
@@ -75,7 +78,7 @@ public final class Constants {
 
     // Hard limits, as reported by thrubore
     public static final Angle upperLimit = Radians.of(5.76);
-    public static final Angle lowerLimit = Radians.of(3.4);
+    public static final Angle lowerLimit = Radians.of(3);
   }
 
   public static class DrivetrainConstants {
@@ -131,22 +134,22 @@ public final class Constants {
     public static final int frontLeftDriveMotorId = 1;
     public static final int frontLeftRotationMotorId = 2;
     public static final int frontLeftCanCoderId = 10;
-    public static final double frontLeftOffsetRad = 0.443359 * 2 * Math.PI;
+    public static final double frontLeftOffsetRad = 0.416260 * 2 * Math.PI;
     // front right
     public static final int frontRightDriveMotorId = 3;
     public static final int frontRightRotationMotorId = 4;
     public static final int frontRightCanCoderId = 20;
-    public static final double frontRightOffsetRad = 0.675537 * 2 * Math.PI;
+    public static final double frontRightOffsetRad = 0.978760 * 2 * Math.PI;
     // back left
     public static final int backLeftDriveMotorId = 5;
     public static final int backLeftRotationMotorId = 6;
     public static final int backLeftCanCoderId = 30;
-    public static final double backLeftOffsetRad = 0.051758 * 2 * Math.PI;
+    public static final double backLeftOffsetRad = 0.831787 * 2 * Math.PI;
     // back right
     public static final int backRightDriveMotorId = 7;
     public static final int backRightRotationMotorId = 8;
     public static final int backRightCanCoderId = 40;
-    public static final double backRightOffsetRad = 0 * 2 * Math.PI;
+    public static final double backRightOffsetRad = 0.136719 * 2 * Math.PI;
 
     /* ======== */
     /* MAXIMUMS */
@@ -228,9 +231,6 @@ public final class Constants {
     public static final ArrayList<Integer> blueHPTags = new ArrayList<>(Arrays.asList(13, 12));
     public static ArrayList<Integer> HPTags = new ArrayList<>();
 
-    // Offset for left or right coral
-    public static final int reefOffset = 10; 
-
     // Standard deviations below are from Team Spectrum 3847’s X-Ray robot
 
     /**
@@ -246,6 +246,16 @@ public final class Constants {
      * [x, y, theta]ᵀ, with units in meters and radians.
      */
     public static final Matrix<N3, N1> measurementStdDevs = VecBuilder.fill(5, 5, 500);
+    
+    // The standard deviations of our vision estimated poses, which affect correction rate
+    public static final Matrix<N3, N1> singleTagStdDevs = VecBuilder.fill(2, 2, 8);
+    public static final Matrix<N3, N1> multiTagStdDevs = VecBuilder.fill(0.5, 0.5, 1);
+  
+    public static final AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+
+    public static final Distance reefAlignFrontOffset = Inches.of(18);
+    public static final Distance reefAlignLeftStrafeOffset = Inches.of(-4);
+    public static final Distance reefAlignRightStrafeOffset = Inches.of(4);
   }
 
   public static class AlgaeCollectorConstants {
@@ -256,7 +266,7 @@ public final class Constants {
     public static final int tiltMotorId = 13;
 
     // DIO IDs
-    public static final int tiltEncoderDio = 5;
+    public static final int irSensorDio = 7;
 
     public static final double horizontalOffset = -2.16; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
 
@@ -265,8 +275,8 @@ public final class Constants {
     public static final double tiltMotorVelocityConvFactor = 0.00232710567;
 
     // Hard limits
-    public static final Angle thruBoreMinimum = Radians.of(0.2);
-    public static final Angle thruBoreMaximum = Radians.of(Math.PI / 2);
+    public static final Angle thruBoreMinimum = Radians.of(0);
+    public static final Angle thruBoreMaximum = Radians.of(1.2);
 
     public static final Current stallDetection = Amps.of(10);
   }
@@ -279,7 +289,6 @@ public final class Constants {
 
     // DIO port IDs
     public static final int irSensorDio = 6;
-    public static final int thruBoreDio = 7;
 
     // Conv. factors
     // 2pi/GR
@@ -289,7 +298,7 @@ public final class Constants {
     // PID & FF gains
     public static final double kPIntake = 0.000019;
     public static final double kFIntake = 0.000149;
-    public static final double kPTilt = 0.5;
+    public static final double kPTilt = 0.3;
     public static final double kITilt = 0.0;
     public static final double kDTilt = 0.0;
     public static final double kSTilt = 0.0; // Note concerning FF values: following mechanical changes, constants no longer needed.
@@ -301,7 +310,7 @@ public final class Constants {
     public static final double tiltMaxVelocity = 7;
     public static final double tiltMaxAccel = 5;
 
-    public static final double horizontalOffset = -2.1717; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
+    public static final double horizontalOffset = 0.358; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
 
     // Smart current limit for Spark controller
     public static final Current tiltCurrentLimit = Amps.of(30);
@@ -316,10 +325,10 @@ public final class Constants {
       restingCoralCollectorPos,  // L0
       restingCoralCollectorPos,  // L1
       Radians.of(-0.657),        // L2
-      Radians.of(-0.500),        // L3
-      Radians.of(-0.750)         // L4
+      Radians.of(-0.74),        // L3
+      Radians.of(-1.06)         // L4
     };
-    public static final Angle humanPlayerAngle = Radians.of(0.56);
+    public static final Angle humanPlayerAngle = Radians.of(0.5);
 
   }
 
@@ -333,11 +342,11 @@ public final class Constants {
 
     // MAX HEIGHT IS A HARD LIMIT! DO NOT GO TOO CLOSE
     public static final Distance maxHeight = Distance.ofBaseUnits(2.38, Meters);
-    public static final Distance minHeight = Distance.ofBaseUnits(0.1, Meters);
+    public static final Distance minHeight = Distance.ofBaseUnits(0, Meters);
 
     // Trapezoidal constraints
     public static final double kMaxVelocity = 3;
-    public static final double kMaxAcceleration = 2;
+    public static final double kMaxAcceleration = 2.5;
 
     // Conversion factors
     public static final double positionConversionFactor = 0.0354650904; // 0.1016/(9xpi)
@@ -345,16 +354,16 @@ public final class Constants {
 
     // Level heights (index is the level, begins at 0, which is ground)
     public static final Distance[] levelHeights = {
-      Meters.of(0.010), // L0
+      Meters.of(0.000), // L0
       Meters.of(0.010), // L1
-      Meters.of(0.654), // L2
+      Meters.of(0.500), // L2
       Meters.of(1.250), // L3
       Meters.of(2.390)  // L4
     };
     
     // Heights for misc. other tasks
-    public static final Distance humanPlayerHeight = Meters.of(0.59);
-    public static final Distance processorHeight = Meters.of(0.2);
+    public static final Distance humanPlayerHeight = Meters.of(0.56);
+    public static final Distance processorHeight = Meters.of(0.4);
     
     // PID & FF gains
     public static final double kS = 0.05701;

@@ -38,8 +38,8 @@ public class AlgaeCollectorRoutine {
                 log -> {
                     log.motor("algaecollector-tiltmotor")
                         .voltage(appliedVoltage.mut_replace(algaeCollector.inputs.tiltMotorAppliedVolts, Volts))
-                        .angularPosition(angle.mut_replace(algaeCollector.inputs.integratedTiltPosRadians, Radians))
-                        .angularVelocity(angularVelocity.mut_replace(algaeCollector.inputs.integratedTiltVelRadPerSec, RadiansPerSecond));
+                        .angularPosition(angle.mut_replace(algaeCollector.inputs.tiltAbsPosRadians, Radians))
+                        .angularVelocity(angularVelocity.mut_replace(algaeCollector.inputs.tiltMotorVelocityRadPerSec, RadiansPerSecond));
                 }, 
                 algaeCollector
             )
@@ -49,20 +49,20 @@ public class AlgaeCollectorRoutine {
     // Quasistatic tests in given direction
     public Command quasistaticForward() {
         return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward)
-            .until(() -> algaeCollector.inputs.thruBorePositionRadians >= AlgaeCollectorConstants.thruBoreMaximum.in(Radians) - 0.1);
+            .until(() -> algaeCollector.inputs.tiltAbsPosRadians >= AlgaeCollectorConstants.thruBoreMaximum.in(Radians) - 0.1);
     }
     public Command quasistaticReverse() {
         return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse)
-            .until(() -> algaeCollector.inputs.thruBorePositionRadians <= AlgaeCollectorConstants.thruBoreMinimum.in(Radians) + 0.1);
+            .until(() -> algaeCollector.inputs.tiltAbsPosRadians <= AlgaeCollectorConstants.thruBoreMinimum.in(Radians) + 0.1);
     }
 
     // Dynamic tests in given direction
     public Command dynamicForward() {
         return sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward)
-            .until(() -> algaeCollector.inputs.thruBorePositionRadians >= AlgaeCollectorConstants.thruBoreMaximum.in(Radians) - 0.1);
+            .until(() -> algaeCollector.inputs.tiltAbsPosRadians >= AlgaeCollectorConstants.thruBoreMaximum.in(Radians) - 0.1);
     }
     public Command dynamicReverse() {
         return sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)
-            .until(() -> algaeCollector.inputs.thruBorePositionRadians <= AlgaeCollectorConstants.thruBoreMinimum.in(Radians) + 0.1);
+            .until(() -> algaeCollector.inputs.tiltAbsPosRadians <= AlgaeCollectorConstants.thruBoreMinimum.in(Radians) + 0.1);
     }
 }

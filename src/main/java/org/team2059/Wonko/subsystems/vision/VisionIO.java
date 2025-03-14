@@ -6,6 +6,10 @@ import org.littletonrobotics.junction.AutoLog;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+
 public interface VisionIO {
     @AutoLog
     class VisionIOInputs {
@@ -33,4 +37,10 @@ public interface VisionIO {
     default public Optional<EstimatedRobotPose> getEstimatedLowerGlobalPose() {
         return Optional.empty();
     };
+    default public Matrix<N3, N1> getUpperCurrentStdDevs() {
+        return null;
+    }
+    default public Matrix<N3, N1> getLowerCurrentStdDevs() {
+        return null;
+    }
 }

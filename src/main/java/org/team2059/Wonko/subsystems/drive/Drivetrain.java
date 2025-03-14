@@ -6,6 +6,7 @@ package org.team2059.Wonko.subsystems.drive;
 
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants;
+import org.team2059.Wonko.RobotContainer;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
@@ -26,7 +27,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.RobotBase;
 
 public class Drivetrain extends SubsystemBase {
 
@@ -87,7 +87,7 @@ public class Drivetrain extends SubsystemBase {
             DrivetrainConstants.frontRightRotationMotorId,
             DrivetrainConstants.frontRightCanCoderId,
             DrivetrainConstants.frontRightOffsetRad,
-            true,
+            false,
             true,
             0.17367,
             2.0218,
@@ -390,20 +390,27 @@ public class Drivetrain extends SubsystemBase {
       stopAllMotors();
     }
 
-    // // Add vision measurements from both cameras
-    var upperOptional = vision.io.getEstimatedUpperGlobalPose();
-    var lowerOptional = vision.io.getEstimatedLowerGlobalPose();
+    // if (!RobotContainer.upperCamSwitch.getAsBoolean()) {
+      var upperOptional = vision.io.getEstimatedUpperGlobalPose();
 
-    if (upperOptional.isPresent() && RobotBase.isReal()) {
-      poseEstimator.addVisionMeasurement(
-          upperOptional.get().estimatedPose.toPose2d(),
-          upperOptional.get().timestampSeconds);
-    }
-    if (lowerOptional.isPresent() && RobotBase.isReal()) {
-      poseEstimator.addVisionMeasurement(
-          lowerOptional.get().estimatedPose.toPose2d(),
-          lowerOptional.get().timestampSeconds);
-    }
+      if (upperOptional.isPresent() && vision.io.getUpperCurrentStdDevs() != null) {
+        poseEstimator.addVisionMeasurement(
+            upperOptional.get().estimatedPose.toPose2d(),
+            upperOptional.get().timestampSeconds,
+            vision.io.getUpperCurrentStdDevs()
+        );
+      }
+    // }
+    // if (!RobotContainer.lowerCamSwitch.getAsBoolean()) {
+      var lowerOptional = vision.io.getEstimatedLowerGlobalPose();
+      if (lowerOptional.isPresent() && vision.io.getLowerCurrentStdDevs() != null) {
+        poseEstimator.addVisionMeasurement(
+            lowerOptional.get().estimatedPose.toPose2d(),
+            lowerOptional.get().timestampSeconds,
+            vision.io.getLowerCurrentStdDevs()
+        );
+      }
+    // }
 
     // Update pose estimator as if it were simply Odometry
     poseEstimator.update(getHeading(), getModulePositions());

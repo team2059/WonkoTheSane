@@ -17,13 +17,10 @@ public interface AlgaeCollectorIO {
         public double motor2Temp = 0.0;
         public double tiltMotorTemp = 0.0;
 
+        public double tiltAbsPosRadians = 0.0;
+        public double tiltMotorVelocityRadPerSec = 0.0;
+
         public boolean hasAlgae;
-
-        public boolean thruBoreConnected = false;
-        public double thruBorePositionRadians = 0.0;
-
-        public double integratedTiltPosRadians = 0.0;
-        public double integratedTiltVelRadPerSec = 0.0;
     }
 
     default void updateInputs(AlgaeCollectorIOInputs inputs) {};
@@ -40,5 +37,5 @@ public interface AlgaeCollectorIO {
 
     default void stopAll() {};
 
-    default void setTiltPos(double posRadians, double arbFF) {};
+    default void setTiltPos(double posRadians) {};
 }

@@ -13,12 +13,8 @@ public interface CoralCollectorIO {
 
         public double intakeMotorTemp = 0.0;
         public double tiltMotorTemp = 0.0;
-        public double tiltMotorPos = 0.0;
 
-        public boolean thruBoreConnected = false;
-        public double thruBorePositionRadians = 0.0;
-
-        public double tiltMotorPositionRad = 0.0;
+        public double tiltAbsPosRadians = 0.0;
         public double tiltMotorVelocityRadPerSec = 0.0;
 
         public boolean hasCoral = false;
@@ -67,8 +63,7 @@ public interface CoralCollectorIO {
     /**
      * Set the PID setpoint for onboard Spark PID controller.
      * @param posRadians setpoint position, in radians
-     * @param arbFF arbitrary feedforward value (volts), calculated elsewhere
      */
-    default void setTiltPos(double posRadians, double arbFF) {};
+    default void setTiltPos(double posRadians) {};
 
 }

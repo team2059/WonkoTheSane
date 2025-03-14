@@ -25,6 +25,8 @@ public interface SwerveModuleIO {
 
         public double driveMotorTemp = 0.0;
         public double rotationMotorTemp = 0.0;
+
+        public boolean rotationPidAtSetpoint = false;
     }
 
     default public void updateInputs(SwerveModuleIOInputs inputs) {};

@@ -8,10 +8,16 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.team2059.Wonko.RobotContainer;
 import org.team2059.Wonko.Constants.VisionConstants;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 public class VisionIOReal implements VisionIO {
 
@@ -33,6 +39,9 @@ public class VisionIOReal implements VisionIO {
     // PhotonPoseEstimators, one for each pipeline
     private PhotonPoseEstimator upperPoseEstimator;
     private PhotonPoseEstimator lowerPoseEstimator;
+
+    private Matrix<N3, N1> upperCurStdDevs;
+    private Matrix<N3, N1> lowerCurStdDevs;
     
     public VisionIOReal() {
 
@@ -97,21 +106,133 @@ public class VisionIOReal implements VisionIO {
         }
     }
 
-    @Override
-    public Optional<EstimatedRobotPose> getEstimatedUpperGlobalPose() {
-        if (upperCameraResult != null) {
-            return upperPoseEstimator.update(upperCameraResult);
+    /**
+     * Calculates new standard deviations
+     * 
+     * This algorithm is a heuristic that creates dynamic standard deviations based on number of
+     * tags, estimation strategy, and distance from the tags
+     * 
+     * @param estimatedPose The estimated pose to guess standard deviations for
+     * @param targets All targets in this camera frame
+     */
+    private void updateUpperEstimationStdDevs(
+        Optional<EstimatedRobotPose> estimatedPose,
+        List<PhotonTrackedTarget> targets
+    ) {
+        if (estimatedPose.isEmpty()) {
+            // No pose input. Default to single-tag std devs
+            upperCurStdDevs = VisionConstants.singleTagStdDevs;
         } else {
-            return Optional.empty();
+            // Pose present. Start running heuristic.
+            var estStdDevs = VisionConstants.singleTagStdDevs;
+            int numTags = 0;
+            double avgDist = 0;
+
+            // Precalculation - see how many tags we cound, and calculate an average-distance metric
+            for (var tgt : targets) {
+                var tagPose = upperPoseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+                if (tagPose.isEmpty()) continue;
+                numTags++;
+                avgDist +=
+                    tagPose
+                        .get()
+                        .toPose2d()
+                        .getTranslation()
+                        .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+            }
+
+            if (numTags == 0) {
+                // No tags visible. Default to single-tag std devs
+                upperCurStdDevs = VisionConstants.singleTagStdDevs;
+            } else {
+                // One or more tags visible, run the full heuristic.
+                avgDist /= numTags;
+                // Increase std devs if multiple targets are visible.
+                if (numTags > 1) estStdDevs = VisionConstants.multiTagStdDevs;
+                // Increase std devs based on (average) distance
+                if (numTags == 1 && avgDist > 4) {
+                    estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+                } else {
+                    estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+                }
+                upperCurStdDevs = estStdDevs;
+            }
+        }
+    }
+    private void updateLowerEstimationStdDevs(
+        Optional<EstimatedRobotPose> estimatedPose,
+        List<PhotonTrackedTarget> targets
+    ) {
+        if (estimatedPose.isEmpty()) {
+            // No pose input. Default to single-tag std devs
+            lowerCurStdDevs = VisionConstants.singleTagStdDevs;
+        } else {
+            // Pose present. Start running heuristic.
+            var estStdDevs = VisionConstants.singleTagStdDevs;
+            int numTags = 0;
+            double avgDist = 0;
+
+            // Precalculation - see how many tags we cound, and calculate an average-distance metric
+            for (var tgt : targets) {
+                var tagPose = lowerPoseEstimator.getFieldTags().getTagPose(tgt.getFiducialId());
+                if (tagPose.isEmpty()) continue;
+                numTags++;
+                avgDist +=
+                    tagPose
+                        .get()
+                        .toPose2d()
+                        .getTranslation()
+                        .getDistance(estimatedPose.get().estimatedPose.toPose2d().getTranslation());
+            }
+
+            if (numTags == 0) {
+                // No tags visible. Default to single-tag std devs
+                lowerCurStdDevs = VisionConstants.singleTagStdDevs;
+            } else {
+                // One or more tags visible, run the full heuristic.
+                avgDist /= numTags;
+                // Increase std devs if multiple targets are visible.
+                if (numTags > 1) estStdDevs = VisionConstants.multiTagStdDevs;
+                // Increase std devs based on (average) distance
+                if (numTags == 1 && avgDist > 4) {
+                    estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+                } else {
+                    estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
+                }
+                lowerCurStdDevs = estStdDevs;
+            }
         }
     }
 
     @Override
-    public Optional<EstimatedRobotPose> getEstimatedLowerGlobalPose() {
-        if (lowerCameraResult != null) {
-            return lowerPoseEstimator.update(lowerCameraResult);
-        } else {
-            return Optional.empty();
+    public Optional<EstimatedRobotPose> getEstimatedUpperGlobalPose() {
+        Optional<EstimatedRobotPose> visionEst = Optional.empty();
+        for (var change : upperCameraResults) {
+            visionEst = upperPoseEstimator.update(change);
+            updateUpperEstimationStdDevs(visionEst, change.getTargets());
         }
+
+        return visionEst;
+    }
+
+    @Override
+    public Optional<EstimatedRobotPose> getEstimatedLowerGlobalPose() {
+        Optional<EstimatedRobotPose> visionEst = Optional.empty();
+        for (var change : lowerCameraResults) {
+            visionEst = lowerPoseEstimator.update(change);
+            updateLowerEstimationStdDevs(visionEst, change.getTargets());
+        }
+
+        return visionEst;
+    }
+
+    @Override
+    public Matrix<N3, N1> getUpperCurrentStdDevs() {
+        return upperCurStdDevs;
+    }
+
+    @Override
+    public Matrix<N3, N1> getLowerCurrentStdDevs() {
+        return lowerCurStdDevs;
     }
 }

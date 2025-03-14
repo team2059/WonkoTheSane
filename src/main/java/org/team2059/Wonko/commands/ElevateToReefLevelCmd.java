@@ -8,7 +8,6 @@ import static edu.wpi.first.units.Units.*;
 
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
-import org.team2059.Wonko.commands.coral.TiltCoralToSetpointCmd;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
@@ -33,9 +32,9 @@ public class ElevateToReefLevelCmd extends ParallelCommandGroup {
       // Hold coral tilt at resting position 
       //  until elevator is within 95% of setpoint,
       //  then hold coral tilt at the outtake level
-      new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.restingCoralCollectorPos)
+      coralCollector.setTiltSetpointCmd(CoralCollectorConstants.restingCoralCollectorPos)
         .until(() -> elevator.inputs.positionMeters >= ElevatorConstants.levelHeights[targetLevel].in(Meters) * 0.95)
-        .andThen(new TiltCoralToSetpointCmd(coralCollector, CoralCollectorConstants.levelCoralTiltAngle[targetLevel])),
+        .andThen(coralCollector.setTiltSetpointCmd(CoralCollectorConstants.levelCoralTiltAngle[targetLevel])),
       // Elevate to the target level
       new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[targetLevel])
     );

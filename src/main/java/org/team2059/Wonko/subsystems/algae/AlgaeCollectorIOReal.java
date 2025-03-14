@@ -1,12 +1,9 @@
 package org.team2059.Wonko.subsystems.algae;
 
-import static edu.wpi.first.units.Units.Amps;
-
 import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.util.LoggedTunableNumber;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -18,19 +15,15 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     private SparkFlex motor1;
     private SparkFlex motor2;
 
     private SparkFlex tiltMotor;
-
-    private DutyCycleEncoder tiltEncoder;
     
-    private RelativeEncoder tiltMotorIntegratedEncoder;
+    private AbsoluteEncoder tiltAbsoluteEnc;
 
     private LoggedTunableNumber kP = new LoggedTunableNumber("AlgaeCollector/Tilt/kP", 0.5);
     private LoggedTunableNumber kI = new LoggedTunableNumber("AlgaeCollector/Tilt/kI", 0.0);
@@ -38,9 +31,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
 
     private SparkClosedLoopController tiltController;
 
-    // Debouncer requires a condition to hold true for a certain amt of time
-    // kRising: false->true
-    private Debouncer debouncer = new Debouncer(0.33, DebounceType.kRising);
+    private DigitalInput irSensor;
 
     public AlgaeCollectorIOReal() {
         // Create intake and tilt motors and configure them
@@ -48,6 +39,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         motor2 = new SparkFlex(AlgaeCollectorConstants.motor2Id, MotorType.kBrushless);
         tiltMotor = new SparkFlex(AlgaeCollectorConstants.tiltMotorId, MotorType.kBrushless);
 
+        // Configure intake motor 1
         SparkFlexConfig motor1Config = new SparkFlexConfig();
         motor1Config
             .inverted(false)
@@ -55,6 +47,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         motor1.configure(motor1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motor1.clearFaults();
 
+        // Configure intake motor 2
         SparkFlexConfig motor2Config = new SparkFlexConfig();
         motor2Config
             .inverted(true)
@@ -62,42 +55,28 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         motor2.configure(motor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         motor2.clearFaults();
 
+        // Configure tilt motor
         SparkFlexConfig tiltConfig = new SparkFlexConfig();
         tiltConfig
             .inverted(false)
-            .idleMode(IdleMode.kBrake);
-        tiltConfig.encoder
-            .positionConversionFactor(AlgaeCollectorConstants.tiltMotorPositionConvFactor)
-            .velocityConversionFactor(AlgaeCollectorConstants.tiltMotorVelocityConvFactor);
+            .idleMode(IdleMode.kBrake)
+            .closedLoopRampRate(0.75);
+        tiltConfig.absoluteEncoder
+            .zeroOffset(0.38)
+            .inverted(false)
+            .positionConversionFactor(2.0 * Math.PI)
+            .velocityConversionFactor(2.0 * Math.PI / 60)
+            .zeroCentered(true);
         tiltConfig.closedLoop
-            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .pid(kP.get(), kI.get(), kD.get())
             .outputRange(-1, 1);
         tiltMotor.configure(tiltConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        tiltMotor.clearFaults();
-
-        // Create thru-bore encoder
-        tiltEncoder = new DutyCycleEncoder(AlgaeCollectorConstants.tiltEncoderDio);
-        tiltEncoder.setInverted(false);
+        tiltAbsoluteEnc = tiltMotor.getAbsoluteEncoder();
 
         tiltController = tiltMotor.getClosedLoopController();
 
-        tiltMotorIntegratedEncoder = tiltMotor.getEncoder();
-
-        // Through my testing I found that the thrubore reports the wrong angle
-        // until a few seconds have passed since power up.
-        // new Thread(() -> {
-        //     try {
-        //         Thread.sleep(2500);
-        //         double initialPos = 2.0 * Math.PI * tiltEncoder.get();
-        //         tiltMotorIntegratedEncoder.setPosition(initialPos);
-        //         System.out.println("ALG INITIAL POS:"+ initialPos);
-        //     } catch (Exception e) {
-        //         e.printStackTrace();
-        //     }
-        //   }).start();
-
-        debouncer.calculate(false); // Start debouncer at false
+        irSensor = new DigitalInput(AlgaeCollectorConstants.irSensorDio);
     }
 
     @Override
@@ -126,6 +105,17 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     @Override
     public void updateInputs(AlgaeCollectorIOInputs inputs) {
 
+        // Update tunables
+        LoggedTunableNumber.ifChanged(
+            hashCode(), 
+            () -> {
+                SparkFlexConfig tempTiltConfig = new SparkFlexConfig();
+                tempTiltConfig.closedLoop.pid(kP.get(), kI.get(), kD.get());
+                tiltMotor.configure(tempTiltConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+            }, 
+            kP, kI, kD
+        );
+
         inputs.motor1AppliedVolts = (motor1.getAppliedOutput() * motor1.getBusVoltage());
         inputs.motor2AppliedVolts = (motor2.getAppliedOutput() * motor2.getBusVoltage());
         inputs.tiltMotorAppliedVolts = (tiltMotor.getAppliedOutput() * tiltMotor.getBusVoltage());
@@ -138,28 +128,10 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
         inputs.motor2Temp = motor2.getMotorTemperature();
         inputs.tiltMotorTemp = tiltMotor.getMotorTemperature();
 
-        inputs.thruBoreConnected = tiltEncoder.isConnected();
-        inputs.thruBorePositionRadians = tiltEncoder.get() * 2.0 * Math.PI + AlgaeCollectorConstants.horizontalOffset;
+        inputs.tiltAbsPosRadians = tiltAbsoluteEnc.getPosition();
+        inputs.tiltMotorVelocityRadPerSec = tiltAbsoluteEnc.getVelocity();
 
-        if (Math.abs(inputs.thruBorePositionRadians - tiltMotorIntegratedEncoder.getPosition()) >= 0.01) {
-            tiltMotorIntegratedEncoder.setPosition(inputs.thruBorePositionRadians);
-        }
-
-        inputs.integratedTiltPosRadians = tiltMotorIntegratedEncoder.getPosition();
-        inputs.integratedTiltVelRadPerSec = tiltMotorIntegratedEncoder.getVelocity();
-
-        // Update tunables
-        LoggedTunableNumber.ifChanged(
-            hashCode(), 
-            () -> {
-                SparkFlexConfig tempTiltConfig = new SparkFlexConfig();
-                tempTiltConfig.closedLoop.pid(kP.get(), kI.get(), kD.get());
-                tiltMotor.configure(tempTiltConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-            }, 
-            kP, kI, kD
-        );
-
-        inputs.hasAlgae = debouncer.calculate(inputs.motor1CurrentAmps > AlgaeCollectorConstants.stallDetection.in(Amps));
+        inputs.hasAlgae = !irSensor.get();
     }
 
     @Override
@@ -173,12 +145,11 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     }
 
     @Override
-    public void setTiltPos(double posRadians, double arbFF) {
+    public void setTiltPos(double posRadians) {
+        // System.out.println("Target CoralTiltPos: " + posRadians);
         tiltController.setReference(
-            posRadians,
-            ControlType.kPosition,
-            ClosedLoopSlot.kSlot0,
-            arbFF
+            posRadians, 
+            ControlType.kPosition
         );
     }
 }

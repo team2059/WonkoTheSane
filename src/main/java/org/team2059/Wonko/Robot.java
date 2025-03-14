@@ -111,7 +111,6 @@ public class Robot extends LoggedRobot {
         if (ally.get() == Alliance.Blue) {
           RobotContainer.isRed = false;
         }
-        System.out.println("NO COLOR YET"); 
       } 
     } catch (NullPointerException ex) {
       System.out.println("error");
