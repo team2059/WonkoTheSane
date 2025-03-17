@@ -81,10 +81,10 @@ public class RobotContainer {
 
     vision = Vision.getInstance(new VisionIOReal());
     drivetrain = new Drivetrain(vision);
-    elevator = new Elevator(new ElevatorIOReal());
-    algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
-    coralCollector = new CoralCollector(new CoralCollectorIOReal());
-    climber = new Climber(new ClimberIOReal());
+    elevator = Elevator.getInstance(new ElevatorIOReal());
+    algaeCollector = AlgaeCollector.getInstance(new AlgaeCollectorIOReal());
+    coralCollector = CoralCollector.getInstance(new CoralCollectorIOReal());
+    climber = Climber.getInstance(new ClimberIOReal());
 
     /* =========== */
     /* CONTROLLERS */

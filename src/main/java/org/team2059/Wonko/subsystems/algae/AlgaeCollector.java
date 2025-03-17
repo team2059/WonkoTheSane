@@ -12,16 +12,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeCollector extends SubsystemBase {
 
+    /* Singleton Instance */
+    private static AlgaeCollector instance;
+
     public AlgaeCollectorIO io;
     
     public AlgaeCollectorIOInputsAutoLogged inputs = new AlgaeCollectorIOInputsAutoLogged();
 
     public AlgaeCollectorRoutine routine;
 
-    public AlgaeCollector(AlgaeCollectorIO io) {
+    private AlgaeCollector(AlgaeCollectorIO io) {
         this.io = io;
 
         routine = new AlgaeCollectorRoutine(this);
+    }
+
+    public static AlgaeCollector getInstance(AlgaeCollectorIO io) {
+        if (instance == null) {
+            instance = new AlgaeCollector(io);
+        }
+        return instance;
     }
 
     public Command intakeCommand() {

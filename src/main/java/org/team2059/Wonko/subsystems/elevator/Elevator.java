@@ -11,16 +11,26 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
 
+    /* Singleton Instance */
+    private static Elevator instance;
+
     public ElevatorIO io;
 
     public ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
     public ElevatorRoutine routine;
 
-    public Elevator(ElevatorIO io) {
+    private Elevator(ElevatorIO io) {
         this.io = io;
         io.resetEncoder();
         this.routine = new ElevatorRoutine(this);
+    }
+
+    public static Elevator getInstance(ElevatorIO io) {
+        if (instance == null) {
+            instance = new Elevator(io);
+        }
+        return instance;
     }
 
     @Override

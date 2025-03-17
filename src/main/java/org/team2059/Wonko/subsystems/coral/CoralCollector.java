@@ -12,14 +12,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralCollector extends SubsystemBase {
 
+    /* Singleton Instance */
+    private static CoralCollector instance;
+
     public CoralCollectorIO io;
     public CoralCollectorIOInputsAutoLogged inputs;
     public CoralCollectorRoutine routine;
 
-    public CoralCollector(CoralCollectorIO io) {
+    private CoralCollector(CoralCollectorIO io) {
         this.io = io;
         inputs = new CoralCollectorIOInputsAutoLogged();
         routine = new CoralCollectorRoutine(this);
+    }
+
+    public static CoralCollector getInstance(CoralCollectorIO io) {
+        if (instance == null) {
+            instance = new CoralCollector(io);
+        }
+        return instance;
     }
 
     public Command intakeCommand() { // Command factory for coral intake.

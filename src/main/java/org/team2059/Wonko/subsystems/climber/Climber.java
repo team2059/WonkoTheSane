@@ -9,13 +9,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase{
+
+    /* Singleton Instance */
+    private static Climber instance;
+    
     public ClimberIO io;
     
     public ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
 
-    public Climber(ClimberIO io) {
+    private Climber(ClimberIO io) {
         this.io = io;
     }
+
+    public static Climber getInstance(ClimberIO io) {
+        if (instance == null) {
+            instance = new Climber(io);
+        }
+        return instance;
+    } 
 
     public Command climberDownCommand() {
         return this.startEnd(() -> io.setClimbSpeed(0.3), () -> io.stopClimb())
