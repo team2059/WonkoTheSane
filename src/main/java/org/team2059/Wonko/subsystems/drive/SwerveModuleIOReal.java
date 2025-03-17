@@ -1,6 +1,5 @@
 package org.team2059.Wonko.subsystems.drive;
 
-import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.util.SwerveUtilities;
 
@@ -16,7 +15,6 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -34,8 +32,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
     private final PIDController rotationPidController;
 
     private final PIDController drivePidController;
-
-    private final SimpleMotorFeedforward driveFF;
 
     public SwerveModuleIOReal(
         int driveMotorId,
@@ -79,8 +75,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
         rotationPidController.setTolerance(Units.degreesToRadians(1));
 
         drivePidController = new PIDController(kP, 0, 0);
-
-        driveFF = new SimpleMotorFeedforward(kS, kV, kA);
 
         canCoder = new CANcoder(canCoderId);
         offset = new Rotation2d(canCoderOffsetRadians);
@@ -262,16 +256,10 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
       // Optimize angle of state to minimize rotation magnitude
       state = SwerveUtilities.optimize(state, getCANcoderRad());
 
-      // PID-controlled rotation
+      // Set rotation motor to a position using its PID controller
       rotationMotor.set(rotationPidController.calculate(getCANcoderRad().getRadians(), state.angle.getRadians()));
 
-    //   if (isClosedLoop) {
-    //     // Feedforward-controlled translation
-    //     driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond));
-    //   } else {
-    //     // Direct set, won't be as accurate
-    //     driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
-    //   }
+      // Use drive feedforward to calculate voltage to attain a certain velocity
       driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond) + drivePidController.calculate(state.speedMetersPerSecond));
     }
 

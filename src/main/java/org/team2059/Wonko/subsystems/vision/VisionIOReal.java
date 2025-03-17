@@ -9,7 +9,6 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.team2059.Wonko.RobotContainer;
 import org.team2059.Wonko.Constants.VisionConstants;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;

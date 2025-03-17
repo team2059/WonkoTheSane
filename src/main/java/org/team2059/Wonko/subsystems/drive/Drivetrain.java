@@ -6,7 +6,6 @@ package org.team2059.Wonko.subsystems.drive;
 
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants;
-import org.team2059.Wonko.RobotContainer;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
@@ -37,8 +36,7 @@ public class Drivetrain extends SubsystemBase {
   public final SwerveModule backLeft;
   public final SwerveModule backRight;
 
-  private GyroIO gyro;
-  private GyroIOInputsAutoLogged gyroInputs;
+  private Gyro gyro;
 
   private SwerveDrivePoseEstimator poseEstimator;
 
@@ -46,7 +44,7 @@ public class Drivetrain extends SubsystemBase {
 
   public final DrivetrainRoutine routine;
 
-  public Drivetrain(Vision vision, GyroIO gyro) {
+  public Drivetrain(Vision vision) {
 
     /*
      * Construct four SwerveModules
@@ -123,12 +121,11 @@ public class Drivetrain extends SubsystemBase {
     this.vision = vision;
 
     // Gyro keeps track of field-relative rotation
-    this.gyro = gyro;
-    gyroInputs = new GyroIOInputsAutoLogged(); // these inputs allow for us to get values from the gyro
+    gyro = new Gyro(new GyroIONavX());
     new Thread(() -> { // gyro may need an extra second to start...
       try {
         Thread.sleep(1000);
-        gyro.reset();
+        gyro.io.reset();
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -194,14 +191,14 @@ public class Drivetrain extends SubsystemBase {
    * Set navX heading to zero
    */
   public void zeroHeading() {
-    gyro.reset();
+    gyro.io.reset();
   }
 
   /**
    * @return Rotation2d of current navX heading
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(-gyroInputs.yaw);
+    return Rotation2d.fromDegrees(-gyro.inputs.yaw);
   }
 
   /**
@@ -380,10 +377,6 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    // Update gyro inputs & logging
-    gyro.updateInputs(gyroInputs);
-    Logger.processInputs("Gyro", gyroInputs);
 
     // For safety...
     if (DriverStation.isDisabled()) {

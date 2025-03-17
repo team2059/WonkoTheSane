@@ -12,7 +12,6 @@ import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.subsystems.vision.Vision;
-import org.team2059.Wonko.util.Elastic;
 
 import com.pathplanner.lib.auto.NamedCommands;
 

@@ -24,7 +24,6 @@ import org.team2059.Wonko.subsystems.climber.ClimberIOReal;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollectorIOReal;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
-import org.team2059.Wonko.subsystems.drive.GyroIONavX;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.subsystems.elevator.ElevatorIOReal;
 import org.team2059.Wonko.subsystems.vision.Vision;
@@ -81,7 +80,7 @@ public class RobotContainer {
     /* ========== */
 
     vision = new Vision(new VisionIOReal());
-    drivetrain = new Drivetrain(vision, new GyroIONavX());
+    drivetrain = new Drivetrain(vision);
     elevator = new Elevator(new ElevatorIOReal());
     algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
     coralCollector = new CoralCollector(new CoralCollectorIOReal());

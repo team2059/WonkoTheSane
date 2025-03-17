@@ -9,7 +9,7 @@ public interface GyroIO {
         public double yaw = 0;
     }
 
-    public void updateInputs(GyroIOInputs inputs);
+    default public void updateInputs(GyroIOInputs inputs) {};
 
-    public void reset();
+    default public void reset() {};
 }
