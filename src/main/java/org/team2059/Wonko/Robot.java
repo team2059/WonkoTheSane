@@ -15,6 +15,7 @@ import org.team2059.Wonko.util.LocalADStarAK;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 // import edu.wpi.first.cameraserver.CameraServer;
@@ -82,8 +83,8 @@ public class Robot extends LoggedRobot {
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
     // for the drivercam: attach USB camera to Rio
-    // CameraServer.startAutomaticCapture();
-
+    CameraServer.startAutomaticCapture();
+    
     // DO THIS AFTER CONFIGURATION OF YOUR DESIRED PATHFINDER
     PathfindingCommand.warmupCommand().schedule();
   }

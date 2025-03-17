@@ -4,6 +4,7 @@
 
 package org.team2059.Wonko.commands.drive;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.team2059.Wonko.Constants.DrivetrainConstants;
@@ -16,16 +17,27 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class TeleopDriveCmd extends Command {
   private final Drivetrain drivetrain;
   private final DoubleSupplier forwardX, forwardY, rotation, slider;
+  private final BooleanSupplier strafeOnly, inverted;
   private final SlewRateLimiter xLimiter, yLimiter, rotLimiter;
 
   /** Creates a new TeleopDriveCmd. */
-  public TeleopDriveCmd(Drivetrain drivetrain, DoubleSupplier forwardX, DoubleSupplier forwardY, DoubleSupplier rotation, DoubleSupplier slider) {
+  public TeleopDriveCmd(
+    Drivetrain drivetrain, 
+    DoubleSupplier forwardX, 
+    DoubleSupplier forwardY, 
+    DoubleSupplier rotation, 
+    DoubleSupplier slider,
+    BooleanSupplier strafeOnly,
+    BooleanSupplier inverted
+  ) {
 
     this.drivetrain = drivetrain;
     this.forwardX = forwardX;
     this.forwardY = forwardY;
     this.rotation = rotation;
     this.slider = slider;
+    this.strafeOnly = strafeOnly;
+    this.inverted = inverted;
 
     this.xLimiter = new SlewRateLimiter(DrivetrainConstants.maxAcceleration);
     this.yLimiter = new SlewRateLimiter(DrivetrainConstants.maxAcceleration);
@@ -74,12 +86,28 @@ public class TeleopDriveCmd extends Command {
     ySpeed = -MathUtil.applyDeadband(ySpeed, 0.1, 1);
     rot = -MathUtil.applyDeadband(rot, 0.3, 0.75);
 
-    drivetrain.drive(
-      xSpeed,
-      ySpeed, 
-      rot, 
-      Drivetrain.fieldRelativeStatus
-    );
+    if (inverted.getAsBoolean()) { // Invert all axes if requested
+      drivetrain.drive(
+        -xSpeed,
+        ySpeed, 
+        -rot, 
+        Drivetrain.fieldRelativeStatus
+      );
+    } else if (strafeOnly.getAsBoolean()) { // Strafe only relative to robot
+      drivetrain.drive(
+        0,
+        ySpeed, 
+        0, 
+        false
+      );
+    } else { // Drive normally
+      drivetrain.drive(
+        xSpeed,
+        ySpeed, 
+        rot, 
+        Drivetrain.fieldRelativeStatus
+      );
+    }
   }
 
   // Called once the command ends or is interrupted.

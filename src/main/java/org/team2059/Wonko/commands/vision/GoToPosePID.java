@@ -17,7 +17,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 
-// Aligns to a certain tag using PID controllers and vision measurements.
+/** Command which allows us to "manually" drive using PID to do precise alignment. */
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class GoToPosePID extends Command {
@@ -28,6 +28,9 @@ public class GoToPosePID extends Command {
   private double yTarget;
   private double rotTarget;
 
+  private double xOffsetInches;
+  private double yOffsetInches;
+
   private PIDController xController;
   private PIDController yController;
   private PIDController thetaController;
@@ -36,23 +39,23 @@ public class GoToPosePID extends Command {
   private LoggedTunableNumber pY = new LoggedTunableNumber("VisionAlign/pY", 3);
   private LoggedTunableNumber pT = new LoggedTunableNumber("VisionAlign/pT", 2.5);
 
-  private boolean isRight;
-
   /** Creates a new AlignReefCmd. */
   public GoToPosePID(
     Drivetrain drivetrain, 
     double xTarget, 
     double yTarget, 
     double rotTarget,
-    boolean isRight
+    double xOffsetInches,
+    double yOffsetInches
   ) {
-
-    this.isRight = isRight;
     this.drivetrain = drivetrain;
 
     this.xTarget = xTarget;
     this.yTarget = yTarget;
     this.rotTarget = rotTarget;
+
+    this.xOffsetInches = xOffsetInches;
+    this.yOffsetInches = yOffsetInches;
 
     xController = new PIDController(pX.get(), 0, 0);
     yController = new PIDController(pY.get(), 0, 0);
@@ -64,11 +67,14 @@ public class GoToPosePID extends Command {
   public GoToPosePID(
     Drivetrain drivetrain, 
     int tagId,
-    boolean isRight
+    double xOffsetInches,
+    double yOffsetInches
   ) {
 
-    this.isRight = isRight;
     this.drivetrain = drivetrain;
+
+    this.yOffsetInches = yOffsetInches;
+    this.xOffsetInches = xOffsetInches;
 
     this.xTarget = VisionConstants.aprilTagFieldLayout.getTagPose(tagId).get().getX();
     this.yTarget = VisionConstants.aprilTagFieldLayout.getTagPose(tagId).get().getY();
@@ -90,11 +96,12 @@ public class GoToPosePID extends Command {
       xTarget, yTarget, Rotation2d.fromRadians(rotTarget)
     );
 
-    if (isRight) {
-      goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(15), Units.inchesToMeters(6), Rotation2d.fromRadians(Math.PI)));
-    } else {
-      goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(15), Units.inchesToMeters(-9), Rotation2d.fromRadians(Math.PI)));
-    }
+    // if (isRight) {
+    //   goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(15), Units.inchesToMeters(6), Rotation2d.fromRadians(Math.PI)));
+    // } else {
+    //   goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(15), Units.inchesToMeters(-9), Rotation2d.fromRadians(Math.PI)));
+    // }
+    goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(xOffsetInches), Units.inchesToMeters(yOffsetInches), Rotation2d.fromRadians(Math.PI)));
 
     Logger.recordOutput("GOAL POSE", goalPose);
 

@@ -64,7 +64,9 @@ public final class Constants {
 
     // We'll add these later once the button box is finalized
     public static final int JoystickResetHeading = 5;
-    public static final int JoystickRobotRelative = 3;
+    public static final int JoystickRobotRelative = 6;
+    public static final int JoystickInvertedDrive = 4;
+    public static final int JoystickStrafeOnly = 3;
   }
 
   public static class ClimberConstants {
@@ -227,7 +229,7 @@ public final class Constants {
 
     // Tags of human player stations 
     // Starts at left human player station from driver POV
-    public static final ArrayList<Integer> redHPTags = new ArrayList<>(Arrays.asList(13, 12));
+    public static final ArrayList<Integer> redHPTags = new ArrayList<>(Arrays.asList(1, 2));
     public static final ArrayList<Integer> blueHPTags = new ArrayList<>(Arrays.asList(13, 12));
     public static ArrayList<Integer> HPTags = new ArrayList<>();
 
@@ -256,6 +258,13 @@ public final class Constants {
     public static final Distance reefAlignFrontOffset = Inches.of(18);
     public static final Distance reefAlignLeftStrafeOffset = Inches.of(-4);
     public static final Distance reefAlignRightStrafeOffset = Inches.of(4);
+
+    public static final double reefXOffsetInches = 15;
+    public static final double reefYRightOffsetInches = 5;
+    public static final double reefYLeftOffsetInches = -7;
+
+    public static final double hpXOffsetInches = 15;
+    public static final double hpYOffsetInches = 0;
   }
 
   public static class AlgaeCollectorConstants {
@@ -346,7 +355,7 @@ public final class Constants {
 
     // Trapezoidal constraints
     public static final double kMaxVelocity = 3;
-    public static final double kMaxAcceleration = 2.5;
+    public static final double kMaxAcceleration = 3;
 
     // Conversion factors
     public static final double positionConversionFactor = 0.0354650904; // 0.1016/(9xpi)
@@ -357,12 +366,12 @@ public final class Constants {
       Meters.of(0.000), // L0
       Meters.of(0.010), // L1
       Meters.of(0.500), // L2
-      Meters.of(1.250), // L3
+      Meters.of(1.200), // L3
       Meters.of(2.390)  // L4
     };
     
     // Heights for misc. other tasks
-    public static final Distance humanPlayerHeight = Meters.of(0.56);
+    public static final Distance humanPlayerHeight = Meters.of(0.54);
     public static final Distance processorHeight = Meters.of(0.4);
     
     // PID & FF gains

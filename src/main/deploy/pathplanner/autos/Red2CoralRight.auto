@@ -1,0 +1,85 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Tag9Right"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetElevator"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightToHPArea"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "HPStation2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeCoral"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetElevator"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RightHPToReef"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Tag8Right"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ScoreL4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetElevator"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -25,7 +25,7 @@ public class AlgaeCollector extends SubsystemBase {
     }
 
     public Command intakeCommand() {
-        return Commands.startEnd(() -> io.setIntakeSpeed(0.25), () -> io.setIntakeSpeed(0))
+        return Commands.startEnd(() -> io.setIntakeSpeed(0.50), () -> io.setIntakeSpeed(0))
             .until(() -> inputs.hasAlgae);
     }
 

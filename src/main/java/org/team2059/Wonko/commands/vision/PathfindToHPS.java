@@ -26,46 +26,30 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
  * then aligns to either left or right side of reef using PID in x, y, theta dimensions.
  */
 
-public class PathfindToReefCmd extends SequentialCommandGroup{
+public class PathfindToHPS extends SequentialCommandGroup{
     
     Drivetrain drivetrain;
     Vision vision;
 
     Transform3d tagToGoal;
 
-    boolean isRight;
-
-    public PathfindToReefCmd (
+    public PathfindToHPS (
         Drivetrain drivetrain,
-        Vision vision,
-        boolean isRight
+        Vision vision
     ){
         this.drivetrain = drivetrain; 
         this.vision = vision;
 
-        this.isRight = isRight;
-
         // This is our ideal end state: 40in back and centered on tag (relative to robot center)
+        tagToGoal = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(15),
+                Units.inchesToMeters(0),
+                0
+            ),
+            new Rotation3d(0, 0, Math.PI)
+        );
 
-        if (isRight) {
-            tagToGoal = new Transform3d(
-                new Translation3d(
-                    Units.inchesToMeters(VisionConstants.reefXOffsetInches),
-                    Units.inchesToMeters(VisionConstants.reefYRightOffsetInches),
-                    0
-                ),
-                new Rotation3d(0, 0, Math.PI)
-            );
-        } else {
-            tagToGoal = new Transform3d(
-                new Translation3d(
-                    Units.inchesToMeters(VisionConstants.reefXOffsetInches),
-                    Units.inchesToMeters(VisionConstants.reefYLeftOffsetInches),
-                    0
-                ),
-                new Rotation3d(0, 0, Math.PI)
-            );
-        }
 
         // Require both vision & drivetrain subsystems
         // This ensures no conflicting commands will be run
@@ -89,14 +73,14 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
      */
     public Command getPathfindCommand() {
         if (
-            vision.inputs.hasLowerTarget &&
-            vision.inputs.lowerBestTarget != null &&
-            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.2 &&
-            VisionConstants.redReefTags.contains(vision.inputs.lowerBestTargetID) || VisionConstants.blueReefTags.contains(vision.inputs.lowerBestTargetID)
+            vision.inputs.hasUpperTarget &&
+            vision.inputs.upperBestTarget != null &&
+            vision.inputs.upperBestTarget.getPoseAmbiguity() <= 0.2 &&
+            VisionConstants.redHPTags.contains(vision.inputs.upperBestTargetID) || VisionConstants.blueHPTags.contains(vision.inputs.upperBestTargetID)
         ) {
             
             // Grab pose of tag
-            int tagId = vision.inputs.lowerBestTargetID;
+            int tagId = vision.inputs.upperBestTargetID;
             var targetPose = VisionConstants.aprilTagFieldLayout.getTagPose(tagId);
 
             // Calculate end state
@@ -105,18 +89,11 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
             return AutoBuilder.pathfindToPose(
                 goalPose, 
                 new PathConstraints(
-                    1.5, 
-                    1,
+                    2.5, 
+                    1.5,
                     Units.degreesToRadians(540),
                     Units.degreesToRadians(720)
                 )
-            ).andThen(
-                new GoToPosePID(
-                    drivetrain,
-                    tagId,
-                    VisionConstants.reefXOffsetInches,
-                    (isRight ? VisionConstants.reefYRightOffsetInches : VisionConstants.reefYLeftOffsetInches)
-                ).withTimeout(0.5)
             );
 
         } else {
