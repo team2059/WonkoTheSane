@@ -79,7 +79,7 @@ public class RobotContainer {
     /* SUBSYSTEMS */
     /* ========== */
 
-    vision = new Vision(new VisionIOReal());
+    vision = Vision.getInstance(new VisionIOReal());
     drivetrain = new Drivetrain(vision);
     elevator = new Elevator(new ElevatorIOReal());
     algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());

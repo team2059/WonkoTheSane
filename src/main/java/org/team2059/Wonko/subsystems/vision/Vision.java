@@ -6,11 +6,21 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Vision extends SubsystemBase {
     
+    /* Singleton instance */
+    private static Vision instance;
+
     public final VisionIO io;
     public final VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
 
-    public Vision(VisionIO io) {
+    private Vision(VisionIO io) {
         this.io = io;
+    }
+
+    public static Vision getInstance(VisionIO io) {
+        if (instance == null) {
+            instance = new Vision(io);
+        }
+        return instance;
     }
 
     @Override
