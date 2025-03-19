@@ -187,11 +187,13 @@ public class RobotContainer {
 
     // Publish auto chooser
     SmartDashboard.putData("Auto Chooser", autoChooser);
+  
+    upperCamSwitch = new JoystickButton(buttonBox, 13);
+    lowerCamSwitch = new JoystickButton(buttonBox, 14);
 
     configureBindings();
 
-    upperCamSwitch = new JoystickButton(buttonBox, 13);
-    lowerCamSwitch = new JoystickButton(buttonBox, 14);
+
   }
 
   /**
@@ -357,12 +359,12 @@ public class RobotContainer {
       .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
 
     upperCamSwitch
-      .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = true))
-      .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = false)); 
+      .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = false))
+      .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = true)); 
     
     lowerCamSwitch
-      .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = true))
-      .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = false)); 
+      .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
+      .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
    }
   
   /**

@@ -244,7 +244,6 @@ public class VisionIOReal implements VisionIO {
             visionEst = lowerPoseEstimator.update(change);
             updateLowerEstimationStdDevs(visionEst, change.getTargets());
         }
-
         return visionEst;
     }
 
