@@ -27,6 +27,9 @@ public interface VisionIO {
 
         public PhotonTrackedTarget upperBestTarget = null;
         public PhotonTrackedTarget lowerBestTarget = null;
+
+        public boolean upperIsOn = true;
+        public boolean lowerIsOn = true; 
     }
 
     default public void updateInputs(VisionIOInputs inputs) {};

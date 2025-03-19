@@ -355,6 +355,14 @@ public class RobotContainer {
 
     new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
       .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
+
+    upperCamSwitch
+      .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = true))
+      .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = false)); 
+    
+    lowerCamSwitch
+      .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = true))
+      .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = false)); 
    }
   
   /**
