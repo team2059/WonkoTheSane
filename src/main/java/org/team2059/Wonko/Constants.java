@@ -270,8 +270,7 @@ public final class Constants {
   public static class AlgaeCollectorConstants {
 
     // CAN IDs
-    public static final int motor1Id = 11;
-    public static final int motor2Id = 12;
+    public static final int intakeId = 12;
     public static final int tiltMotorId = 13;
 
     // DIO IDs
@@ -344,7 +343,8 @@ public final class Constants {
   public static class ElevatorConstants {
 
     // CAN ID
-    public static final int motorId = 16;
+    public static final int rightMotorId = 16;
+    public static final int leftMotorId = 19; 
 
     // Smart current limit for Spark motor
     public static final Current currentLimit = Amps.of(40);
@@ -358,7 +358,7 @@ public final class Constants {
     public static final double kMaxAcceleration = 3;
 
     // Conversion factors
-    public static final double positionConversionFactor = 0.0354650904; // 0.1016/(9xpi)
+    public static final double positionConversionFactor = 0.06468056887; // ORIGINAL: 0.1016/(9xpi) <- Not sure if this is wrong NEW: 1.016 / (5 * PI) 0  
     public static final double velocityConversionFactor = positionConversionFactor / 60;
 
     // Level heights (index is the level, begins at 0, which is ground)

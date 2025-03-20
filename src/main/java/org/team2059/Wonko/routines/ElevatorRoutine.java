@@ -37,7 +37,7 @@ public class ElevatorRoutine {
                 }, 
                 log -> {
                     log.motor("elevator-motor")
-                        .voltage(appliedVoltage.mut_replace(elevator.inputs.appliedVolts, Volts))
+                        .voltage(appliedVoltage.mut_replace(elevator.inputs.rightMotorAppliedVolts, Volts))
                         .linearPosition(distance.mut_replace(elevator.inputs.positionMeters, Meters))
                         .linearVelocity(linearVelocity.mut_replace(elevator.inputs.velocityMetersPerSecond, MetersPerSecond));
                 }, 

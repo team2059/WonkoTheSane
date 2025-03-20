@@ -4,23 +4,35 @@
 
 package org.team2059.Wonko;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.urcl.URCL;
+import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
+import org.team2059.Wonko.Constants.ClimberConstants;
+import org.team2059.Wonko.Constants.CoralCollectorConstants;
+import org.team2059.Wonko.Constants.DrivetrainConstants;
+import org.team2059.Wonko.Constants.ElevatorConstants;
+import org.team2059.Wonko.subsystems.climber.Climber;
 import org.team2059.Wonko.util.LocalADStarAK;
 
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.util.datalog.DataLog;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 // import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -74,6 +86,7 @@ public class Robot extends LoggedRobot {
     if (isReal()) {
         Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        DataLogManager.start();
         new PowerDistribution(9, ModuleType.kRev); // Enables power distribution logging
     } else {
         setUseTiming(false); // Run as fast as possible
@@ -81,6 +94,7 @@ public class Robot extends LoggedRobot {
     }
     
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+    URCL.start(getCanIDMap());
 
     // for the drivercam: attach USB camera to Rio
     CameraServer.startAutomaticCapture();
@@ -176,4 +190,30 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+
+  private Map<Integer, String> getCanIDMap() {
+		var map = new HashMap<Integer, String>();
+
+		map.put(DrivetrainConstants.frontLeftDriveMotorId, "FrontLeftDrive");
+		map.put(DrivetrainConstants.frontLeftRotationMotorId, "FrontLeftTurn");
+		map.put(DrivetrainConstants.frontRightDriveMotorId, "FrontRightDrive");
+		map.put(DrivetrainConstants.frontRightRotationMotorId, "FrontRightTurn");
+		map.put(DrivetrainConstants.backLeftDriveMotorId, "RearLeftDrive");
+		map.put(DrivetrainConstants.backLeftRotationMotorId, "RearLeftTurn");
+		map.put(DrivetrainConstants.backRightDriveMotorId, "RearRightDrive");
+		map.put(DrivetrainConstants.backLeftRotationMotorId, "RearRightTurn");
+
+		map.put(AlgaeCollectorConstants.intakeId, "AlgaeIntake");
+    map.put(AlgaeCollectorConstants.tiltMotorId, "AlgaeTilt");
+    
+    map.put(CoralCollectorConstants.intakeMotorId, "CoralIntake");
+    map.put(CoralCollectorConstants.tiltMotorId, "CoralTilt");
+
+    map.put(ElevatorConstants.rightMotorId, "RightElevatorMotor");
+    map.put(ElevatorConstants.leftMotorId, "LeftElevatorMotor");
+
+		map.put(ClimberConstants.motor1ID, "LeftClimber");
+    map.put(ClimberConstants.motor2ID, "RightClimber");
+		return map;
+	}
 }

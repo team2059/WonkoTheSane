@@ -18,8 +18,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
-    private SparkFlex motor1;
-    private SparkFlex motor2;
+    private SparkFlex intake;
 
     private SparkFlex tiltMotor;
     
@@ -35,25 +34,16 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
 
     public AlgaeCollectorIOReal() {
         // Create intake and tilt motors and configure them
-        motor1 = new SparkFlex(AlgaeCollectorConstants.motor1Id, MotorType.kBrushless);
-        motor2 = new SparkFlex(AlgaeCollectorConstants.motor2Id, MotorType.kBrushless);
+        intake = new SparkFlex(AlgaeCollectorConstants.intakeId, MotorType.kBrushless);
         tiltMotor = new SparkFlex(AlgaeCollectorConstants.tiltMotorId, MotorType.kBrushless);
 
         // Configure intake motor 1
-        SparkFlexConfig motor1Config = new SparkFlexConfig();
-        motor1Config
+        SparkFlexConfig intakeConfig = new SparkFlexConfig();
+        intakeConfig
             .inverted(false)
             .idleMode(IdleMode.kBrake);
-        motor1.configure(motor1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        motor1.clearFaults();
-
-        // Configure intake motor 2
-        SparkFlexConfig motor2Config = new SparkFlexConfig();
-        motor2Config
-            .inverted(true)
-            .idleMode(IdleMode.kBrake);
-        motor2.configure(motor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        motor2.clearFaults();
+        intake.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intake.clearFaults();
 
         // Configure tilt motor
         SparkFlexConfig tiltConfig = new SparkFlexConfig();
@@ -81,14 +71,12 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
 
     @Override
     public void setIntakeSpeed(double speed) {
-        motor1.set(speed);
-        motor2.set(speed);
+        intake.set(speed);
     }
 
     @Override
     public void stopIntake() {
-        motor1.setVoltage(0);
-        motor2.setVoltage(0);
+        intake.setVoltage(0);
     }
 
     @Override
@@ -116,16 +104,13 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
             kP, kI, kD
         );
 
-        inputs.motor1AppliedVolts = (motor1.getAppliedOutput() * motor1.getBusVoltage());
-        inputs.motor2AppliedVolts = (motor2.getAppliedOutput() * motor2.getBusVoltage());
+        inputs.intakeAppliedVolts = (intake.getAppliedOutput() * intake.getBusVoltage());
         inputs.tiltMotorAppliedVolts = (tiltMotor.getAppliedOutput() * tiltMotor.getBusVoltage());
 
-        inputs.motor1CurrentAmps = motor1.getOutputCurrent();
-        inputs.motor2CurrentAmps = motor2.getOutputCurrent();
+        inputs.intakeCurrentAmps = intake.getOutputCurrent();
         inputs.tiltMotorCurrentAmps = tiltMotor.getOutputCurrent();
 
-        inputs.motor1Temp = motor1.getMotorTemperature();
-        inputs.motor2Temp = motor2.getMotorTemperature();
+        inputs.intakeTemp = intake.getMotorTemperature();
         inputs.tiltMotorTemp = tiltMotor.getMotorTemperature();
 
         inputs.tiltAbsPosRadians = tiltAbsoluteEnc.getPosition();
