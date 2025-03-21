@@ -354,11 +354,11 @@ public final class Constants {
     public static final Distance minHeight = Distance.ofBaseUnits(0, Meters);
 
     // Trapezoidal constraints
-    public static final double kMaxVelocity = 3;
-    public static final double kMaxAcceleration = 3;
+    public static final double kMaxVelocity = 7;
+    public static final double kMaxAcceleration = 7;
 
     // Conversion factors
-    public static final double positionConversionFactor = 0.06468056887; // ORIGINAL: 0.1016/(9xpi) <- Not sure if this is wrong NEW: 1.016 / (5 * PI) 0  
+    public static final double positionConversionFactor = 0.0354650904; // NEW: 1.016 / (5 * PI)
     public static final double velocityConversionFactor = positionConversionFactor / 60;
 
     // Level heights (index is the level, begins at 0, which is ground)

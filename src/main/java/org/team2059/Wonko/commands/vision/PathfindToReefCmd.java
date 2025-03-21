@@ -105,8 +105,8 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
             return AutoBuilder.pathfindToPose(
                 goalPose, 
                 new PathConstraints(
-                    1.5, 
-                    1,
+                    2.5, 
+                    1.5,
                     Units.degreesToRadians(540),
                     Units.degreesToRadians(720)
                 )
@@ -116,7 +116,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
                     tagId,
                     VisionConstants.reefXOffsetInches,
                     (isRight ? VisionConstants.reefYRightOffsetInches : VisionConstants.reefYLeftOffsetInches)
-                ).withTimeout(0.5)
+                ).withTimeout(2)
             );
 
         } else {

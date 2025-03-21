@@ -19,7 +19,6 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
-// import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -60,9 +59,9 @@ public class ElevatorIOReal implements ElevatorIO {
         rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         rightMotor.clearFaults();
 
-        // Will make left motor follow right motor 
-        config.follow(ElevatorConstants.rightMotorId); // TODO: Might be inverted 
-
+        // // Will make left motor follow right motor 
+        // config.follow(ElevatorConstants.rightMotorId, true); 
+        config.follow(ElevatorConstants.rightMotorId, true);
         leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         leftMotor.clearFaults();
 
@@ -114,11 +113,13 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void stop() {
+        // leftMotor.setVoltage(0);
         rightMotor.setVoltage(0);
     }
 
     @Override
     public void setVoltage(double volts) {
+        // leftMotor.setVoltage(MathUtil.clamp(volts, -12, 12));
         rightMotor.setVoltage(MathUtil.clamp(volts, -12, 12));
     }
 
@@ -130,6 +131,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void setSpeed(double speed) {
+        // leftMotor.set(speed);
         rightMotor.set(speed);
     }
 

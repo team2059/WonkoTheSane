@@ -94,7 +94,7 @@ public class Robot extends LoggedRobot {
     }
     
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
-    URCL.start(getCanIDMap());
+    // URCL.start(getCanIDMap());
 
     // for the drivercam: attach USB camera to Rio
     CameraServer.startAutomaticCapture();
