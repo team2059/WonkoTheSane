@@ -1,6 +1,5 @@
 package org.team2059.Wonko.subsystems.drive;
 
-import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.util.SwerveUtilities;
 

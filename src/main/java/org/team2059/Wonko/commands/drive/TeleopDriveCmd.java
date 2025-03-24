@@ -98,7 +98,7 @@ public class TeleopDriveCmd extends Command {
         0,
         ySpeed, 
         0, 
-        false
+        true
       );
     } else { // Drive normally
       drivetrain.drive(

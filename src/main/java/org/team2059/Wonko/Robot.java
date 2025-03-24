@@ -86,7 +86,7 @@ public class Robot extends LoggedRobot {
     if (isReal()) {
         Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-        DataLogManager.start();
+        // DataLogManager.start();
         new PowerDistribution(9, ModuleType.kRev); // Enables power distribution logging
     } else {
         setUseTiming(false); // Run as fast as possible
@@ -97,7 +97,7 @@ public class Robot extends LoggedRobot {
     // URCL.start(getCanIDMap());
 
     // for the drivercam: attach USB camera to Rio
-    CameraServer.startAutomaticCapture();
+    // CameraServer.startAutomaticCapture();
     
     // DO THIS AFTER CONFIGURATION OF YOUR DESIRED PATHFINDER
     PathfindingCommand.warmupCommand().schedule();

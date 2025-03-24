@@ -36,8 +36,8 @@ public class GoToPosePID extends Command {
   private PIDController thetaController;
 
   private LoggedTunableNumber pX = new LoggedTunableNumber("VisionAlign/pX", 2);
-  private LoggedTunableNumber pY = new LoggedTunableNumber("VisionAlign/pY",1.5);
-  private LoggedTunableNumber pT = new LoggedTunableNumber("VisionAlign/pT", 2);
+  private LoggedTunableNumber pY = new LoggedTunableNumber("VisionAlign/pY",3);
+  private LoggedTunableNumber pT = new LoggedTunableNumber("VisionAlign/pT", 2.5);
 
   /** Creates a new AlignReefCmd. */
   public GoToPosePID(

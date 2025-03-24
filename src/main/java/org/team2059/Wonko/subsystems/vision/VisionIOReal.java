@@ -1,7 +1,5 @@
 package org.team2059.Wonko.subsystems.vision;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +10,6 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.team2059.Wonko.RobotContainer;
 import org.team2059.Wonko.Constants.VisionConstants;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;

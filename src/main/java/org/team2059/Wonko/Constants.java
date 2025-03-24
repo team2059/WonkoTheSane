@@ -79,8 +79,8 @@ public final class Constants {
     public static final int climbThroughBoreDIO = 8; 
 
     // Hard limits, as reported by thrubore
-    public static final Angle upperLimit = Radians.of(5.76);
-    public static final Angle lowerLimit = Radians.of(3);
+    public static final Angle upperLimit = Radians.of(4.7);
+    public static final Angle lowerLimit = Radians.of(3.45);
   }
 
   public static class DrivetrainConstants {
@@ -260,8 +260,8 @@ public final class Constants {
     public static final Distance reefAlignRightStrafeOffset = Inches.of(4);
 
     public static final double reefXOffsetInches = 15;
-    public static final double reefYRightOffsetInches = 5;
-    public static final double reefYLeftOffsetInches = -7;
+    public static final double reefYRightOffsetInches = 6;
+    public static final double reefYLeftOffsetInches = -9;
 
     public static final double hpXOffsetInches = 15;
     public static final double hpYOffsetInches = 0;
@@ -354,11 +354,11 @@ public final class Constants {
     public static final Distance minHeight = Distance.ofBaseUnits(0, Meters);
 
     // Trapezoidal constraints
-    public static final double kMaxVelocity = 7;
-    public static final double kMaxAcceleration = 7;
+    public static final double kMaxVelocity = 5;
+    public static final double kMaxAcceleration = 5;
 
     // Conversion factors
-    public static final double positionConversionFactor = 0.0354650904; // NEW: 1.016 / (5 * PI)
+    public static final double positionConversionFactor = 0.0354650904; // 0.1016 * PI / 9
     public static final double velocityConversionFactor = positionConversionFactor / 60;
 
     // Level heights (index is the level, begins at 0, which is ground)
@@ -375,11 +375,11 @@ public final class Constants {
     public static final Distance processorHeight = Meters.of(0.4);
     
     // PID & FF gains
-    public static final double kS = 0.05701;
-    public static final double kG = 0.99688;
-    public static final double kV = 3.5529;
-    public static final double kA = 1.0786;
-    public static final double kP = 2.0;
+    public static final double kS = 0.11432;
+    public static final double kG = 0.56393;
+    public static final double kV = 3.6283;
+    public static final double kA = 0.51094;
+    public static final double kP = 1.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;
   }

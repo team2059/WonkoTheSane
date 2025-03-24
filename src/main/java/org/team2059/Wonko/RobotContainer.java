@@ -113,13 +113,13 @@ public class RobotContainer {
       )
     );
 
-    // elevator.setDefaultCommand(
-    //   Commands.parallel(
-    //     new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0]),
-    //     coralCollector.setTiltSetpointCmd(CoralCollectorConstants.levelCoralTiltAngle[0]),
-    //     algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum)
-    //   ).until(() -> (elevator.inputs.zeroLimit || elevator.inputs.positionMeters <= 0.1))
-    // );
+    elevator.setDefaultCommand(
+      Commands.parallel(
+        new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0]),
+        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.levelCoralTiltAngle[0]),
+        algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum)
+      ).until(() -> (elevator.inputs.zeroLimit || elevator.inputs.positionMeters <= 0.1))
+    );
 
     if (isRed) {
       VisionConstants.HPTags = VisionConstants.redHPTags; 
@@ -244,31 +244,31 @@ public class RobotContainer {
       .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
     
     // // Human player station
-    // new JoystickButton(buttonBox, 8)
-    //   .whileTrue(Commands.parallel(
-    //     new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-    //     coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
-    //     coralCollector.intakeCommand()
-    //   ));    
+    new JoystickButton(buttonBox, 8)
+      .whileTrue(Commands.parallel(
+        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
+        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
+        coralCollector.intakeCommand()
+      ));    
 
     // // Processor
-    // new JoystickButton(buttonBox, 7)
-    //   .whileTrue(
-    //     Commands.parallel(
-    //       algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-    //       new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
-    //     )
-    // );
+    new JoystickButton(buttonBox, 7)
+      .whileTrue(
+        Commands.parallel(
+          algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
+          new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
+        )
+    );
 
     // Elevator sysID routine
-    new JoystickButton(buttonBox, 5)
-      .whileTrue(elevator.routine.quasistaticForward());
-    new JoystickButton(buttonBox, 6)
-      .whileTrue(elevator.routine.quasistaticReverse());
-    new JoystickButton(buttonBox, 7)
-      .whileTrue(elevator.routine.dynamicForward());
-    new JoystickButton(buttonBox, 8)
-      .whileTrue(elevator.routine.dynamicReverse());
+    // new JoystickButton(buttonBox, 5)
+    //   .whileTrue(elevator.routine.quasistaticForward());
+    // new JoystickButton(buttonBox, 6)
+    //   .whileTrue(elevator.routine.quasistaticReverse());
+    // new JoystickButton(buttonBox, 7)
+    //   .whileTrue(elevator.routine.dynamicForward());
+    // new JoystickButton(buttonBox, 8)
+    //   .whileTrue(elevator.routine.dynamicReverse());
 
     /* =============== */
     /* Coral Collector */
@@ -301,12 +301,12 @@ public class RobotContainer {
       .whileTrue(algaeCollector.outtakeCommand());
 
     // // Tilt up/down
-    // new JoystickButton(buttonBox, 5)
-    //   .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum));
-    //   // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
-    // new JoystickButton(buttonBox, 6)
-    //   .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum));
-    //   // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
+    new JoystickButton(buttonBox, 5)
+      .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum));
+      // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
+    new JoystickButton(buttonBox, 6)
+      .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum));
+      // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
 
     // Elevate & intake
     // Upper Algae

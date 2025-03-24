@@ -24,7 +24,7 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
     
     private AbsoluteEncoder tiltAbsoluteEnc;
 
-    private LoggedTunableNumber kP = new LoggedTunableNumber("AlgaeCollector/Tilt/kP", 0.5);
+    private LoggedTunableNumber kP = new LoggedTunableNumber("AlgaeCollector/Tilt/kP", 0.4);
     private LoggedTunableNumber kI = new LoggedTunableNumber("AlgaeCollector/Tilt/kI", 0.0);
     private LoggedTunableNumber kD = new LoggedTunableNumber("AlgaeCollector/Tilt/kD", 0.0);
 

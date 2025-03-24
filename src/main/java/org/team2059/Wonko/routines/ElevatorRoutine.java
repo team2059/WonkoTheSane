@@ -26,7 +26,7 @@ public class ElevatorRoutine {
 
         sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(4).per(Units.Second), // Ramp rate in volts per second
+                Volts.of(3).per(Units.Second), // Ramp rate in volts per second
                 Volts.of(3), // Dynamic step voltage
                 Time.ofBaseUnits(10, Units.Second), // Test duration of 2 seconds
                 null
@@ -48,17 +48,17 @@ public class ElevatorRoutine {
 
     // Quasistatic tests in given direction
     public Command quasistaticForward() {
-        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> elevator.inputs.positionMeters >= 2.2);
+        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(() -> elevator.inputs.positionMeters >= 2);
     }
     public Command quasistaticReverse() {
-        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse);
+        return sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(() -> elevator.inputs.positionMeters <= 0.1);
     }
 
     // Dynamic tests in given direction
     public Command dynamicForward() {
-        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(() -> elevator.inputs.positionMeters >= 2.2);
+        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(() -> elevator.inputs.positionMeters >= 2);
     }
     public Command dynamicReverse() {
-        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse);
+        return sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(() -> elevator.inputs.positionMeters <= 0.1);
     }
 }
