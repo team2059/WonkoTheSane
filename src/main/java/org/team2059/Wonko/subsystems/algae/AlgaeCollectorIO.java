@@ -5,16 +5,13 @@ import org.littletonrobotics.junction.AutoLog;
 public interface AlgaeCollectorIO {
     @AutoLog
     class AlgaeCollectorIOInputs {
-        public double motor1AppliedVolts = 0.0;
-        public double motor2AppliedVolts = 0.0;
+        public double intakeAppliedVolts = 0.0;
         public double tiltMotorAppliedVolts = 0.0;
         
-        public double motor1CurrentAmps = 0.0;
-        public double motor2CurrentAmps = 0.0;
+        public double intakeCurrentAmps = 0.0;
         public double tiltMotorCurrentAmps = 0.0;
 
-        public double motor1Temp = 0.0;
-        public double motor2Temp = 0.0;
+        public double intakeTemp = 0.0;
         public double tiltMotorTemp = 0.0;
 
         public double tiltAbsPosRadians = 0.0;

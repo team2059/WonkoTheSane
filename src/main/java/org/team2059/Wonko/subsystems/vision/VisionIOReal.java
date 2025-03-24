@@ -1,5 +1,6 @@
 package org.team2059.Wonko.subsystems.vision;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +10,6 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.team2059.Wonko.RobotContainer;
 import org.team2059.Wonko.Constants.VisionConstants;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
@@ -74,36 +74,55 @@ public class VisionIOReal implements VisionIO {
         inputs.upperIsConnected = upperCamera.isConnected();
         inputs.lowerIsConnected = lowerCamera.isConnected();
 
-        // Update camera readings
-        upperCameraResults = upperCamera.getAllUnreadResults();
-        lowerCameraResults = lowerCamera.getAllUnreadResults();
+        
+        // If camera switch is on then use pose estimation, else all values are null 
+        if (inputs.upperIsOn) {
+            // Update camera readings
+            upperCameraResults = upperCamera.getAllUnreadResults();
 
-        if (!upperCameraResults.isEmpty()) {
-            // Get latest results from list of results
-            upperCameraResult = upperCameraResults.get(upperCameraResults.size() - 1);
-
-            inputs.hasUpperTarget = upperCameraResult.hasTargets();
-            if (inputs.hasUpperTarget) { // If we have any targets, get the best one.
-                inputs.upperBestTarget = upperCameraResult.getBestTarget();
-                inputs.upperBestTargetID = inputs.upperBestTarget.getFiducialId();
-            } else { // If we don't have any targets, set null values.
-                inputs.upperBestTargetID = -1;
-                inputs.upperBestTarget = null;
+            if (!upperCameraResults.isEmpty()) {
+                // Get latest results from list of results
+                upperCameraResult = upperCameraResults.get(upperCameraResults.size() - 1);
+    
+                inputs.hasUpperTarget = upperCameraResult.hasTargets();
+                if (inputs.hasUpperTarget) { // If we have any targets, get the best one.
+                    inputs.upperBestTarget = upperCameraResult.getBestTarget();
+                    inputs.upperBestTargetID = inputs.upperBestTarget.getFiducialId();
+                } else { // If we don't have any targets, set null values.
+                    inputs.upperBestTargetID = -1;
+                    inputs.upperBestTarget = null;
+                }
             }
+        } else {
+            // Make results empty and everything else null 
+            upperCameraResults = Collections.emptyList();  
+            inputs.hasUpperTarget = false;
+            inputs.upperBestTarget = null; 
+            inputs.upperBestTargetID = -1;  
         }
 
-        if (!lowerCameraResults.isEmpty()) {
-            lowerCameraResult = lowerCameraResults.get(lowerCameraResults.size() - 1);
+        if (inputs.lowerIsOn) {
+            lowerCameraResults = lowerCamera.getAllUnreadResults();
 
-            inputs.hasLowerTarget = lowerCameraResult.hasTargets();
-            if (inputs.hasLowerTarget) {
-                inputs.lowerBestTarget = lowerCameraResult.getBestTarget();
-                inputs.lowerBestTargetID = inputs.lowerBestTarget.getFiducialId();
-            } else {
-                inputs.lowerBestTargetID = -1;
-                inputs.lowerBestTarget = null;
+            if (!lowerCameraResults.isEmpty()) {
+                lowerCameraResult = lowerCameraResults.get(lowerCameraResults.size() - 1);
+    
+                inputs.hasLowerTarget = lowerCameraResult.hasTargets();
+                if (inputs.hasLowerTarget) {
+                    inputs.lowerBestTarget = lowerCameraResult.getBestTarget();
+                    inputs.lowerBestTargetID = inputs.lowerBestTarget.getFiducialId();
+                } else {
+                    inputs.lowerBestTargetID = -1;
+                    inputs.lowerBestTarget = null;
+                }
             }
+        } else {
+            lowerCameraResults = Collections.emptyList();
+            inputs.hasLowerTarget = false; 
+            inputs.lowerBestTarget = null; 
+            inputs.lowerBestTargetID = -1; 
         }
+
     }
 
     /**
@@ -222,7 +241,6 @@ public class VisionIOReal implements VisionIO {
             visionEst = lowerPoseEstimator.update(change);
             updateLowerEstimationStdDevs(visionEst, change.getTargets());
         }
-
         return visionEst;
     }
 

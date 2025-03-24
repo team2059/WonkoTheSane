@@ -9,10 +9,15 @@ public interface ElevatorIO {
         public double positionMeters = 0.0;
         public double velocityMetersPerSecond = 0.0;
 
-        public double appliedVolts = 0.0;
-        public double currentAmps = 0.0;
+        public double rightMotorAppliedVolts = 0.0;
+        public double rightMotorCurrentAmps = 0.0;
 
-        public double motorTemp = 0.0;
+        public double rightMotorTemp = 0.0;
+
+        public double leftMotorAppliedVolts = 0.0;
+        public double leftMotorCurrentAmps = 0.0;
+
+        public double leftMotorTemp = 0.0;
 
         public boolean zeroLimit = false;
     }

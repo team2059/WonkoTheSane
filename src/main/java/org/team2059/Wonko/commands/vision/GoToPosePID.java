@@ -36,7 +36,7 @@ public class GoToPosePID extends Command {
   private PIDController thetaController;
 
   private LoggedTunableNumber pX = new LoggedTunableNumber("VisionAlign/pX", 2);
-  private LoggedTunableNumber pY = new LoggedTunableNumber("VisionAlign/pY", 3);
+  private LoggedTunableNumber pY = new LoggedTunableNumber("VisionAlign/pY",3);
   private LoggedTunableNumber pT = new LoggedTunableNumber("VisionAlign/pT", 2.5);
 
   /** Creates a new AlignReefCmd. */
@@ -75,7 +75,7 @@ public class GoToPosePID extends Command {
 
     this.yOffsetInches = yOffsetInches;
     this.xOffsetInches = xOffsetInches;
-
+    
     this.xTarget = VisionConstants.aprilTagFieldLayout.getTagPose(tagId).get().getX();
     this.yTarget = VisionConstants.aprilTagFieldLayout.getTagPose(tagId).get().getY();
     this.rotTarget = VisionConstants.aprilTagFieldLayout.getTagPose(tagId).get().getRotation().getZ();

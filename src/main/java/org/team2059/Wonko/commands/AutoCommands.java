@@ -12,7 +12,6 @@ import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.subsystems.vision.Vision;
-import org.team2059.Wonko.util.Elastic;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -166,12 +165,12 @@ public final class AutoCommands {
         NamedCommands.registerCommand(
             "ScoreL4", 
             new ElevateToReefLevelCmd(4, coralCollector, elevator)
-                .withTimeout(2)
+                .withTimeout(1.25)
                 .andThen(
                     Commands.parallel(
                         new ElevateToReefLevelCmd(4, coralCollector, elevator),
                         coralCollector.outtakeCommand()
-                    ).withTimeout(0.75)
+                    ).withTimeout(1)
                 )
                 .andThen(
                 new InstantCommand(
@@ -259,7 +258,6 @@ public final class AutoCommands {
             .andThen(
                 new InstantCommand(
                     () -> {
-                        // Elastic.sendNotification(new Elastic.Notification(Elastic.Notification.NotificationLevel.INFO, "RIGHT REEF PATHFIND COMPLETE!", ));
                         System.out.println("RIGHT REEF PATHFIND COMPLETE!");
                     }
                 )
@@ -267,24 +265,42 @@ public final class AutoCommands {
         );
         NamedCommands.registerCommand(
             "LeftPathfindToClosestLowerTag",
-            new PathfindToReefCmd(drivetrain, vision, false)
-            .andThen(
+            Commands.sequence(
+                Commands.parallel(
+                    new PathfindToReefCmd(drivetrain, vision, false),
+                    new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[3])
+                ),
                 new InstantCommand(
                     () -> {
                         System.out.println("LEFT REEF PATHFIND COMPLETE!");
                     }
                 )
             )
+            .withTimeout(2.2)
         );
 
         NamedCommands.registerCommand(
             "PathfindToNearestHPS", 
-            new PathfindToHPS(drivetrain, vision)
-            .andThen(
-                new InstantCommand(
-                    () -> {
-                        System.out.println("PATHFIND HUMAN PLAYER COMPLETE!");
-                    }
+            Commands.parallel(
+                Commands.sequence(
+                    new PathfindToHPS(drivetrain, vision),
+                    new InstantCommand(
+                        () -> {
+                            System.out.println("PATHFIND HUMAN PLAYER COMPLETE!");
+                        }
+                    )
+                ),
+                Commands.sequence(
+                    Commands.parallel(
+                        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
+                        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
+                        coralCollector.intakeCommand()    
+                    ).until(() -> coralCollector.inputs.hasCoral),
+                    new InstantCommand(
+                        () -> {
+                            System.out.println("CORAL INTAKE COMPLETE!");
+                        }
+                    )
                 )
             )
         );

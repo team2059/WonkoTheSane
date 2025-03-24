@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * Command which goes to either the left or right stem of a reef tag using pathfinding.
@@ -74,8 +75,12 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
+            new InstantCommand(() -> {vision.inputs.upperIsOn = false;}),
+            new InstantCommand(() -> drivetrain.stopAllMotors()),
+            new WaitCommand(0.25),
             new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
-            new InstantCommand(() -> drivetrain.stopAllMotors())
+            new InstantCommand(() -> drivetrain.stopAllMotors()),
+            new InstantCommand(() -> {vision.inputs.upperIsOn = true;})
         );
     }
     
@@ -105,8 +110,8 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
             return AutoBuilder.pathfindToPose(
                 goalPose, 
                 new PathConstraints(
-                    1.5, 
-                    1,
+                    2.5, 
+                    1.5,
                     Units.degreesToRadians(540),
                     Units.degreesToRadians(720)
                 )
@@ -116,11 +121,15 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
                     tagId,
                     VisionConstants.reefXOffsetInches,
                     (isRight ? VisionConstants.reefYRightOffsetInches : VisionConstants.reefYLeftOffsetInches)
-                ).withTimeout(0.5)
+                ).withTimeout(0.75)
             );
 
         } else {
-            return new InstantCommand();
+            return new InstantCommand(
+                () -> {
+                    System.out.println("Conditions Not Met For Auto Alignment To Reef");
+                }
+            );
         }
     }
 }

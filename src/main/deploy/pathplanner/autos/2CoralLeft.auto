@@ -7,13 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right"
+            "pathName": "Left"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.33
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Tag9Right"
+            "name": "LeftPathfindToClosestLowerTag"
           }
         },
         {
@@ -31,13 +37,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightToHPArea"
+            "pathName": "LeftToHPArea"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.33
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "HPStation2"
+            "name": "PathfindToNearestHPS"
           }
         },
         {
@@ -55,13 +67,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightHPToReef"
+            "pathName": "LeftHPToReef"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.33
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Tag8Right"
+            "name": "LeftPathfindToClosestLowerTag"
           }
         },
         {

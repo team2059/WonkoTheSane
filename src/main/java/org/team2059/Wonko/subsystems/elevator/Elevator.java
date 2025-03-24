@@ -38,4 +38,8 @@ public class Elevator extends SubsystemBase {
         return this.startEnd(() -> this.io.setSpeed(-0.05), () -> this.io.setSpeed(0))
             .until(() -> this.inputs.positionMeters <= ElevatorConstants.minHeight.in(Meters));
     }
+
+    public Command set5Volts() {
+        return this.startEnd(() -> this.io.setVoltage(4), () -> this.io.stop());
+    }
 }

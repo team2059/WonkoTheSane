@@ -187,11 +187,13 @@ public class RobotContainer {
 
     // Publish auto chooser
     SmartDashboard.putData("Auto Chooser", autoChooser);
+  
+    upperCamSwitch = new JoystickButton(buttonBox, 13);
+    lowerCamSwitch = new JoystickButton(buttonBox, 14);
 
     configureBindings();
 
-    upperCamSwitch = new JoystickButton(buttonBox, 13);
-    lowerCamSwitch = new JoystickButton(buttonBox, 14);
+
   }
 
   /**
@@ -241,7 +243,7 @@ public class RobotContainer {
     new JoystickButton(buttonBox, 4) // L4
       .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
     
-    // Human player station
+    // // Human player station
     new JoystickButton(buttonBox, 8)
       .whileTrue(Commands.parallel(
         new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
@@ -249,7 +251,7 @@ public class RobotContainer {
         coralCollector.intakeCommand()
       ));    
 
-    // Processor
+    // // Processor
     new JoystickButton(buttonBox, 7)
       .whileTrue(
         Commands.parallel(
@@ -298,7 +300,7 @@ public class RobotContainer {
     new JoystickButton(xboxController, 3) // X
       .whileTrue(algaeCollector.outtakeCommand());
 
-    // Tilt up/down
+    // // Tilt up/down
     new JoystickButton(buttonBox, 5)
       .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum));
       // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
@@ -355,6 +357,14 @@ public class RobotContainer {
 
     new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
       .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
+
+    upperCamSwitch
+      .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = false))
+      .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = true)); 
+    
+    lowerCamSwitch
+      .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
+      .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
    }
   
   /**

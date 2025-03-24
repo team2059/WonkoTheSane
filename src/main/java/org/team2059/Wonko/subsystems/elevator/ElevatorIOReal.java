@@ -18,15 +18,19 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
-// import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class ElevatorIOReal implements ElevatorIO {
 
-    private final SparkMax motor;
-    private final RelativeEncoder encoder;
+    private final SparkMax rightMotor;
+    private final SparkMax leftMotor; 
+
+    private final RelativeEncoder rightEncoder;
+    private final RelativeEncoder leftEncoder;
+
     private SparkClosedLoopController controller;
     
+
     // Limit switches
     private DigitalInput zeroLimit;
 
@@ -35,7 +39,8 @@ public class ElevatorIOReal implements ElevatorIO {
     private LoggedTunableNumber kD = new LoggedTunableNumber("Elevator/kD", ElevatorConstants.kD);
 
     public ElevatorIOReal() {
-        motor = new SparkMax(ElevatorConstants.motorId, MotorType.kBrushless);
+        rightMotor = new SparkMax(ElevatorConstants.rightMotorId, MotorType.kBrushless);
+        leftMotor = new SparkMax(ElevatorConstants.leftMotorId, MotorType.kBrushless); 
 
         SparkMaxConfig config = new SparkMaxConfig();
         config
@@ -50,12 +55,21 @@ public class ElevatorIOReal implements ElevatorIO {
             .pid(kP.get(), kI.get(), kD.get())
             .outputRange(-1.0, 1.0)
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
-        motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        motor.clearFaults();
+        rightMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        rightMotor.clearFaults();
 
-        encoder = motor.getEncoder();
-        controller = motor.getClosedLoopController();
+        // // Will make left motor follow right motor 
+        // config.follow(ElevatorConstants.rightMotorId, true); 
+        config.follow(ElevatorConstants.rightMotorId, true);
+        leftMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leftMotor.clearFaults();
 
+        rightEncoder = rightMotor.getEncoder();
+        controller = rightMotor.getClosedLoopController();
+
+        leftEncoder = leftMotor.getEncoder();
+
+        // Gets limit switch at bottom of elevator
         zeroLimit = new DigitalInput(0);
     }
 
@@ -68,46 +82,56 @@ public class ElevatorIOReal implements ElevatorIO {
             () -> {
                 SparkMaxConfig pidConfigChange = new SparkMaxConfig();
                 pidConfigChange.closedLoop.pid(kP.get(), kI.get(), kD.get());
-                motor.configure(pidConfigChange, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+                rightMotor.configure(pidConfigChange, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
             }, 
             kP, kI, kD
         );
 
         // Update all logged input values
-        inputs.velocityMetersPerSecond = encoder.getVelocity();
-        inputs.appliedVolts = getAppliedVolts();
-        inputs.currentAmps = motor.getOutputCurrent();
-        inputs.motorTemp = motor.getMotorTemperature();
+        inputs.velocityMetersPerSecond = rightEncoder.getVelocity();
+
+        inputs.rightMotorAppliedVolts = getAppliedVolts(rightMotor);
+        inputs.rightMotorCurrentAmps = rightMotor.getOutputCurrent();
+        inputs.rightMotorTemp = rightMotor.getMotorTemperature();
+
+        inputs.leftMotorAppliedVolts = getAppliedVolts(leftMotor);
+        inputs.leftMotorCurrentAmps = leftMotor.getOutputCurrent();
+        inputs.leftMotorTemp = leftMotor.getMotorTemperature();
+
         inputs.zeroLimit = !zeroLimit.get();
 
         if (inputs.zeroLimit) resetEncoder();
-        inputs.positionMeters = encoder.getPosition();
+        inputs.positionMeters = rightEncoder.getPosition();
 
     }
 
     // local helper method
-    public double getAppliedVolts() {
+    public double getAppliedVolts(SparkMax motor) {
         return (motor.getAppliedOutput() * motor.getBusVoltage());
     }
 
     @Override
     public void stop() {
-        motor.setVoltage(0);
+        // leftMotor.setVoltage(0);
+        rightMotor.setVoltage(0);
     }
 
     @Override
     public void setVoltage(double volts) {
-        motor.setVoltage(MathUtil.clamp(volts, -12, 12));
+        // leftMotor.setVoltage(MathUtil.clamp(volts, -12, 12));
+        rightMotor.setVoltage(MathUtil.clamp(volts, -12, 12));
     }
 
     @Override
     public void resetEncoder() {
-        encoder.setPosition(0);
+        rightEncoder.setPosition(0);
+        leftEncoder.setPosition(0);
     }
 
     @Override
     public void setSpeed(double speed) {
-        motor.set(speed);
+        // leftMotor.set(speed);
+        rightMotor.set(speed);
     }
 
     @Override
