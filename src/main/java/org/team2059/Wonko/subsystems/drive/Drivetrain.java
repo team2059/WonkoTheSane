@@ -377,6 +377,10 @@ public class Drivetrain extends SubsystemBase {
     backRight.io.setRotationMotorAnglePID(0);
   }
 
+  public void set180GyroRotation(boolean enabled) {
+    gyro.set180Rotation(enabled);
+  }
+
   @Override
   public void periodic() {
 

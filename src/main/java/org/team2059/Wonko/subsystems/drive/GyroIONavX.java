@@ -6,6 +6,8 @@ public class GyroIONavX implements GyroIO{
 
     private final AHRS gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
+    private boolean is180Rotated = false;
+
     public GyroIONavX() {
         reset();
     }
@@ -13,12 +15,23 @@ public class GyroIONavX implements GyroIO{
     @Override
     public void updateInputs(GyroIOInputs inputs) {
         inputs.connected = gyro.isConnected();
-        inputs.yaw = gyro.getYaw();
+        inputs.is180Rotated = is180Rotated;
+
+        if (inputs.is180Rotated) {
+            inputs.yaw = gyro.getYaw() + 180;
+        } else {
+            inputs.yaw = gyro.getYaw();
+        }
     }
 
     @Override
     public void reset() {
         gyro.reset();
+    }
+
+    @Override
+    public void set180Rotation(boolean enabled) {
+        is180Rotated = enabled;
     }
     
 }

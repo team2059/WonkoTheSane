@@ -219,6 +219,11 @@ public class RobotContainer {
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
       .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
+    /* Toggle gyro 180 degree rotation */
+    new JoystickButton(buttonBox, 15)
+      .onTrue(new InstantCommand(() -> drivetrain.set180GyroRotation(true)))
+      .onFalse(new InstantCommand(() -> drivetrain.set180GyroRotation(false)));
+
     // Drivetrain translation sysID routine (just drive motors) (wheels must be locked straight for this)
     // new JoystickButton(buttonBox, 1)
     //   .whileTrue(drivetrain.routine.quasistaticForward());

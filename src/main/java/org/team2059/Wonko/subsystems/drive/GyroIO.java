@@ -7,9 +7,12 @@ public interface GyroIO {
     public static class GyroIOInputs {
         public boolean connected = false;
         public double yaw = 0;
+        public boolean is180Rotated = false;
     }
 
-    public void updateInputs(GyroIOInputs inputs);
+    default public void updateInputs(GyroIOInputs inputs) {}
 
-    public void reset();
+    default public void reset() {}
+
+    default public void set180Rotation(boolean enabled) {}
 }
