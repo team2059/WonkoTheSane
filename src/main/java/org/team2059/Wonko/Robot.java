@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
@@ -75,7 +76,7 @@ public class Robot extends LoggedRobot {
         Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         Logger.registerURCL(URCL.startExternal());
-        new PowerDistribution(9, ModuleType.kRev); // Enables power distribution logging
+        LoggedPowerDistribution.getInstance(50, ModuleType.kRev);
     } else {
         setUseTiming(false); // Run as fast as possible
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
