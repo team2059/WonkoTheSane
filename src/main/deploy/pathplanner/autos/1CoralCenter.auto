@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left"
+            "pathName": "Center"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Tag20Right"
+            "name": "AlignToReefLeft"
           }
         },
         {
@@ -26,6 +26,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "1 Coral",
   "choreoAuto": false
 }

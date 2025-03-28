@@ -334,7 +334,7 @@ public final class Constants {
       restingCoralCollectorPos,  // L1
       Radians.of(-0.657),        // L2
       Radians.of(-0.74),        // L3
-      Radians.of(-1.06)         // L4
+      Radians.of(-1.165)         // L4
     };
     public static final Angle humanPlayerAngle = Radians.of(0.5);
 
@@ -354,11 +354,11 @@ public final class Constants {
     public static final Distance minHeight = Distance.ofBaseUnits(0, Meters);
 
     // Trapezoidal constraints
-    public static final double kMaxVelocity = 5;
+    public static final double kMaxVelocity = 8;
     public static final double kMaxAcceleration = 5;
 
     // Conversion factors
-    public static final double positionConversionFactor = 0.0354650904; // 0.1016 * PI / 9
+    public static final double positionConversionFactor = 0.06383716272; // 0.1016 * PI / 9
     public static final double velocityConversionFactor = positionConversionFactor / 60;
 
     // Level heights (index is the level, begins at 0, which is ground)
@@ -367,7 +367,7 @@ public final class Constants {
       Meters.of(0.010), // L1
       Meters.of(0.500), // L2
       Meters.of(1.200), // L3
-      Meters.of(2.390)  // L4
+      Meters.of(2.35)  // L4
     };
     
     // Heights for misc. other tasks
@@ -375,10 +375,10 @@ public final class Constants {
     public static final Distance processorHeight = Meters.of(0.4);
     
     // PID & FF gains
-    public static final double kS = 0.11432;
-    public static final double kG = 0.56393;
-    public static final double kV = 3.6283;
-    public static final double kA = 0.51094;
+    public static final double kS = 0.078528;
+    public static final double kG = 0.94894;
+    public static final double kV = 1.8799;
+    public static final double kA = 0.42541;
     public static final double kP = 1.0;
     public static final double kI = 0.0;
     public static final double kD = 0.0;

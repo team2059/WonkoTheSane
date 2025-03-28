@@ -27,7 +27,7 @@ public class ElevatorRoutine {
         sysIdRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(
                 Volts.of(3).per(Units.Second), // Ramp rate in volts per second
-                Volts.of(3), // Dynamic step voltage
+                Volts.of(4), // Dynamic step voltage
                 Time.ofBaseUnits(10, Units.Second), // Test duration of 2 seconds
                 null
             ), 

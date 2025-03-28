@@ -7,13 +7,13 @@
         {
           "type": "named",
           "data": {
-            "name": "PathfindToNearestHPS"
+            "name": "AlignToHumanPlayer"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "Test Sequences",
   "choreoAuto": false
 }

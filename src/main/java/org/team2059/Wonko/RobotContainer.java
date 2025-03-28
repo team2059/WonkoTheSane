@@ -16,6 +16,7 @@ import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
+import org.team2059.Wonko.commands.vision.GoToPosePID;
 import org.team2059.Wonko.commands.vision.PathfindToHPS;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
@@ -266,13 +267,13 @@ public class RobotContainer {
     );
 
     // Elevator sysID routine
-    // new JoystickButton(buttonBox, 5)
+    // new JoystickButton(buttonBox, 1)
     //   .whileTrue(elevator.routine.quasistaticForward());
-    // new JoystickButton(buttonBox, 6)
+    // new JoystickButton(buttonBox, 2)
     //   .whileTrue(elevator.routine.quasistaticReverse());
-    // new JoystickButton(buttonBox, 7)
+    // new JoystickButton(buttonBox, 3)
     //   .whileTrue(elevator.routine.dynamicForward());
-    // new JoystickButton(buttonBox, 8)
+    // new JoystickButton(buttonBox, 4)
     //   .whileTrue(elevator.routine.dynamicReverse());
 
     /* =============== */
@@ -370,6 +371,9 @@ public class RobotContainer {
     lowerCamSwitch
       .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
       .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
+
+    new JoystickButton(buttonBox, 11)
+      .whileTrue(new GoToPosePID(drivetrain, 17, VisionConstants.reefXOffsetInches, VisionConstants.reefYLeftOffsetInches));
    }
   
   /**

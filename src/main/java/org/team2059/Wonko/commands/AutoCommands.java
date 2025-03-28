@@ -2,9 +2,7 @@ package org.team2059.Wonko.commands;
 
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
-import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.GoToPosePID;
 import org.team2059.Wonko.commands.vision.PathfindToHPS;
 import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
@@ -15,6 +13,7 @@ import org.team2059.Wonko.subsystems.vision.Vision;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -24,6 +23,25 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
  * NamedCommands to be referenced in auto.
  */
 public final class AutoCommands {
+
+    /**
+     * Returns an InstantCommand which prints a message to the console for use in log replay.
+     * 
+     * @param message the desired message to display in the console
+     * @return an InstantCommand
+     */
+    public static Command logToConsoleCommand(String message) {
+        return new InstantCommand(() -> System.out.println(message));
+    }
+
+    /**
+     * Register all NamedCommands for PathPlanner. Requires all used subsystems to be passed.
+     * @param drivetrain
+     * @param coralCollector
+     * @param algaeCollector
+     * @param elevator
+     * @param vision
+     */
     public static void registerNamedCommands(
         Drivetrain drivetrain,
         CoralCollector coralCollector,
@@ -32,136 +50,10 @@ public final class AutoCommands {
         Vision vision
     ) {
 
-        // GO TO REEF TAG PID
-        final double goToReefTagTimeout = 2;
-        NamedCommands.registerCommand(
-            "Tag20Right", 
-            new GoToPosePID(
-                drivetrain, 
-                20, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYRightOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag20Left", 
-            new GoToPosePID(
-                drivetrain, 
-                20, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYLeftOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag21Right", 
-            new GoToPosePID(
-                drivetrain, 
-                21, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYRightOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag21Left", 
-            new GoToPosePID(
-                drivetrain, 
-                21, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYLeftOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag22Right", 
-            new GoToPosePID(
-                drivetrain, 
-                22, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYRightOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag22Left", 
-            new GoToPosePID(
-                drivetrain, 
-                22, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYLeftOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag9Right", 
-            new GoToPosePID(
-                drivetrain, 
-                9, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYRightOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag9Left", 
-            new GoToPosePID(
-                drivetrain, 
-                9, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYLeftOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag10Right", 
-            new GoToPosePID(
-                drivetrain, 
-                10, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYRightOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag10Left", 
-            new GoToPosePID(
-                drivetrain, 
-                10, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYLeftOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag11Right", 
-            new GoToPosePID(
-                drivetrain, 
-                11, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYRightOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag11Left", 
-            new GoToPosePID(
-                drivetrain, 
-                11, 
-                VisionConstants.reefXOffsetInches,
-                VisionConstants.reefYLeftOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "Tag17Right", 
-            new GoToPosePID(
-                drivetrain, 
-                17, 
-                VisionConstants.reefXOffsetInches, 
-                VisionConstants.reefYRightOffsetInches
-            )
-        );
-        NamedCommands.registerCommand(
-            "Tag8Right", 
-            new GoToPosePID(
-                drivetrain, 
-                8, 
-                VisionConstants.reefXOffsetInches, 
-                VisionConstants.reefYRightOffsetInches
-            )
-        );
+        /* Timeouts */
+        final double alignToReefTimeout = 2.2;
 
-        // SCORE CORAL ON REEF
+        /* Coral Score */
         NamedCommands.registerCommand(
             "ScoreL4", 
             new ElevateToReefLevelCmd(4, coralCollector, elevator)
@@ -170,20 +62,12 @@ public final class AutoCommands {
                     Commands.parallel(
                         new ElevateToReefLevelCmd(4, coralCollector, elevator),
                         coralCollector.outtakeCommand()
-                    ).withTimeout(1)
+                    ).withTimeout(0.5)
                 )
-                .andThen(
-                new InstantCommand(
-                    () -> {
-                        System.out.println("L4 SCORE COMPLETE!");
-                    }
-                )
-            )
+                .andThen(logToConsoleCommand("[auto] L4 SCORE COMPLETE!"))
         );
 
-        // HUMAN PLAYER STATION
-        final double goToHPTagTimeout = 2;
-
+        /* Coral Intake */
         NamedCommands.registerCommand(
             "IntakeCoral", 
             new ParallelCommandGroup(
@@ -191,104 +75,50 @@ public final class AutoCommands {
                 coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
                 coralCollector.intakeCommand()    
             ).until(() -> coralCollector.inputs.hasCoral)
-            .andThen(
-                new InstantCommand(
-                    () -> {
-                        System.out.println("CORAL INTAKE COMPLETE!");
-                    }
-                )
-            )
-        );
-        NamedCommands.registerCommand(
-            "HPStation12", 
-            new GoToPosePID(
-                drivetrain,
-                12,
-                VisionConstants.hpXOffsetInches,
-                VisionConstants.hpYOffsetInches
-            ).withTimeout(goToHPTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "HPStation13",
-            new GoToPosePID(
-                drivetrain, 
-                13, 
-                VisionConstants.hpXOffsetInches,
-                VisionConstants.hpYOffsetInches
-            ).withTimeout(goToHPTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "HPStation2",
-            new GoToPosePID(
-                drivetrain, 
-                2, 
-                VisionConstants.hpXOffsetInches,
-                VisionConstants.hpYOffsetInches
-            ).withTimeout(goToReefTagTimeout)
-        );
-        NamedCommands.registerCommand(
-            "HPStation1",
-            new GoToPosePID(
-                drivetrain, 
-                1, 
-                VisionConstants.hpXOffsetInches,
-                VisionConstants.hpYOffsetInches
-            ).withTimeout(goToHPTagTimeout)
+            .andThen(logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!"))
         );
 
-        // ELEVATOR RESET
+        /* Elevator Reset */
         NamedCommands.registerCommand(
             "ResetElevator", 
             Commands.parallel(
                 new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0]),
                 coralCollector.setTiltSetpointCmd(CoralCollectorConstants.levelCoralTiltAngle[0])
             ).until(() -> (elevator.inputs.zeroLimit || elevator.inputs.positionMeters <= 0.1))
-            .andThen(
-                new InstantCommand(
-                    () -> {
-                        System.out.println("ELEVATOR RESET COMPLETE!");
-                    }
-                )
-            )
+            .andThen(logToConsoleCommand("[auto] ELEVATOR RESET COMPLETE!"))
         );
 
+        /* Align to Reef */
         NamedCommands.registerCommand(
-            "RightPathfindToClosestLowerTag",
-            new PathfindToReefCmd(drivetrain, vision, true)
-            .andThen(
-                new InstantCommand(
-                    () -> {
-                        System.out.println("RIGHT REEF PATHFIND COMPLETE!");
-                    }
-                )
+            "AlignToReefRight",
+            Commands.sequence(
+                Commands.parallel(
+                    new PathfindToReefCmd(drivetrain, vision, true),
+                    new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[3])
+                ),
+                logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!")
             )
+            .withTimeout(alignToReefTimeout)
         );
         NamedCommands.registerCommand(
-            "LeftPathfindToClosestLowerTag",
+            "AlignToReefLeft",
             Commands.sequence(
                 Commands.parallel(
                     new PathfindToReefCmd(drivetrain, vision, false),
                     new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[3])
                 ),
-                new InstantCommand(
-                    () -> {
-                        System.out.println("LEFT REEF PATHFIND COMPLETE!");
-                    }
-                )
+                logToConsoleCommand("[auto] LEFT REEF ALIGN COMPLETE!")
             )
-            .withTimeout(2.2)
+            .withTimeout(alignToReefTimeout)
         );
 
+        /* Human Player Station */
         NamedCommands.registerCommand(
-            "PathfindToNearestHPS", 
+            "AlignToHumanPlayer", 
             Commands.parallel(
                 Commands.sequence(
                     new PathfindToHPS(drivetrain, vision),
-                    new InstantCommand(
-                        () -> {
-                            System.out.println("PATHFIND HUMAN PLAYER COMPLETE!");
-                        }
-                    )
+                    logToConsoleCommand("[auto] HUMAN PLAYER ALIGN COMPLETE!")
                 ),
                 Commands.sequence(
                     Commands.parallel(
@@ -296,11 +126,7 @@ public final class AutoCommands {
                         coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
                         coralCollector.intakeCommand()    
                     ).until(() -> coralCollector.inputs.hasCoral),
-                    new InstantCommand(
-                        () -> {
-                            System.out.println("CORAL INTAKE COMPLETE!");
-                        }
-                    )
+                    logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!")
                 )
             )
         );

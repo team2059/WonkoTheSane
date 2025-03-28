@@ -35,6 +35,8 @@ public class GoToPosePID extends Command {
   private PIDController yController;
   private PIDController thetaController;
 
+  private Pose2d goalPose;
+
   private LoggedTunableNumber pX = new LoggedTunableNumber("VisionAlign/pX", 2);
   private LoggedTunableNumber pY = new LoggedTunableNumber("VisionAlign/pY",3);
   private LoggedTunableNumber pT = new LoggedTunableNumber("VisionAlign/pT", 2.5);
@@ -92,15 +94,16 @@ public class GoToPosePID extends Command {
   @Override
   public void initialize() {
 
-    var goalPose = new Pose2d(
-      xTarget, yTarget, Rotation2d.fromRadians(rotTarget)
-    );
-
     // if (isRight) {
     //   goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(15), Units.inchesToMeters(6), Rotation2d.fromRadians(Math.PI)));
     // } else {
     //   goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(15), Units.inchesToMeters(-9), Rotation2d.fromRadians(Math.PI)));
     // }
+
+    goalPose = new Pose2d(
+      xTarget, yTarget, Rotation2d.fromRadians(rotTarget)
+    );
+
     goalPose = goalPose.transformBy(new Transform2d(Units.inchesToMeters(xOffsetInches), Units.inchesToMeters(yOffsetInches), Rotation2d.fromRadians(Math.PI)));
 
     Logger.recordOutput("GOAL POSE", goalPose);
@@ -114,6 +117,11 @@ public class GoToPosePID extends Command {
     xController.setTolerance(Units.inchesToMeters(1));
     yController.setTolerance(Units.inchesToMeters(1));
     thetaController.setTolerance(Units.degreesToRadians(5));
+
+    xController.reset();
+    yController.reset();
+    thetaController.reset();
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -130,7 +138,7 @@ public class GoToPosePID extends Command {
       pX, pY, pT
     );
 
-    var drivetrainPose = drivetrain.getPose();
+    var drivetrainPose = drivetrain.getPose().relativeTo(goalPose);
 
     double xSpeed = xController.calculate(drivetrainPose.getX());
     double ySpeed = yController.calculate(drivetrainPose.getY());
@@ -141,8 +149,8 @@ public class GoToPosePID extends Command {
     Logger.recordOutput("thetaSpeed", thetaSpeed);
 
     drivetrain.drive(
-      MathUtil.clamp(-xSpeed, -1, 1), 
-      MathUtil.clamp(-ySpeed, -1, 1), 
+      MathUtil.clamp(xSpeed, -1, 1), 
+      MathUtil.clamp(ySpeed, -1, 1), 
       MathUtil.clamp(thetaSpeed, -5, 5), 
       true
     );

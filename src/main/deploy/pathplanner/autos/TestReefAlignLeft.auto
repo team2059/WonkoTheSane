@@ -7,13 +7,13 @@
         {
           "type": "named",
           "data": {
-            "name": "LeftPathfindToClosestLowerTag"
+            "name": "AlignToReefLeft"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "Test Sequences",
   "choreoAuto": false
 }

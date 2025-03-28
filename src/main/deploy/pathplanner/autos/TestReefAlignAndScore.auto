@@ -5,15 +5,9 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Center"
-          }
-        },
-        {
           "type": "named",
           "data": {
-            "name": "Tag10Right"
+            "name": "AlignToReefLeft"
           }
         },
         {
@@ -21,11 +15,17 @@
           "data": {
             "name": "ScoreL4"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetElevator"
+          }
         }
       ]
     }
   },
-  "resetOdom": true,
-  "folder": null,
+  "resetOdom": false,
+  "folder": "Test Sequences",
   "choreoAuto": false
 }

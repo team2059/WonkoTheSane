@@ -13,7 +13,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LeftPathfindToClosestLowerTag"
+            "name": "AlignToReefLeft"
           }
         },
         {
@@ -43,7 +43,7 @@
         {
           "type": "named",
           "data": {
-            "name": "PathfindToNearestHPS"
+            "name": "AlignToHumanPlayer"
           }
         },
         {
@@ -61,7 +61,7 @@
         {
           "type": "named",
           "data": {
-            "name": "LeftPathfindToClosestLowerTag"
+            "name": "AlignToReefLeft"
           }
         },
         {
@@ -80,6 +80,6 @@
     }
   },
   "resetOdom": true,
-  "folder": null,
+  "folder": "2 Coral",
   "choreoAuto": false
 }
