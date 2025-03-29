@@ -41,13 +41,18 @@ public final class Constants {
     // Sets whether or not tunable numbers can be changed. If false, only defaults will be used.
     public static final boolean tuningMode = true;
 
+    // Whether to use XboxController or Joystick
+    public static final boolean useXboxForDriving = true;
+
     /* ===== */
     /* PORTS */
     /* ===== */
 
+    public static final int xboxDriverPort = 3;
     public static final int logitechPort = 0;
     public static final int buttonBoxPort = 1;
     public static final int xboxControllerPort = 2;
+
 
     /* ==== */
     /* AXES */
@@ -57,6 +62,10 @@ public final class Constants {
     public static final int JoystickStrafeAxis = 0;
     public static final int JoystickRotationAxis = 2;
     public static final int JoystickSliderAxis = 3;
+
+    public static final int XboxDriverLeftYAxis = 1;     // Forward/backward 
+    public static final int XboxDriverLeftXAxis = 0;     // Strafe
+    public static final int XboxDriverRightXAxis = 4;    // Rotation
 
     /* ======= */
     /* BUTTONS */
