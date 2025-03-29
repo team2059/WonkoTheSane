@@ -78,6 +78,13 @@ public final class AutoCommands {
             .andThen(logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!"))
         );
 
+        NamedCommands.registerCommand(
+            "IntakeFunnel", 
+            new ParallelCommandGroup(
+                coralCollector.intakeCommand()
+            ).until(() -> coralCollector.inputs.hasCoral)
+        );
+
         /* Elevator Reset */
         NamedCommands.registerCommand(
             "ResetElevator", 

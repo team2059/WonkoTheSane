@@ -16,7 +16,6 @@ import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
-import org.team2059.Wonko.commands.vision.GoToPosePID;
 import org.team2059.Wonko.commands.vision.PathfindToHPS;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
@@ -220,11 +219,6 @@ public class RobotContainer {
     new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
       .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
-    /* Toggle gyro 180 degree rotation */
-    new JoystickButton(buttonBox, 15)
-      .onTrue(new InstantCommand(() -> drivetrain.set180GyroRotation(true)))
-      .onFalse(new InstantCommand(() -> drivetrain.set180GyroRotation(false)));
-
     // Drivetrain translation sysID routine (just drive motors) (wheels must be locked straight for this)
     // new JoystickButton(buttonBox, 1)
     //   .whileTrue(drivetrain.routine.quasistaticForward());
@@ -267,13 +261,13 @@ public class RobotContainer {
     );
 
     // Elevator sysID routine
-    // new JoystickButton(buttonBox, 1)
+    // new JoystickButton(buttonBox, 5)
     //   .whileTrue(elevator.routine.quasistaticForward());
-    // new JoystickButton(buttonBox, 2)
+    // new JoystickButton(buttonBox, 6)
     //   .whileTrue(elevator.routine.quasistaticReverse());
-    // new JoystickButton(buttonBox, 3)
+    // new JoystickButton(buttonBox, 7)
     //   .whileTrue(elevator.routine.dynamicForward());
-    // new JoystickButton(buttonBox, 4)
+    // new JoystickButton(buttonBox, 8)
     //   .whileTrue(elevator.routine.dynamicReverse());
 
     /* =============== */
@@ -371,9 +365,6 @@ public class RobotContainer {
     lowerCamSwitch
       .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
       .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
-
-    new JoystickButton(buttonBox, 11)
-      .whileTrue(new GoToPosePID(drivetrain, 17, VisionConstants.reefXOffsetInches, VisionConstants.reefYLeftOffsetInches));
    }
   
   /**
