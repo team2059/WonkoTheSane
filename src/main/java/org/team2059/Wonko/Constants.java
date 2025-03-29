@@ -324,8 +324,8 @@ public final class Constants {
     public static final double kGTilt = 0.0;
 
     // Trapezoidal constraints
-    public static final double tiltMaxVelocity = 7;
-    public static final double tiltMaxAccel = 5;
+    public static final double tiltMaxVelocity = 8.5;
+    public static final double tiltMaxAccel = 6;
 
     public static final double horizontalOffset = 0.358; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
 
