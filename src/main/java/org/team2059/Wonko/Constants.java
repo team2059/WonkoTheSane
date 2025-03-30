@@ -260,8 +260,8 @@ public final class Constants {
     public static final Distance reefAlignRightStrafeOffset = Inches.of(4);
 
     public static final double reefXOffsetInches = 15;
-    public static final double reefYRightOffsetInches = 6;
-    public static final double reefYLeftOffsetInches = -9;
+    public static final double reefYRightOffsetInches = 7.5;
+    public static final double reefYLeftOffsetInches = -7.2;
 
     public static final double hpXOffsetInches = 15;
     public static final double hpYOffsetInches = 0;
@@ -315,8 +315,8 @@ public final class Constants {
     public static final double kGTilt = 0.0;
 
     // Trapezoidal constraints
-    public static final double tiltMaxVelocity = 8.5;
-    public static final double tiltMaxAccel = 6;
+    public static final double tiltMaxVelocity = 7;
+    public static final double tiltMaxAccel = 5;
 
     public static final double horizontalOffset = 0.358; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
 

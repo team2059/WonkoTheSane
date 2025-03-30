@@ -4,6 +4,7 @@ import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.commands.vision.PathfindToHPS;
+import org.team2059.Wonko.commands.vision.PathfindToReefAutoCmd;
 import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
@@ -57,7 +58,7 @@ public final class AutoCommands {
         NamedCommands.registerCommand(
             "ScoreL4", 
             new ElevateToReefLevelCmd(4, coralCollector, elevator)
-                .withTimeout(1.25)
+                .withTimeout(1.75)
                 .andThen(
                     Commands.parallel(
                         new ElevateToReefLevelCmd(4, coralCollector, elevator),
@@ -100,8 +101,7 @@ public final class AutoCommands {
             "AlignToReefRight",
             Commands.sequence(
                 Commands.parallel(
-                    new PathfindToReefCmd(drivetrain, vision, true),
-                    new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[3])
+                    new PathfindToReefAutoCmd(drivetrain, vision, true)
                 ),
                 logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!")
             )
@@ -111,8 +111,7 @@ public final class AutoCommands {
             "AlignToReefLeft",
             Commands.sequence(
                 Commands.parallel(
-                    new PathfindToReefCmd(drivetrain, vision, false),
-                    new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[3])
+                    new PathfindToReefAutoCmd(drivetrain, vision, false)
                 ),
                 logToConsoleCommand("[auto] LEFT REEF ALIGN COMPLETE!")
             )
@@ -126,14 +125,6 @@ public final class AutoCommands {
                 Commands.sequence(
                     new PathfindToHPS(drivetrain, vision),
                     logToConsoleCommand("[auto] HUMAN PLAYER ALIGN COMPLETE!")
-                ),
-                Commands.sequence(
-                    Commands.parallel(
-                        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-                        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
-                        coralCollector.intakeCommand()    
-                    ).until(() -> coralCollector.inputs.hasCoral),
-                    logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!")
                 )
             )
         );

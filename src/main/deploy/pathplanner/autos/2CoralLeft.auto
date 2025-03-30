@@ -11,12 +11,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.33
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "AlignToReefLeft"
@@ -41,12 +35,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.33
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "AlignToHumanPlayer"
@@ -55,7 +43,7 @@
         {
           "type": "named",
           "data": {
-            "name": "IntakeCoral"
+            "name": "IntakeFunnel"
           }
         },
         {
@@ -68,12 +56,6 @@
           "type": "path",
           "data": {
             "pathName": "LeftHPToReef"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.33
           }
         },
         {

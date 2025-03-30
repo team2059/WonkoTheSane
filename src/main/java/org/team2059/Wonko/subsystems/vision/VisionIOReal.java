@@ -76,7 +76,7 @@ public class VisionIOReal implements VisionIO {
 
         
         // If camera switch is on then use pose estimation, else all values are null 
-        if (inputs.upperIsOn) {
+        // if (inputs.upperIsOn) {
             // Update camera readings
             upperCameraResults = upperCamera.getAllUnreadResults();
 
@@ -92,16 +92,17 @@ public class VisionIOReal implements VisionIO {
                     inputs.upperBestTargetID = -1;
                     inputs.upperBestTarget = null;
                 }
-            }
-        } else {
-            // Make results empty and everything else null 
-            upperCameraResults = Collections.emptyList();  
-            inputs.hasUpperTarget = false;
-            inputs.upperBestTarget = null; 
-            inputs.upperBestTargetID = -1;  
-        }
 
-        if (inputs.lowerIsOn) {
+        // } else {
+        //     // Make results empty and everything else null 
+        //     upperCameraResults = Collections.emptyList();  
+        //     inputs.hasUpperTarget = false;
+        //     inputs.upperBestTarget = null; 
+        //     inputs.upperBestTargetID = -1;  
+        // }
+    }
+
+
             lowerCameraResults = lowerCamera.getAllUnreadResults();
 
             if (!lowerCameraResults.isEmpty()) {
@@ -116,14 +117,16 @@ public class VisionIOReal implements VisionIO {
                     inputs.lowerBestTarget = null;
                 }
             }
-        } else {
-            lowerCameraResults = Collections.emptyList();
-            inputs.hasLowerTarget = false; 
-            inputs.lowerBestTarget = null; 
-            inputs.lowerBestTargetID = -1; 
         }
 
-    }
+        // } else {
+        //     lowerCameraResults = Collections.emptyList();
+        //     inputs.hasLowerTarget = false; 
+        //     inputs.lowerBestTarget = null; 
+        //     inputs.lowerBestTargetID = -1; 
+        // }
+        
+    
 
     /**
      * Calculates new standard deviations

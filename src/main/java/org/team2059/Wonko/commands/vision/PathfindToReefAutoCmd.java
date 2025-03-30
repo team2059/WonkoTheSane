@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
  * then aligns to either left or right side of reef using PID in x, y, theta dimensions.
  */
 
-public class PathfindToReefCmd extends SequentialCommandGroup{
+public class PathfindToReefAutoCmd extends SequentialCommandGroup{
     
     Drivetrain drivetrain;
     Vision vision;
@@ -36,7 +36,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
 
     boolean isRight;
 
-    public PathfindToReefCmd (
+    public PathfindToReefAutoCmd (
         Drivetrain drivetrain,
         Vision vision,
         boolean isRight
@@ -115,13 +115,6 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
                     Units.degreesToRadians(540),
                     Units.degreesToRadians(720)
                 )
-            ).andThen(
-                new GoToPosePID(
-                    drivetrain,
-                    tagId,
-                    VisionConstants.reefXOffsetInches,
-                    (isRight ? VisionConstants.reefYRightOffsetInches : VisionConstants.reefYLeftOffsetInches)
-                ).withTimeout(0.45)
             );
 
         } else {

@@ -260,6 +260,11 @@ public class RobotContainer {
         )
     );
 
+    /* Toggle gyro 180 degree rotation */
+    new JoystickButton(buttonBox, 15)
+      .onTrue(new InstantCommand(() -> drivetrain.set180GyroRotation(true)))
+      .onFalse(new InstantCommand(() -> drivetrain.set180GyroRotation(false)));
+
     // Elevator sysID routine
     // new JoystickButton(buttonBox, 5)
     //   .whileTrue(elevator.routine.quasistaticForward());
@@ -358,13 +363,13 @@ public class RobotContainer {
     new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
       .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
 
-    upperCamSwitch
-      .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = false))
-      .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = true)); 
+    // upperCamSwitch
+    //   .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = false))
+    //   .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = true)); 
     
-    lowerCamSwitch
-      .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
-      .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
+    // lowerCamSwitch
+    //   .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
+    //   .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
    }
   
   /**
