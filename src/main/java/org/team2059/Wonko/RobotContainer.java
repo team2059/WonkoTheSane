@@ -4,7 +4,9 @@
 
 package org.team2059.Wonko;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meters;
+
+import java.util.function.Supplier;
 
 import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
@@ -14,9 +16,11 @@ import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.commands.AutoCommands;
 import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
+import org.team2059.Wonko.commands.drive.TeleopDriveCmdXbox;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
+import org.team2059.Wonko.commands.vision.GoToPosePID;
 import org.team2059.Wonko.commands.vision.PathfindToHPS;
+import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.climber.Climber;
@@ -65,6 +69,7 @@ public class RobotContainer {
   public static CoralCollector coralCollector;
   public static Climber climber;
 
+  public static CommandXboxController xboxDriver;
   public static Joystick logitech;
   public static GenericHID buttonBox;
   public static XboxController xboxController;
@@ -73,9 +78,14 @@ public class RobotContainer {
 
   public static boolean isRed = false; 
 
+  public static boolean isSlowMode;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    
+
+    isSlowMode = true;
+
+
     /* ========== */
     /* SUBSYSTEMS */
     /* ========== */
@@ -91,17 +101,33 @@ public class RobotContainer {
     /* CONTROLLERS */
     /* =========== */
 
+    xboxDriver = new CommandXboxController(OperatorConstants.xboxDriverPort);
     logitech = new Joystick(OperatorConstants.logitechPort);
     buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
     xboxController = new XboxController(OperatorConstants.xboxControllerPort);
+
+    // Drive Controls
+    final Supplier<Double> translation = xboxDriver::getLeftX;
+    final Supplier<Double> strafe = xboxDriver::getLeftY;
+    final Supplier<Double> rotation = xboxDriver::getRightX;
 
     /* ================ */
     /* DEFAULT COMMANDS */
     /* ================ */
 
     // Default commands run when the subsystem in question has no scheduled commands requiring it.
-    
-    drivetrain.setDefaultCommand(
+    if (OperatorConstants.useXboxForDriving) {
+      drivetrain.setDefaultCommand(
+      new TeleopDriveCmdXbox(
+        drivetrain, 
+        () -> -strafe.get(), // forwardX
+        () -> -translation.get(), // forwardY
+        () -> -rotation.get(), // rotation
+        () -> isSlowMode
+      )
+    );
+    } else {
+      drivetrain.setDefaultCommand(
       new TeleopDriveCmd(
         drivetrain, 
         () -> -logitech.getRawAxis(OperatorConstants.JoystickTranslationAxis), // forwardX
@@ -112,6 +138,8 @@ public class RobotContainer {
         () -> logitech.getRawButton(OperatorConstants.JoystickInvertedDrive) // Inverted buytton
       )
     );
+    }
+    
 
     elevator.setDefaultCommand(
       Commands.parallel(
@@ -195,6 +223,13 @@ public class RobotContainer {
 
 
   }
+  public void slowMode() {
+    if (isSlowMode) {
+      isSlowMode = false;
+    } else {
+      isSlowMode = true;
+    }
+  }
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -207,17 +242,43 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
+    if (OperatorConstants.useXboxForDriving) {
+      xboxDriver.start().onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
+      xboxDriver.back().onTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
+      xboxDriver.rightBumper().onTrue(new InstantCommand(() -> slowMode()));
+      xboxDriver.leftTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
+      xboxDriver.rightTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
+    } else {
+      /* RESET NAVX HEADING */
+      new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
+        .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
+
+      /* SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
+      new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
+        .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
+
+      new JoystickButton(logitech, 12) // HP ALIGN
+        .whileTrue(new PathfindToHPS(drivetrain, vision));
+      new JoystickButton(logitech, 2) // LEFT REEF ALIGN
+        .whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
+  
+      new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
+        .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
+    }
+
+    
+
     /* ========== */
     /* Drivetrain */
     /* ========== */
 
-    /* RESET NAVX HEADING */
-    new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
-      .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
+    // /* RESET NAVX HEADING */
+    // new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
+    //   .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
 
-    /* SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
-    new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
-      .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
+    // /* SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
+    // new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
+    //   .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
     // Drivetrain translation sysID routine (just drive motors) (wheels must be locked straight for this)
     // new JoystickButton(buttonBox, 1)
@@ -355,13 +416,13 @@ public class RobotContainer {
     /* Vision */
     /* ====== */
 
-    new JoystickButton(logitech, 12) // HP ALIGN
-      .whileTrue(new PathfindToHPS(drivetrain, vision));
-    new JoystickButton(logitech, 2) // LEFT REEF ALIGN
-      .whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
+    // new JoystickButton(logitech, 12) // HP ALIGN
+    //   .whileTrue(new PathfindToHPS(drivetrain, vision));
+    // new JoystickButton(logitech, 2) // LEFT REEF ALIGN
+    //   .whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
 
-    new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
-      .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
+    // new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
+    //   .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
 
     // upperCamSwitch
     //   .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = false))
