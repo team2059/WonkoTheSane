@@ -77,7 +77,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         addCommands(
             new InstantCommand(() -> {vision.inputs.upperIsOn = false;}),
             new InstantCommand(() -> drivetrain.stopAllMotors()),
-            new WaitCommand(0.1),
+            new WaitCommand(0.2),
             new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
             new InstantCommand(() -> drivetrain.stopAllMotors()),
             new InstantCommand(() -> {vision.inputs.upperIsOn = true;})
@@ -96,7 +96,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         if (
             vision.inputs.hasLowerTarget &&
             vision.inputs.lowerBestTarget != null &&
-            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.2 &&
+            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.5 &&
             VisionConstants.redReefTags.contains(vision.inputs.lowerBestTargetID) || VisionConstants.blueReefTags.contains(vision.inputs.lowerBestTargetID)
         ) {
             

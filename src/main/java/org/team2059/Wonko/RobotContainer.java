@@ -76,6 +76,10 @@ public class RobotContainer {
   public static JoystickButton upperCamSwitch;
   public static JoystickButton lowerCamSwitch;
 
+  public static Supplier<Double> strafe; 
+  public static Supplier<Double> translation; 
+  public static Supplier<Double> rotation; 
+
   public static boolean isRed = false; 
 
   public static boolean isSlowMode;
@@ -100,16 +104,18 @@ public class RobotContainer {
     /* =========== */
     /* CONTROLLERS */
     /* =========== */
-
+    
     xboxDriver = new CommandXboxController(OperatorConstants.xboxDriverPort);
     logitech = new Joystick(OperatorConstants.logitechPort);
     buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
     xboxController = new XboxController(OperatorConstants.xboxControllerPort);
 
     // Drive Controls
-    final Supplier<Double> translation = xboxDriver::getLeftX;
-    final Supplier<Double> strafe = xboxDriver::getLeftY;
-    final Supplier<Double> rotation = xboxDriver::getRightX;
+    if (OperatorConstants.useXboxForDriving) {
+      translation = xboxDriver::getLeftX;
+      strafe = xboxDriver::getLeftY;
+      rotation = xboxDriver::getRightX;
+    }
 
     /* ================ */
     /* DEFAULT COMMANDS */
@@ -124,8 +130,7 @@ public class RobotContainer {
         () -> -translation.get(), // forwardY
         () -> -rotation.get(), // rotation
         () -> isSlowMode
-      )
-    );
+      )); 
     } else {
       drivetrain.setDefaultCommand(
       new TeleopDriveCmd(
@@ -137,7 +142,7 @@ public class RobotContainer {
         () -> logitech.getRawButton(OperatorConstants.JoystickStrafeOnly), // Strafe Only Button
         () -> logitech.getRawButton(OperatorConstants.JoystickInvertedDrive) // Inverted buytton
       )
-    );
+      );
     }
     
 
@@ -245,7 +250,7 @@ public class RobotContainer {
     if (OperatorConstants.useXboxForDriving) {
       xboxDriver.start().onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
       xboxDriver.back().onTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
-      xboxDriver.rightBumper().onTrue(new InstantCommand(() -> slowMode()));
+      xboxDriver.rightBumper().whileTrue(new InstantCommand(() -> slowMode()));
       xboxDriver.leftTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
       xboxDriver.rightTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
     } else {
@@ -304,22 +309,24 @@ public class RobotContainer {
     new JoystickButton(buttonBox, 4) // L4
       .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
     
-    // // Human player station
+    // Human player station (No longer needed due to funnel)
     new JoystickButton(buttonBox, 8)
       .whileTrue(Commands.parallel(
-        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
+        // new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
+        // coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
         coralCollector.intakeCommand()
       ));    
 
     // // Processor
     new JoystickButton(buttonBox, 7)
       .whileTrue(
-        Commands.parallel(
-          algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-          new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
-        )
+        // Commands.parallel(
+        //   algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
+        //   new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
+        // )
+        coralCollector.outtakeCommand()
     );
+
 
     /* Toggle gyro 180 degree rotation */
     new JoystickButton(buttonBox, 15)

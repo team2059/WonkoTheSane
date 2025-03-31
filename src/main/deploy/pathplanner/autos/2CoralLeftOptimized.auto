@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Right"
+            "pathName": "Left"
           }
         },
         {
@@ -23,21 +23,28 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ResetElevator"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LeftToHPSlow"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ResetElevator"
+                }
+              }
+            ]
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "RightToHPAreaAutoAlign"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "RightToHPAreaSlow"
+            "pathName": "LeftToHPArea"
           }
         },
         {
@@ -49,7 +56,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightHPToReef"
+            "pathName": "LeftHPToReef"
           }
         },
         {

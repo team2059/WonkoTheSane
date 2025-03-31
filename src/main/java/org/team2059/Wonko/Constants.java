@@ -42,7 +42,7 @@ public final class Constants {
     public static final boolean tuningMode = true;
 
     // Whether to use XboxController or Joystick
-    public static final boolean useXboxForDriving = true;
+    public static final boolean useXboxForDriving = false;
 
     /* ===== */
     /* PORTS */
@@ -293,7 +293,7 @@ public final class Constants {
 
     // Hard limits
     public static final Angle thruBoreMinimum = Radians.of(0);
-    public static final Angle thruBoreMaximum = Radians.of(1.2);
+    public static final Angle thruBoreMaximum = Radians.of(1.4); // 1.2
 
     public static final Current stallDetection = Amps.of(10);
   }
