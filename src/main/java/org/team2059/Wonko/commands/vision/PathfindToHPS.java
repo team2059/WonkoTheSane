@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * Command which goes to either the left or right stem of a reef tag using pathfinding.
@@ -59,6 +60,7 @@ public class PathfindToHPS extends SequentialCommandGroup{
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
             new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
+            new WaitCommand(0.3),
             new InstantCommand(() -> drivetrain.stopAllMotors())
         );
     }
@@ -75,9 +77,8 @@ public class PathfindToHPS extends SequentialCommandGroup{
         if (
             vision.inputs.hasUpperTarget &&
             vision.inputs.upperBestTarget != null &&
-            vision.inputs.upperBestTarget.getPoseAmbiguity() <= 0.2 &&
-            VisionConstants.redHPTags.contains(vision.inputs.upperBestTargetID) || VisionConstants.blueHPTags.contains(vision.inputs.upperBestTargetID)
-        ) {
+            vision.inputs.upperBestTarget.getPoseAmbiguity() <= 1
+        ) { 
             
             // Grab pose of tag
             int tagId = vision.inputs.upperBestTargetID;
@@ -89,15 +90,15 @@ public class PathfindToHPS extends SequentialCommandGroup{
             return AutoBuilder.pathfindToPose(
                 goalPose, 
                 new PathConstraints(
-                    2.5, 
-                    1.5,
+                    3.5, 
+                    2.5,
                     Units.degreesToRadians(540),
                     Units.degreesToRadians(720)
                 )
             );
 
         } else {
-            return new InstantCommand();
-        }
+            return new InstantCommand(() -> System.out.println("Conditions not met for human player align"));
+        }   
     }
 }

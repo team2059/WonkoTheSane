@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
  * then aligns to either left or right side of reef using PID in x, y, theta dimensions.
  */
 
-public class PathfindToReefCmd extends SequentialCommandGroup{
+public class PathfindToReefAutoCmd extends SequentialCommandGroup{
     
     Drivetrain drivetrain;
     Vision vision;
@@ -36,7 +36,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
 
     boolean isRight;
 
-    public PathfindToReefCmd (
+    public PathfindToReefAutoCmd (
         Drivetrain drivetrain,
         Vision vision,
         boolean isRight
@@ -77,7 +77,6 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         addCommands(
             new InstantCommand(() -> {vision.inputs.upperIsOn = false;}),
             new InstantCommand(() -> drivetrain.stopAllMotors()),
-            new WaitCommand(0.2),
             new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
             new InstantCommand(() -> drivetrain.stopAllMotors()),
             new InstantCommand(() -> {vision.inputs.upperIsOn = true;})
@@ -96,7 +95,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         if (
             vision.inputs.hasLowerTarget &&
             vision.inputs.lowerBestTarget != null &&
-            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.5 &&
+            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.2 &&
             VisionConstants.redReefTags.contains(vision.inputs.lowerBestTargetID) || VisionConstants.blueReefTags.contains(vision.inputs.lowerBestTargetID)
         ) {
             
@@ -115,13 +114,6 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
                     Units.degreesToRadians(540),
                     Units.degreesToRadians(720)
                 )
-            ).andThen(
-                new GoToPosePID(
-                    drivetrain,
-                    tagId,
-                    VisionConstants.reefXOffsetInches,
-                    (isRight ? VisionConstants.reefYRightOffsetInches : VisionConstants.reefYLeftOffsetInches)
-                ).withTimeout(0.45)
             );
 
         } else {

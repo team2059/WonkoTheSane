@@ -52,11 +52,11 @@ public class AlgaeCollectorIOReal implements AlgaeCollectorIO {
             .idleMode(IdleMode.kBrake)
             .closedLoopRampRate(0.75);
         tiltConfig.absoluteEncoder
-            .zeroOffset(0.38)
+            // .zeroOffset(0.14)
             .inverted(false)
             .positionConversionFactor(2.0 * Math.PI)
-            .velocityConversionFactor(2.0 * Math.PI / 60)
-            .zeroCentered(true);
+            .velocityConversionFactor(2.0 * Math.PI / 60);
+            // .zeroCentered(true);
         tiltConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .pid(kP.get(), kI.get(), kD.get())

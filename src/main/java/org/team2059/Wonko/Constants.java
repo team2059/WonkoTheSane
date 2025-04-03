@@ -41,13 +41,18 @@ public final class Constants {
     // Sets whether or not tunable numbers can be changed. If false, only defaults will be used.
     public static final boolean tuningMode = true;
 
+    // Whether to use XboxController or Joystick
+    public static final boolean useXboxForDriving = false;
+
     /* ===== */
     /* PORTS */
     /* ===== */
 
+    public static final int xboxDriverPort = 3;
     public static final int logitechPort = 0;
     public static final int buttonBoxPort = 1;
     public static final int xboxControllerPort = 2;
+
 
     /* ==== */
     /* AXES */
@@ -57,6 +62,10 @@ public final class Constants {
     public static final int JoystickStrafeAxis = 0;
     public static final int JoystickRotationAxis = 2;
     public static final int JoystickSliderAxis = 3;
+
+    public static final int XboxDriverLeftYAxis = 1;     // Forward/backward 
+    public static final int XboxDriverLeftXAxis = 0;     // Strafe
+    public static final int XboxDriverRightXAxis = 4;    // Rotation
 
     /* ======= */
     /* BUTTONS */
@@ -260,8 +269,8 @@ public final class Constants {
     public static final Distance reefAlignRightStrafeOffset = Inches.of(4);
 
     public static final double reefXOffsetInches = 15;
-    public static final double reefYRightOffsetInches = 6;
-    public static final double reefYLeftOffsetInches = -9;
+    public static final double reefYRightOffsetInches = 7.5;
+    public static final double reefYLeftOffsetInches = -7.2;
 
     public static final double hpXOffsetInches = 15;
     public static final double hpYOffsetInches = 0;
@@ -283,8 +292,11 @@ public final class Constants {
     public static final double tiltMotorVelocityConvFactor = 0.00232710567;
 
     // Hard limits
-    public static final Angle thruBoreMinimum = Radians.of(0);
-    public static final Angle thruBoreMaximum = Radians.of(1.2);
+    public static final Angle thruBoreMinimum = Radians.of(1.54);
+    public static final Angle thruBoreMaximum = Radians.of(3.01); // 1.2
+
+    public static final double lowAlgaeHeight = 1.35; 
+    public static final double highAlgaeHeight = 2; 
 
     public static final Current stallDetection = Amps.of(10);
   }
