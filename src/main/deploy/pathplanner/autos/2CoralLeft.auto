@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left"
+            "pathName": "LeftStartToReef"
           }
         },
         {
@@ -23,15 +23,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "ResetElevator"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "LeftToHPArea"
+            "pathName": "LeftReefToHPStation"
           }
         },
         {
@@ -44,12 +38,6 @@
           "type": "named",
           "data": {
             "name": "IntakeFunnel"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ResetElevator"
           }
         },
         {
@@ -68,12 +56,6 @@
           "type": "named",
           "data": {
             "name": "ScoreL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ResetElevator"
           }
         }
       ]
