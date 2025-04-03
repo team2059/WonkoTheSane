@@ -51,7 +51,6 @@ public class PathfindToHPS extends SequentialCommandGroup{
             new Rotation3d(0, 0, Math.PI)
         );
 
-
         // Require both vision & drivetrain subsystems
         // This ensures no conflicting commands will be run
         addRequirements(vision, drivetrain);
@@ -60,7 +59,6 @@ public class PathfindToHPS extends SequentialCommandGroup{
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
             new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
-            new WaitCommand(0.3),
             new InstantCommand(() -> drivetrain.stopAllMotors())
         );
     }

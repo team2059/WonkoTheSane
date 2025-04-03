@@ -50,6 +50,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -144,13 +145,15 @@ public class RobotContainer {
       );
     }
     
-
     elevator.setDefaultCommand(
       Commands.parallel(
         new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0]),
-        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.levelCoralTiltAngle[0]),
-        algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum)
+        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.levelCoralTiltAngle[0])
       ).until(() -> (elevator.inputs.zeroLimit || elevator.inputs.positionMeters <= 0.1))
+    );
+
+    algaeCollector.setDefaultCommand(
+      algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum)
     );
 
     if (isRed) {
@@ -250,8 +253,8 @@ public class RobotContainer {
       xboxDriver.start().onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
       xboxDriver.back().onTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
       xboxDriver.rightBumper().whileTrue(new InstantCommand(() -> slowMode()));
-      xboxDriver.leftTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
-      xboxDriver.rightTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
+      xboxDriver.leftTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, false, true));
+      xboxDriver.rightTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, true, true));
     } else {
       /* RESET NAVX HEADING */
       new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
@@ -264,25 +267,15 @@ public class RobotContainer {
       new JoystickButton(logitech, 12) // HP ALIGN
         .whileTrue(new PathfindToHPS(drivetrain, vision));
       new JoystickButton(logitech, 2) // LEFT REEF ALIGN
-        .whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
+        .whileTrue(new PathfindToReefCmd(drivetrain, vision, false, true));
   
       new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
-        .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
+        .whileTrue(new PathfindToReefCmd(drivetrain, vision, true, true));
     }
-
-    
 
     /* ========== */
     /* Drivetrain */
     /* ========== */
-
-    // /* RESET NAVX HEADING */
-    // new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
-    //   .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
-
-    // /* SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
-    // new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
-    //   .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
     // Drivetrain translation sysID routine (just drive motors) (wheels must be locked straight for this)
     // new JoystickButton(buttonBox, 1)
@@ -316,7 +309,7 @@ public class RobotContainer {
         coralCollector.intakeCommand()
       ));    
 
-    // // Processor
+    // Processor
     new JoystickButton(buttonBox, 7)
       .whileTrue(
         Commands.parallel(
@@ -324,7 +317,6 @@ public class RobotContainer {
           new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
         )
     );
-
 
     /* Toggle gyro 180 degree rotation */
     new JoystickButton(buttonBox, 15)
@@ -368,8 +360,8 @@ public class RobotContainer {
     // Intake/Outtake (on XboxController)
     new JoystickButton(xboxController, 4) // Y
       .whileTrue(algaeCollector.intakeCommand());
-    new JoystickButton(xboxController, 3) // X
-      .whileTrue(algaeCollector.outtakeCommand());
+    // new JoystickButton(xboxController, 3) // X
+    //   .whileTrue(algaeCollector.outtakeCommand());
 
     // // Tilt up/down
     new JoystickButton(buttonBox, 5)
@@ -385,17 +377,15 @@ public class RobotContainer {
       .whileTrue(new ParallelCommandGroup(
         new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.highAlgaeHeight)),
         algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-        algaeCollector.outtakeCommand().until(() -> algaeCollector.inputs.hasAlgae)
-      )
-    );
+        algaeCollector.intakeCommand())
+      );
     // Lower Algae
     new JoystickButton(buttonBox, 12).and(() -> buttonBox.getRawButton(16))
       .whileTrue(new ParallelCommandGroup(
         new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.lowAlgaeHeight)),
         algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-        algaeCollector.outtakeCommand().until(() -> algaeCollector.inputs.hasAlgae)
-      )
-    );
+        algaeCollector.intakeCommand())
+      );
 
     // Algae sysID routine
     // new JoystickButton(buttonBox, 5)

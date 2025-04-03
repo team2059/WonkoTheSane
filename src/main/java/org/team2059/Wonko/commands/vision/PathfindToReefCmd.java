@@ -3,6 +3,7 @@ package org.team2059.Wonko.commands.vision;
 import java.util.Set;
 
 import org.team2059.Wonko.Constants.VisionConstants;
+import org.team2059.Wonko.commands.drive.PIDSwerve;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.vision.Vision;
 
@@ -32,24 +33,38 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
     Drivetrain drivetrain;
     Vision vision;
 
+    Transform3d tagToGoalFinal;
+
     Transform3d tagToGoal;
 
     boolean isRight;
+    boolean usePathfinder;
 
     public PathfindToReefCmd (
         Drivetrain drivetrain,
         Vision vision,
-        boolean isRight
+        boolean isRight,
+        boolean usePathfinder
     ){
         this.drivetrain = drivetrain; 
         this.vision = vision;
 
         this.isRight = isRight;
+        this.usePathfinder = usePathfinder;
 
         // This is our ideal end state: 40in back and centered on tag (relative to robot center)
 
+        tagToGoal = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(VisionConstants.initialReefOffsetInches),
+                0,
+                0
+            ),
+            new Rotation3d(0, 0, Math.PI)
+        );
+
         if (isRight) {
-            tagToGoal = new Transform3d(
+            tagToGoalFinal = new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(VisionConstants.reefXOffsetInches),
                     Units.inchesToMeters(VisionConstants.reefYRightOffsetInches),
@@ -58,7 +73,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
                 new Rotation3d(0, 0, Math.PI)
             );
         } else {
-            tagToGoal = new Transform3d(
+            tagToGoalFinal = new Transform3d(
                 new Translation3d(
                     Units.inchesToMeters(VisionConstants.reefXOffsetInches),
                     Units.inchesToMeters(VisionConstants.reefYLeftOffsetInches),
@@ -75,12 +90,10 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         // Add your commands in the addCommands() call, e.g.
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
-            new InstantCommand(() -> {vision.inputs.upperIsOn = false;}),
             new InstantCommand(() -> drivetrain.stopAllMotors()),
             new WaitCommand(0.2),
             new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
-            new InstantCommand(() -> drivetrain.stopAllMotors()),
-            new InstantCommand(() -> {vision.inputs.upperIsOn = true;})
+            new InstantCommand(() -> drivetrain.stopAllMotors())
         );
     }
     
@@ -106,23 +119,26 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
 
             // Calculate end state
             var goalPose = targetPose.get().transformBy(tagToGoal).toPose2d();
+            var goalPoseFinal = targetPose.get().transformBy(tagToGoalFinal).toPose2d();
 
-            return AutoBuilder.pathfindToPose(
-                goalPose, 
-                new PathConstraints(
-                    2.5, 
-                    1.5,
-                    Units.degreesToRadians(540),
-                    Units.degreesToRadians(720)
-                )
-            ).andThen(
-                new GoToPosePID(
-                    drivetrain,
-                    tagId,
-                    VisionConstants.reefXOffsetInches,
-                    (isRight ? VisionConstants.reefYRightOffsetInches : VisionConstants.reefYLeftOffsetInches)
-                ).withTimeout(0.45)
-            );
+            if (usePathfinder) {
+                return AutoBuilder.pathfindToPose(
+                    goalPose, 
+                    new PathConstraints(
+                        3.5, 
+                        2.5,
+                        Units.degreesToRadians(540),
+                        Units.degreesToRadians(720)
+                    )
+                ).andThen(
+                    new PIDSwerve(
+                        drivetrain, 
+                        goalPoseFinal
+                    )
+                );
+            } else {
+                return new PIDSwerve(drivetrain, goalPoseFinal);
+            }
 
         } else {
             return new InstantCommand(

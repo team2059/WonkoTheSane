@@ -52,13 +52,13 @@ public final class AutoCommands {
     ) {
 
         /* Timeouts */
-        final double alignToReefTimeout = 2.2;
+        final double alignToReefTimeout = 1;
 
         /* Coral Score */
         NamedCommands.registerCommand(
             "ScoreL4", 
             new ElevateToReefLevelCmd(4, coralCollector, elevator)
-                .withTimeout(1.75)
+                .withTimeout(2)
                 .andThen(
                     Commands.parallel(
                         new ElevateToReefLevelCmd(4, coralCollector, elevator),
@@ -98,24 +98,16 @@ public final class AutoCommands {
 
         /* Align to Reef */
         NamedCommands.registerCommand(
-            "AlignToReefRight",
-            Commands.sequence(
-                Commands.parallel(
-                    new PathfindToReefAutoCmd(drivetrain, vision, true)
-                ),
-                logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!")
-            )
+            "AlignToReefLeft", 
+            new PathfindToReefCmd(drivetrain, vision, false, false)
             .withTimeout(alignToReefTimeout)
+            .andThen(logToConsoleCommand("[auto] LEFT REEF ALIGN COMPLETE!"))
         );
         NamedCommands.registerCommand(
-            "AlignToReefLeft",
-            Commands.sequence(
-                Commands.parallel(
-                    new PathfindToReefAutoCmd(drivetrain, vision, false)
-                ),
-                logToConsoleCommand("[auto] LEFT REEF ALIGN COMPLETE!")
-            )
+            "AlignToReefRight", 
+            new PathfindToReefCmd(drivetrain, vision, false, false)
             .withTimeout(alignToReefTimeout)
+            .andThen(logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!"))
         );
 
         /* Human Player Station */

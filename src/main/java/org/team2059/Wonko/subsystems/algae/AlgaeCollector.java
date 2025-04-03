@@ -33,7 +33,7 @@ public class AlgaeCollector extends SubsystemBase {
     }
 
     public Command intakeCommand() {
-        return Commands.startEnd(() -> io.setIntakeSpeed(0.50), () -> io.setIntakeSpeed(0))
+        return Commands.startEnd(() -> io.setIntakeSpeed(-0.75), () -> io.setIntakeSpeed(0))
             .until(() -> inputs.hasAlgae)
             .andThen(new InstantCommand(() -> {
                 Elastic.sendNotification(AlgaeIntakeCompleteNotif);
@@ -41,11 +41,11 @@ public class AlgaeCollector extends SubsystemBase {
     }
 
     public Command outtakeCommand() {
-        return Commands.startEnd(() -> io.setIntakeSpeed(-0.75), () -> io.stopIntake());
+        return Commands.startEnd(() -> io.setIntakeSpeed(0.75), () -> io.stopIntake());
     }
 
     public Command setTiltSetpointCmd(Angle targetAngle) {
-        return Commands.run(
+        return this.run(
             () -> io.setTiltPos(targetAngle.in(Radians))
         );
     }

@@ -269,8 +269,10 @@ public final class Constants {
     public static final Distance reefAlignRightStrafeOffset = Inches.of(4);
 
     public static final double reefXOffsetInches = 15;
-    public static final double reefYRightOffsetInches = 7.5;
+    public static final double reefYRightOffsetInches = 6;
     public static final double reefYLeftOffsetInches = -7.2;
+
+    public static final double initialReefOffsetInches = 40;
 
     public static final double hpXOffsetInches = 15;
     public static final double hpYOffsetInches = 0;
@@ -285,17 +287,15 @@ public final class Constants {
     // DIO IDs
     public static final int irSensorDio = 7;
 
-    public static final double horizontalOffset = -2.16; // Add this value to the raw thrubore reading to have 0 reported at the horizontal.
-
     // Conv. factors (2pi/GR to get Radians)
     public static final double tiltMotorPositionConvFactor = 0.1396263402;
     public static final double tiltMotorVelocityConvFactor = 0.00232710567;
 
     // Hard limits
-    public static final Angle thruBoreMinimum = Radians.of(1.54);
-    public static final Angle thruBoreMaximum = Radians.of(3.01); // 1.2
+    public static final Angle thruBoreMinimum = Radians.of(-0.77);
+    public static final Angle thruBoreMaximum = Radians.of(1.11);
 
-    public static final double lowAlgaeHeight = 1.35; 
+    public static final double lowAlgaeHeight = 1.65; 
     public static final double highAlgaeHeight = 2; 
 
     public static final Current stallDetection = Amps.of(10);
