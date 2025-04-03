@@ -292,8 +292,11 @@ public final class Constants {
     public static final double tiltMotorVelocityConvFactor = 0.00232710567;
 
     // Hard limits
-    public static final Angle thruBoreMinimum = Radians.of(0);
-    public static final Angle thruBoreMaximum = Radians.of(1.4); // 1.2
+    public static final Angle thruBoreMinimum = Radians.of(1.54);
+    public static final Angle thruBoreMaximum = Radians.of(3.01); // 1.2
+
+    public static final double lowAlgaeHeight = 1.35; 
+    public static final double highAlgaeHeight = 2; 
 
     public static final Current stallDetection = Amps.of(10);
   }

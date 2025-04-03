@@ -18,7 +18,6 @@ import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmdXbox;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.GoToPosePID;
 import org.team2059.Wonko.commands.vision.PathfindToHPS;
 import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
@@ -312,19 +311,18 @@ public class RobotContainer {
     // Human player station (No longer needed due to funnel)
     new JoystickButton(buttonBox, 8)
       .whileTrue(Commands.parallel(
-        // new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-        // coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
+        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
+        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
         coralCollector.intakeCommand()
       ));    
 
     // // Processor
     new JoystickButton(buttonBox, 7)
       .whileTrue(
-        // Commands.parallel(
-        //   algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-        //   new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
-        // )
-        coralCollector.outtakeCommand()
+        Commands.parallel(
+          algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
+          new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
+        )
     );
 
 
@@ -385,17 +383,17 @@ public class RobotContainer {
     // Upper Algae
     new JoystickButton(buttonBox, 12).and(() -> !buttonBox.getRawButton(16))
       .whileTrue(new ParallelCommandGroup(
-        new ElevateToSetpointCmd(elevator, Meters.of(1.7)),
+        new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.highAlgaeHeight)),
         algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-        algaeCollector.intakeCommand().until(() -> algaeCollector.inputs.hasAlgae)
+        algaeCollector.outtakeCommand().until(() -> algaeCollector.inputs.hasAlgae)
       )
     );
     // Lower Algae
     new JoystickButton(buttonBox, 12).and(() -> buttonBox.getRawButton(16))
       .whileTrue(new ParallelCommandGroup(
-        new ElevateToSetpointCmd(elevator, Meters.of(1.13)),
+        new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.lowAlgaeHeight)),
         algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-        algaeCollector.intakeCommand().until(() -> algaeCollector.inputs.hasAlgae)
+        algaeCollector.outtakeCommand().until(() -> algaeCollector.inputs.hasAlgae)
       )
     );
 
