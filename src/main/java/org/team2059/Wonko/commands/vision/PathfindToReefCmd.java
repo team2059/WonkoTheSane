@@ -91,7 +91,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         // addCommands(new FooCommand(), new BarCommand());
         addCommands(
             new InstantCommand(() -> drivetrain.stopAllMotors()),
-            new WaitCommand(0.2),
+            new WaitCommand(0.33),
             new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
             new InstantCommand(() -> drivetrain.stopAllMotors())
         );

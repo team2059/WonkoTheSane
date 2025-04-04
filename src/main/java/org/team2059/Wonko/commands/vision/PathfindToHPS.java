@@ -3,6 +3,7 @@ package org.team2059.Wonko.commands.vision;
 import java.util.Set;
 
 import org.team2059.Wonko.Constants.VisionConstants;
+import org.team2059.Wonko.commands.drive.PIDSwerve;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.vision.Vision;
 
@@ -17,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /**
  * Command which goes to either the left or right stem of a reef tag using pathfinding.
@@ -34,18 +34,34 @@ public class PathfindToHPS extends SequentialCommandGroup{
 
     Transform3d tagToGoal;
 
+    Transform3d tagToGoalFinal;
+
+    boolean usePathfinder;
+
     public PathfindToHPS (
         Drivetrain drivetrain,
-        Vision vision
+        Vision vision,
+        boolean usePathfinder
     ){
         this.drivetrain = drivetrain; 
         this.vision = vision;
 
+        this.usePathfinder = usePathfinder;
+
         // This is our ideal end state: 40in back and centered on tag (relative to robot center)
+        tagToGoalFinal = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(18),
+                0,
+                0
+            ),
+            new Rotation3d(0, 0, Math.PI)
+        );
+
         tagToGoal = new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(15),
-                Units.inchesToMeters(0),
+                Units.inchesToMeters(40),
+                0,
                 0
             ),
             new Rotation3d(0, 0, Math.PI)
@@ -84,16 +100,21 @@ public class PathfindToHPS extends SequentialCommandGroup{
 
             // Calculate end state
             var goalPose = targetPose.get().transformBy(tagToGoal).toPose2d();
+            var goalPoseFinal = targetPose.get().transformBy(tagToGoalFinal).toPose2d();
 
-            return AutoBuilder.pathfindToPose(
-                goalPose, 
-                new PathConstraints(
-                    3.5, 
-                    2.5,
-                    Units.degreesToRadians(540),
-                    Units.degreesToRadians(720)
-                )
-            );
+            if (usePathfinder) {
+                return AutoBuilder.pathfindToPose(
+                    goalPose, 
+                    new PathConstraints(
+                        3.5, 
+                        2.5,
+                        Units.degreesToRadians(540),
+                        Units.degreesToRadians(720)
+                    )
+                ).andThen(new PIDSwerve(drivetrain, goalPoseFinal));
+            } else {
+                return new PIDSwerve(drivetrain, goalPoseFinal);
+            }
 
         } else {
             return new InstantCommand(() -> System.out.println("Conditions not met for human player align"));

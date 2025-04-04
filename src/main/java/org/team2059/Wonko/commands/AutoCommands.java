@@ -1,10 +1,12 @@
 package org.team2059.Wonko.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.commands.vision.PathfindToHPS;
-import org.team2059.Wonko.commands.vision.PathfindToReefAutoCmd;
 import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /** 
  * Organization class for registering all
@@ -58,7 +61,10 @@ public final class AutoCommands {
         NamedCommands.registerCommand(
             "ScoreL4", 
             new ElevateToReefLevelCmd(4, coralCollector, elevator)
-                .withTimeout(2)
+                .until(
+                    // () -> Math.abs(elevator.inputs.positionMeters - ElevatorConstants.levelHeights[4].in(Meters)) <= 0.04
+                    () -> Math.abs(coralCollector.inputs.tiltAbsPosRadians - CoralCollectorConstants.levelCoralTiltAngle[4].in(Radians)) <= 0.05
+                )
                 .andThen(
                     Commands.parallel(
                         new ElevateToReefLevelCmd(4, coralCollector, elevator),
@@ -72,18 +78,9 @@ public final class AutoCommands {
         NamedCommands.registerCommand(
             "IntakeCoral", 
             new ParallelCommandGroup(
-                new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-                coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
-                coralCollector.intakeCommand()    
-            ).until(() -> coralCollector.inputs.hasCoral)
-            .andThen(logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!"))
-        );
-
-        NamedCommands.registerCommand(
-            "IntakeFunnel", 
-            new ParallelCommandGroup(
                 coralCollector.intakeCommand()
             ).until(() -> coralCollector.inputs.hasCoral)
+            .andThen(logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!"))
         );
 
         /* Elevator Reset */
@@ -115,7 +112,7 @@ public final class AutoCommands {
             "AlignToHumanPlayer", 
             Commands.parallel(
                 Commands.sequence(
-                    new PathfindToHPS(drivetrain, vision),
+                    new PathfindToHPS(drivetrain, vision, false),
                     logToConsoleCommand("[auto] HUMAN PLAYER ALIGN COMPLETE!")
                 )
             )

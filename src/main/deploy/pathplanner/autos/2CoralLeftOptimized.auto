@@ -23,9 +23,22 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "ResetElevator"
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LeftToHPSlow"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ResetElevator"
+                }
+              }
+            ]
           }
         },
         {
@@ -37,19 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AlignToHumanPlayer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "IntakeFunnel"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ResetElevator"
           }
         },
         {
