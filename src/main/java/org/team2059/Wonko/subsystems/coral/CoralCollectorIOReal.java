@@ -18,6 +18,8 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 public class CoralCollectorIOReal implements CoralCollectorIO {
@@ -40,6 +42,8 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
     private LoggedTunableNumber kPTilt = new LoggedTunableNumber("CoralCollector/Tilt/kP", CoralCollectorConstants.kPTilt);
     private LoggedTunableNumber kITilt = new LoggedTunableNumber("CoralCollector/Tilt/kI", CoralCollectorConstants.kITilt);
     private LoggedTunableNumber kDTilt = new LoggedTunableNumber("CoralCollector/Tilt/kD", CoralCollectorConstants.kDTilt);
+
+    private Debouncer hasCoralDebounce;
 
     public CoralCollectorIOReal() {
         intakeMotor = new SparkFlex(CoralCollectorConstants.intakeMotorId, MotorType.kBrushless);
@@ -81,6 +85,8 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
 
         // Configure IR sensor - reports presence of coral
         irSensor = new DigitalInput(CoralCollectorConstants.irSensorDio);
+
+        hasCoralDebounce = new Debouncer(0.25, DebounceType.kRising);
     }
 
     @Override
@@ -113,7 +119,7 @@ public class CoralCollectorIOReal implements CoralCollectorIO {
         inputs.tiltAbsPosRadians = tiltAbsoluteEnc.getPosition();
         inputs.tiltMotorVelocityRadPerSec = tiltAbsoluteEnc.getVelocity();
 
-        inputs.hasCoral = !irSensor.get();
+        inputs.hasCoral = hasCoralDebounce.calculate(!irSensor.get());
 
         inputs.intakeMotorSpeed = intakeMotor.getEncoder().getVelocity();
     }

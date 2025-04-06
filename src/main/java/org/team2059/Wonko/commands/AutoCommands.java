@@ -1,13 +1,12 @@
 package org.team2059.Wonko.commands;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.PathfindToHPS;
-import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
+import org.team2059.Wonko.commands.vision.AlignToHumanPlayer;
+import org.team2059.Wonko.commands.vision.AlignToReef;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
@@ -19,8 +18,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 /** 
  * Organization class for registering all
@@ -55,7 +52,7 @@ public final class AutoCommands {
     ) {
 
         /* Timeouts */
-        final double alignToReefTimeout = 1;
+        final double alignToReefTimeout = 1.5;
 
         /* Coral Score */
         NamedCommands.registerCommand(
@@ -77,9 +74,8 @@ public final class AutoCommands {
         /* Coral Intake */
         NamedCommands.registerCommand(
             "IntakeCoral", 
-            new ParallelCommandGroup(
-                coralCollector.intakeCommand()
-            ).until(() -> coralCollector.inputs.hasCoral)
+            coralCollector.autoIntakeCmd()
+            .withTimeout(1.5)
             .andThen(logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!"))
         );
 
@@ -96,25 +92,25 @@ public final class AutoCommands {
         /* Align to Reef */
         NamedCommands.registerCommand(
             "AlignToReefLeft", 
-            new PathfindToReefCmd(drivetrain, vision, false, false)
+            new AlignToReef(drivetrain, vision, false, false)
             .withTimeout(alignToReefTimeout)
             .andThen(logToConsoleCommand("[auto] LEFT REEF ALIGN COMPLETE!"))
         );
         NamedCommands.registerCommand(
             "AlignToReefRight", 
-            new PathfindToReefCmd(drivetrain, vision, false, false)
+            new AlignToReef(drivetrain, vision, false, false)
             .withTimeout(alignToReefTimeout)
             .andThen(logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!"))
         );
 
+        final double humanPlayerAlignTimeout = 1.5;
         /* Human Player Station */
         NamedCommands.registerCommand(
             "AlignToHumanPlayer", 
-            Commands.parallel(
-                Commands.sequence(
-                    new PathfindToHPS(drivetrain, vision, false),
-                    logToConsoleCommand("[auto] HUMAN PLAYER ALIGN COMPLETE!")
-                )
+            Commands.sequence(
+                new AlignToHumanPlayer(drivetrain, vision, false)
+                .withTimeout(humanPlayerAlignTimeout),
+                logToConsoleCommand("[auto] HUMAN PLAYER ALIGN COMPLETE!")
             )
         );
     }

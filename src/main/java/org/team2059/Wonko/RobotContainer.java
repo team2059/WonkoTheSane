@@ -18,8 +18,8 @@ import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmdXbox;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.PathfindToHPS;
-import org.team2059.Wonko.commands.vision.PathfindToReefCmd;
+import org.team2059.Wonko.commands.vision.AlignToHumanPlayer;
+import org.team2059.Wonko.commands.vision.AlignToReef;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
 import org.team2059.Wonko.subsystems.climber.Climber;
@@ -34,12 +34,10 @@ import org.team2059.Wonko.subsystems.vision.Vision;
 import org.team2059.Wonko.subsystems.vision.VisionIOReal;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -176,19 +174,6 @@ public class RobotContainer {
     /* LOGGING */
     /* ======= */
 
-    // Field for PathPlanner debugging
-    var field = new Field2d();
-    SmartDashboard.putData(field);
-    PathPlannerLogging.setLogCurrentPoseCallback((pose) -> { // current pose
-      field.setRobotPose(pose);
-    });
-    PathPlannerLogging.setLogTargetPoseCallback((pose) -> { // target pose
-      field.getObject("target pose").setPose(pose);
-    });
-    PathPlannerLogging.setLogActivePathCallback((poses) -> { // active path (list of poses)
-      field.getObject("trajectory").setPoses(poses);
-    });
-
     // Build info
     SmartDashboard.putString("ProjectName", "WonkoTheSane");
     SmartDashboard.putString("BuildDate", BuildConstants.BUILD_DATE);
@@ -226,8 +211,8 @@ public class RobotContainer {
 
     configureBindings();
 
-
   }
+
   public void slowMode() {
     if (isSlowMode) {
       isSlowMode = false;
@@ -251,8 +236,8 @@ public class RobotContainer {
       xboxDriver.start().onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
       xboxDriver.back().onTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
       xboxDriver.rightBumper().whileTrue(new InstantCommand(() -> slowMode()));
-      xboxDriver.leftTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, false, true));
-      xboxDriver.rightTrigger().whileTrue(new PathfindToReefCmd(drivetrain, vision, true, true));
+      xboxDriver.leftTrigger().whileTrue(new AlignToReef(drivetrain, vision, false, true));
+      xboxDriver.rightTrigger().whileTrue(new AlignToReef(drivetrain, vision, true, true));
     } else {
       /* RESET NAVX HEADING */
       new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
@@ -263,17 +248,19 @@ public class RobotContainer {
         .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
       new JoystickButton(logitech, 12) // HP ALIGN
-        .whileTrue(new PathfindToHPS(drivetrain, vision, true));
+        .whileTrue(new AlignToHumanPlayer(drivetrain, vision, false));
       new JoystickButton(logitech, 2) // LEFT REEF ALIGN
-        .whileTrue(new PathfindToReefCmd(drivetrain, vision, false, false));
+        .whileTrue(new AlignToReef(drivetrain, vision, false, false));
   
       new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
-        .whileTrue(new PathfindToReefCmd(drivetrain, vision, true, false));
+        .whileTrue(new AlignToReef(drivetrain, vision, true, false));
     }
 
     /* ========== */
     /* Drivetrain */
     /* ========== */
+
+    // Gyro reset & field relative buttons are above (switched for Xbox and Logitech controllers)
 
     // Drivetrain translation sysID routine (just drive motors) (wheels must be locked straight for this)
     // new JoystickButton(buttonBox, 1)
@@ -300,12 +287,12 @@ public class RobotContainer {
       .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
     
     // Human player station (No longer needed due to funnel)
-    new JoystickButton(buttonBox, 8)
-      .whileTrue(Commands.parallel(
-        new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-        coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
-        coralCollector.intakeCommand()
-      ));    
+    // new JoystickButton(buttonBox, 8)
+    //   .whileTrue(Commands.parallel(
+    //     new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
+    //     coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
+    //     coralCollector.intakeCommand()
+    //   ));
 
     // Processor
     new JoystickButton(buttonBox, 7)
@@ -336,7 +323,7 @@ public class RobotContainer {
     /* =============== */
     
     // Intake/Outtake (on XboxController)
-    new JoystickButton(xboxController, 2) // B
+    new JoystickButton(xboxController, 2).or(() -> buttonBox.getRawButton(8)) // B
       .whileTrue(coralCollector.intakeCommand());
     new JoystickButton(xboxController, 1) // A
       .whileTrue(coralCollector.outtakeCommand());

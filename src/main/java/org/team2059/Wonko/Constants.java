@@ -269,8 +269,8 @@ public final class Constants {
     public static final Distance reefAlignRightStrafeOffset = Inches.of(4);
 
     public static final double reefXOffsetInches = 15;
-    public static final double reefYRightOffsetInches = 6;
-    public static final double reefYLeftOffsetInches = -7.2;
+    // public static final double reefYRightOffsetInches = 6;
+    // public static final double reefYLeftOffsetInches = -7.2;
 
     public static final double initialReefOffsetInches = 40;
 
@@ -295,8 +295,8 @@ public final class Constants {
     public static final Angle thruBoreMinimum = Radians.of(-0.77);
     public static final Angle thruBoreMaximum = Radians.of(1.11);
 
-    public static final double lowAlgaeHeight = 1.65; 
-    public static final double highAlgaeHeight = 2; 
+    public static final double lowAlgaeHeight = 1.55; 
+    public static final double highAlgaeHeight = 2.1; 
 
     public static final Current stallDetection = Amps.of(10);
   }

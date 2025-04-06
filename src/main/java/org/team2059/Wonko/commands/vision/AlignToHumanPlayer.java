@@ -28,60 +28,45 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
  * then aligns to either left or right side of reef using PID in x, y, theta dimensions.
  */
 
-public class PathfindToReefCmd extends SequentialCommandGroup{
+public class AlignToHumanPlayer extends SequentialCommandGroup{
     
     Drivetrain drivetrain;
     Vision vision;
 
-    Transform3d tagToGoalFinal;
-
     Transform3d tagToGoal;
 
-    boolean isRight;
+    Transform3d tagToGoalFinal;
+
     boolean usePathfinder;
 
-    public PathfindToReefCmd (
+    public AlignToHumanPlayer (
         Drivetrain drivetrain,
         Vision vision,
-        boolean isRight,
         boolean usePathfinder
     ){
         this.drivetrain = drivetrain; 
         this.vision = vision;
 
-        this.isRight = isRight;
         this.usePathfinder = usePathfinder;
 
         // This is our ideal end state: 40in back and centered on tag (relative to robot center)
-
-        tagToGoal = new Transform3d(
+        tagToGoalFinal = new Transform3d(
             new Translation3d(
-                Units.inchesToMeters(VisionConstants.initialReefOffsetInches),
+                Units.inchesToMeters(18),
                 0,
                 0
             ),
             new Rotation3d(0, 0, Math.PI)
         );
 
-        if (isRight) {
-            tagToGoalFinal = new Transform3d(
-                new Translation3d(
-                    Units.inchesToMeters(VisionConstants.reefXOffsetInches),
-                    Units.inchesToMeters(VisionConstants.reefYRightOffsetInches),
-                    0
-                ),
-                new Rotation3d(0, 0, Math.PI)
-            );
-        } else {
-            tagToGoalFinal = new Transform3d(
-                new Translation3d(
-                    Units.inchesToMeters(VisionConstants.reefXOffsetInches),
-                    Units.inchesToMeters(VisionConstants.reefYLeftOffsetInches),
-                    0
-                ),
-                new Rotation3d(0, 0, Math.PI)
-            );
-        }
+        tagToGoal = new Transform3d(
+            new Translation3d(
+                Units.inchesToMeters(40),
+                0,
+                0
+            ),
+            new Rotation3d(0, 0, Math.PI)
+        );
 
         // Require both vision & drivetrain subsystems
         // This ensures no conflicting commands will be run
@@ -92,8 +77,7 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
         addCommands(
             new InstantCommand(() -> drivetrain.stopAllMotors()),
             new WaitCommand(0.33),
-            new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision)),
-            new InstantCommand(() -> drivetrain.stopAllMotors())
+            new DeferredCommand(() -> getPathfindCommand(), Set.of(drivetrain, vision))
         );
     }
     
@@ -107,14 +91,13 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
      */
     public Command getPathfindCommand() {
         if (
-            vision.inputs.hasLowerTarget &&
-            vision.inputs.lowerBestTarget != null &&
-            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.5 &&
-            VisionConstants.redReefTags.contains(vision.inputs.lowerBestTargetID) || VisionConstants.blueReefTags.contains(vision.inputs.lowerBestTargetID)
-        ) {
+            vision.inputs.hasUpperTarget &&
+            vision.inputs.upperBestTarget != null &&
+            vision.inputs.upperBestTarget.getPoseAmbiguity() <= 0.5
+        ) { 
             
             // Grab pose of tag
-            int tagId = vision.inputs.lowerBestTargetID;
+            int tagId = vision.inputs.upperBestTargetID;
             var targetPose = VisionConstants.aprilTagFieldLayout.getTagPose(tagId);
 
             // Calculate end state
@@ -130,22 +113,13 @@ public class PathfindToReefCmd extends SequentialCommandGroup{
                         Units.degreesToRadians(540),
                         Units.degreesToRadians(720)
                     )
-                ).andThen(
-                    new PIDSwerve(
-                        drivetrain, 
-                        goalPoseFinal
-                    )
-                );
+                ).andThen(new PIDSwerve(drivetrain, goalPoseFinal));
             } else {
                 return new PIDSwerve(drivetrain, goalPoseFinal);
             }
 
         } else {
-            return new InstantCommand(
-                () -> {
-                    System.out.println("Conditions Not Met For Auto Alignment To Reef");
-                }
-            );
-        }
+            return new InstantCommand(() -> System.out.println("Conditions not met for human player align"));
+        }   
     }
 }

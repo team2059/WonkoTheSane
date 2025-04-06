@@ -16,6 +16,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -25,6 +26,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
@@ -44,6 +47,8 @@ public class Drivetrain extends SubsystemBase {
   private final Vision vision;
 
   public final DrivetrainRoutine routine;
+
+  private Field2d field = new Field2d();
 
   public Drivetrain(Vision vision, GyroIO gyro) {
 
@@ -161,6 +166,15 @@ public class Drivetrain extends SubsystemBase {
 
     // Configure auto builder last
     configureAutoBuilder();
+
+    PathPlannerLogging.setLogTargetPoseCallback((pose) -> { // target pose
+      field.getObject("target pose").setPose(pose);
+    });
+    PathPlannerLogging.setLogActivePathCallback((poses) -> { // active path (list of poses)
+      field.getObject("trajectory").setPoses(poses);
+    });
+
+    SmartDashboard.putData(field);
   }
 
   /**
@@ -420,6 +434,7 @@ public class Drivetrain extends SubsystemBase {
 
     // Logging
     Logger.recordOutput("Pose", getPose());
+    field.setRobotPose(getPose());
     Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
     Logger.recordOutput("Real States", getStates());
   }

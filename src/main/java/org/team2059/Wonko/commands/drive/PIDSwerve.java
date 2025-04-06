@@ -73,6 +73,11 @@ public class PIDSwerve extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (false);
+    return (
+      Math.abs(goalPose.getX() - drivetrain.getPose().getX()) <= 0.05 &&
+      Math.abs(goalPose.getY() - drivetrain.getPose().getY()) <= 0.05 &&
+      Math.abs(goalPose.getTranslation().getAngle().getDegrees() - drivetrain.getPose().getRotation().getDegrees()) <= 1.0
+    );
+    
   }
 }

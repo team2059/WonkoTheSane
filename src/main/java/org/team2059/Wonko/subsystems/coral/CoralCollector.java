@@ -38,6 +38,10 @@ public class CoralCollector extends SubsystemBase {
             }));
     }
 
+    public Command autoIntakeCmd() {
+        return Commands.startEnd(() -> io.setIntakeSpeed(1000), () -> io.setIntakeSpeed(0));
+    }
+
     public Command outtakeCommand() { // Command factory for coral outtake/release.
         return Commands.startEnd(() -> io.setIntakeSpeed(-1000), () -> io.setIntakeSpeed(0));
     }
