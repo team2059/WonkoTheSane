@@ -73,11 +73,11 @@ public class RobotContainer {
   public static JoystickButton upperCamSwitch;
   public static JoystickButton lowerCamSwitch;
 
-  public static Supplier<Double> strafe;
-  public static Supplier<Double> translation;
-  public static Supplier<Double> rotation;
+  public static Supplier<Double> strafe; 
+  public static Supplier<Double> translation; 
+  public static Supplier<Double> rotation; 
 
-  public static boolean isRed = false;
+  public static boolean isRed = false; 
 
   public static boolean isSlowMode;
 
@@ -100,7 +100,7 @@ public class RobotContainer {
     /* =========== */
     /* CONTROLLERS */
     /* =========== */
-
+    
     xboxDriver = new CommandXboxController(OperatorConstants.xboxDriverPort);
     logitech = new Joystick(OperatorConstants.logitechPort);
     buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
@@ -120,27 +120,27 @@ public class RobotContainer {
     // Default commands run when the subsystem in question has no scheduled commands requiring it.
     if (OperatorConstants.useXboxForDriving) {
       drivetrain.setDefaultCommand(
-              new TeleopDriveCmdXbox(
-                      drivetrain,
-                      () -> -strafe.get(), // forwardX
-                      () -> -translation.get(), // forwardY
-                      () -> -rotation.get(), // rotation
-                      () -> isSlowMode
-              ));
+      new TeleopDriveCmdXbox(
+        drivetrain, 
+        () -> -strafe.get(), // forwardX
+        () -> -translation.get(), // forwardY
+        () -> -rotation.get(), // rotation
+        () -> isSlowMode
+      )); 
     } else {
       drivetrain.setDefaultCommand(
-              new TeleopDriveCmd(
-                      drivetrain,
-                      () -> -logitech.getRawAxis(OperatorConstants.JoystickTranslationAxis), // forwardX
-                      () -> -logitech.getRawAxis(OperatorConstants.JoystickStrafeAxis), // forwardY
-                      () -> -logitech.getRawAxis(OperatorConstants.JoystickRotationAxis), // rotation
-                      () -> logitech.getRawAxis(OperatorConstants.JoystickSliderAxis), // slider
-                      () -> logitech.getRawButton(OperatorConstants.JoystickStrafeOnly), // Strafe Only Button
-                      () -> logitech.getRawButton(OperatorConstants.JoystickInvertedDrive) // Inverted button
-              )
+      new TeleopDriveCmd(
+        drivetrain, 
+        () -> -logitech.getRawAxis(OperatorConstants.JoystickTranslationAxis), // forwardX
+        () -> -logitech.getRawAxis(OperatorConstants.JoystickStrafeAxis), // forwardY
+        () -> -logitech.getRawAxis(OperatorConstants.JoystickRotationAxis), // rotation
+        () -> logitech.getRawAxis(OperatorConstants.JoystickSliderAxis), // slider
+        () -> logitech.getRawButton(OperatorConstants.JoystickStrafeOnly), // Strafe Only Button
+        () -> logitech.getRawButton(OperatorConstants.JoystickInvertedDrive) // Inverted buytton
+      )
       );
     }
-
+    
     elevator.setDefaultCommand(
       Commands.parallel(
         new ElevateToSetpointCmd(elevator, ElevatorConstants.levelHeights[0]),
@@ -153,11 +153,11 @@ public class RobotContainer {
     );
 
     if (isRed) {
-      VisionConstants.HPTags = VisionConstants.redHPTags;
-      VisionConstants.reefTags = VisionConstants.redReefTags;
+      VisionConstants.HPTags = VisionConstants.redHPTags; 
+      VisionConstants.reefTags = VisionConstants.redReefTags; 
     } else {
-      VisionConstants.HPTags = VisionConstants.blueHPTags;
-      VisionConstants.reefTags = VisionConstants.blueReefTags;
+      VisionConstants.HPTags = VisionConstants.blueHPTags; 
+      VisionConstants.reefTags = VisionConstants.blueReefTags; 
     }
 
     /* ========== */
@@ -192,7 +192,7 @@ public class RobotContainer {
         break;
     }
 
-    // Allow viewing of command scheduler queue in dashboards
+    // Allow viewing of command scheduler queue in dashboards 
     SmartDashboard.putData(CommandScheduler.getInstance());
 
     // Publish subsystem status to dashboard
@@ -205,7 +205,7 @@ public class RobotContainer {
 
     // Publish auto chooser
     SmartDashboard.putData("Auto Chooser", autoChooser);
-
+  
     upperCamSwitch = new JoystickButton(buttonBox, 13);
     lowerCamSwitch = new JoystickButton(buttonBox, 14);
 
@@ -214,7 +214,11 @@ public class RobotContainer {
   }
 
   public void slowMode() {
-    isSlowMode = !isSlowMode;
+    if (isSlowMode) {
+      isSlowMode = false;
+    } else {
+      isSlowMode = true;
+    }
   }
 
   /**
@@ -231,25 +235,25 @@ public class RobotContainer {
     if (OperatorConstants.useXboxForDriving) {
       xboxDriver.start().onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
       xboxDriver.back().onTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
-      xboxDriver.rightBumper().whileTrue(new InstantCommand(this::slowMode));
+      xboxDriver.rightBumper().whileTrue(new InstantCommand(() -> slowMode()));
       xboxDriver.leftTrigger().whileTrue(new AlignToReef(drivetrain, vision, false, true));
       xboxDriver.rightTrigger().whileTrue(new AlignToReef(drivetrain, vision, true, true));
     } else {
       /* RESET NAVX HEADING */
       new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
-              .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
+        .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
 
       /* SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
       new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
-              .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
+        .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
       new JoystickButton(logitech, 12) // HP ALIGN
-              .whileTrue(new AlignToHumanPlayer(drivetrain, vision, false));
+        .whileTrue(new AlignToHumanPlayer(drivetrain, vision, false));
       new JoystickButton(logitech, 2) // LEFT REEF ALIGN
-              .whileTrue(new AlignToReef(drivetrain, vision, false, false));
-
+        .whileTrue(new AlignToReef(drivetrain, vision, false, false));
+  
       new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
-              .whileTrue(new AlignToReef(drivetrain, vision, true, false));
+        .whileTrue(new AlignToReef(drivetrain, vision, true, false));
     }
 
     /* ========== */
@@ -274,14 +278,14 @@ public class RobotContainer {
 
     // Reef levels
     new JoystickButton(buttonBox, 1) // L1
-            .whileTrue(new ElevateToReefLevelCmd(1, coralCollector, elevator));
+      .whileTrue(new ElevateToReefLevelCmd(1, coralCollector, elevator));
     new JoystickButton(buttonBox, 2) // L2
-            .whileTrue(new ElevateToReefLevelCmd(2, coralCollector, elevator));
+      .whileTrue(new ElevateToReefLevelCmd(2, coralCollector, elevator));
     new JoystickButton(buttonBox, 3) // L3
-            .whileTrue(new ElevateToReefLevelCmd(3, coralCollector, elevator));
+      .whileTrue(new ElevateToReefLevelCmd(3, coralCollector, elevator));
     new JoystickButton(buttonBox, 4) // L4
-            .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
-
+      .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
+    
     // Human player station (No longer needed due to funnel)
     // new JoystickButton(buttonBox, 8)
     //   .whileTrue(Commands.parallel(
@@ -292,17 +296,17 @@ public class RobotContainer {
 
     // Processor
     new JoystickButton(buttonBox, 7)
-            .whileTrue(
-                    Commands.parallel(
-                            algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-                            new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
-                    )
-            );
+      .whileTrue(
+        Commands.parallel(
+          algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
+          new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
+        )
+    );
 
     /* Toggle gyro 180 degree rotation */
     new JoystickButton(buttonBox, 15)
-            .onTrue(new InstantCommand(() -> drivetrain.set180GyroRotation(true)))
-            .onFalse(new InstantCommand(() -> drivetrain.set180GyroRotation(false)));
+      .onTrue(new InstantCommand(() -> drivetrain.set180GyroRotation(true)))
+      .onFalse(new InstantCommand(() -> drivetrain.set180GyroRotation(false)));
 
     // Elevator sysID routine
     // new JoystickButton(buttonBox, 5)
@@ -317,12 +321,12 @@ public class RobotContainer {
     /* =============== */
     /* Coral Collector */
     /* =============== */
-
+    
     // Intake/Outtake (on XboxController)
     new JoystickButton(xboxController, 2).or(() -> buttonBox.getRawButton(8)) // B
-            .whileTrue(coralCollector.intakeCommand());
+      .whileTrue(coralCollector.intakeCommand());
     new JoystickButton(xboxController, 1) // A
-            .whileTrue(coralCollector.outtakeCommand());
+      .whileTrue(coralCollector.outtakeCommand());
 
     // Coral collector sysID routine
     // new JoystickButton(buttonBox, 1)
@@ -340,33 +344,33 @@ public class RobotContainer {
 
     // Intake/Outtake (on XboxController)
     new JoystickButton(xboxController, 4) // Y
-            .whileTrue(algaeCollector.intakeCommand());
+      .whileTrue(algaeCollector.intakeCommand());
     // new JoystickButton(xboxController, 3) // X
     //   .whileTrue(algaeCollector.outtakeCommand());
 
     // // Tilt up/down
     new JoystickButton(buttonBox, 5)
-            .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum));
-    // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
+      .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum));
+      // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
     new JoystickButton(buttonBox, 6)
-            .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum));
-    // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
+      .whileTrue(algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum));
+      // .onFalse(new InstantCommand(() -> algaeCollector.io.stopTilt()));
 
     // Elevate & intake
     // Upper Algae
     new JoystickButton(buttonBox, 12).and(() -> !buttonBox.getRawButton(16))
-            .whileTrue(new ParallelCommandGroup(
-                    new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.highAlgaeHeight)),
-                    algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-                    algaeCollector.intakeCommand())
-            );
+      .whileTrue(new ParallelCommandGroup(
+        new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.highAlgaeHeight)),
+        algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
+        algaeCollector.intakeCommand())
+      );
     // Lower Algae
     new JoystickButton(buttonBox, 12).and(() -> buttonBox.getRawButton(16))
-            .whileTrue(new ParallelCommandGroup(
-                    new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.lowAlgaeHeight)),
-                    algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
-                    algaeCollector.intakeCommand())
-            );
+      .whileTrue(new ParallelCommandGroup(
+        new ElevateToSetpointCmd(elevator, Meters.of(AlgaeCollectorConstants.lowAlgaeHeight)),
+        algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMinimum),
+        algaeCollector.intakeCommand())
+      );
 
     // Algae sysID routine
     // new JoystickButton(buttonBox, 5)
@@ -384,9 +388,9 @@ public class RobotContainer {
 
     // Up/down
     new JoystickButton(buttonBox, 9)
-            .whileTrue(climber.climberUpCommand());
+      .whileTrue(climber.climberUpCommand());
     new JoystickButton(buttonBox, 10)
-            .whileTrue(climber.climberDownCommand());
+      .whileTrue(climber.climberDownCommand());
 
     /* ====== */
     /* Vision */
@@ -402,13 +406,13 @@ public class RobotContainer {
 
     // upperCamSwitch
     //   .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = false))
-    //   .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = true));
-
+    //   .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = true)); 
+    
     // lowerCamSwitch
     //   .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
-    //   .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true));
-  }
-
+    //   .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
+   }
+  
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
