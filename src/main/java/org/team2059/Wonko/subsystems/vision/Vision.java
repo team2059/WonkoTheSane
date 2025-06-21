@@ -23,6 +23,6 @@ public class Vision extends SubsystemBase {
     }
 
     public boolean hasTargets() {
-        return inputs.hasLowerTarget || inputs.hasUpperTarget;
+        return inputs.hasLowerTarget;
     }
 }

@@ -407,17 +407,6 @@ public class Drivetrain extends SubsystemBase {
       stopAllMotors();
     }
 
-    // if (!RobotContainer.upperCamSwitch.getAsBoolean()) {
-      var upperOptional = vision.io.getEstimatedUpperGlobalPose();
-
-      if (upperOptional.isPresent() && vision.io.getUpperCurrentStdDevs() != null) {
-        poseEstimator.addVisionMeasurement(
-            upperOptional.get().estimatedPose.toPose2d(),
-            upperOptional.get().timestampSeconds,
-            vision.io.getUpperCurrentStdDevs()
-        );
-      }
-    // }
     // if (!RobotContainer.lowerCamSwitch.getAsBoolean()) {
       var lowerOptional = vision.io.getEstimatedLowerGlobalPose();
       if (lowerOptional.isPresent() && vision.io.getLowerCurrentStdDevs() != null) {

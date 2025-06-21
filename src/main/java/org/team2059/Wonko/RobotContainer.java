@@ -18,7 +18,6 @@ import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmdXbox;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.AlignToHumanPlayer;
 import org.team2059.Wonko.commands.vision.AlignToReef;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
@@ -247,8 +246,6 @@ public class RobotContainer {
       new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
         .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
-      new JoystickButton(logitech, 12) // HP ALIGN
-        .whileTrue(new AlignToHumanPlayer(drivetrain, vision, false));
       new JoystickButton(logitech, 2) // LEFT REEF ALIGN
         .whileTrue(new AlignToReef(drivetrain, vision, false, false));
   

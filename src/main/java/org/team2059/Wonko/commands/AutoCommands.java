@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Radians;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.AlignToHumanPlayer;
 import org.team2059.Wonko.commands.vision.AlignToReef;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
@@ -103,15 +102,15 @@ public final class AutoCommands {
             .andThen(logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!"))
         );
 
-        final double humanPlayerAlignTimeout = 1.5;
-        /* Human Player Station */
-        NamedCommands.registerCommand(
-            "AlignToHumanPlayer", 
-            Commands.sequence(
-                new AlignToHumanPlayer(drivetrain, vision, false)
-                .withTimeout(humanPlayerAlignTimeout),
-                logToConsoleCommand("[auto] HUMAN PLAYER ALIGN COMPLETE!")
-            )
-        );
+//        final double humanPlayerAlignTimeout = 1.5;
+//        /* Human Player Station */
+//        NamedCommands.registerCommand(
+//            "AlignToHumanPlayer",
+//            Commands.sequence(
+//                new AlignToHumanPlayer(drivetrain, vision, false)
+//                .withTimeout(humanPlayerAlignTimeout),
+//                logToConsoleCommand("[auto] HUMAN PLAYER ALIGN COMPLETE!")
+//            )
+//        );
     }
 }
