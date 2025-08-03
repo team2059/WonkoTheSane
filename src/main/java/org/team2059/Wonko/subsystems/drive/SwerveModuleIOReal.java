@@ -32,21 +32,13 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
     private final PIDController rotationPidController;
 
-    private final PIDController drivePidController;
-
-    private final SimpleMotorFeedforward driveFF;
-
     public SwerveModuleIOReal(
         int driveMotorId,
         int rotationMotorId,
         int canCoderId,
         double canCoderOffsetRadians,
         boolean isDriveInverted,
-        boolean isRotationInverted,
-        double kS,
-        double kV,
-        double kA,
-        double kP
+        boolean isRotationInverted
     ) {
         // Motor controllers
         driveMotor = new SparkFlex(driveMotorId, MotorType.kBrushless);
@@ -76,10 +68,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
         rotationPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         rotationPidController.setTolerance(Units.degreesToRadians(1));
-
-        drivePidController = new PIDController(kP, 0, 0);
-
-        driveFF = new SimpleMotorFeedforward(kS, kV, kA);
 
         canCoder = new CANcoder(canCoderId);
         offset = new Rotation2d(canCoderOffsetRadians);
@@ -271,7 +259,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
     //     // Direct set, won't be as accurate
     //     driveMotor.set(state.speedMetersPerSecond / DrivetrainConstants.maxVelocity);
     //   }
-      driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond) + drivePidController.calculate(state.speedMetersPerSecond));
+      driveMotor.setVoltage(DrivetrainConstants.driveFF.calculate(state.speedMetersPerSecond));
     }
 
     @Override
