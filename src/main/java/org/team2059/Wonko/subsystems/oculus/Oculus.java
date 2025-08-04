@@ -54,6 +54,7 @@ public class Oculus extends SubsystemBase {
     poseFrames = questNav.getAllUnreadPoseFrames();
 
     Logger.recordOutput("QuestNavConnected", questNav.isConnected());
+    Logger.recordOutput("QuestNavLostTracking", questNav.getTrackingLostCounter().getAsInt());
     Logger.recordOutput("QuestNavBatt", questNav.getBatteryPercent().getAsInt());
     Logger.recordOutput("QuestNavRobotPose", getRobotPose());
   }
