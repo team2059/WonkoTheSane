@@ -14,10 +14,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -35,7 +32,24 @@ import edu.wpi.first.units.measure.Distance;
  * constants are needed, to reduce verbosly.
  */
 public final class Constants {
-  
+
+  public static class OculusConstants {
+    /**
+     * Standard deviations representing how much we "trust" the position from the Oculus. By default,
+     * the Quest 3 provides sub-centimeter accuracy. Values represent: [0]: X position trust (50mm)
+     * [1]: Y position trust (50mm) [2]: Rotation trust (~2.87 degrees)
+     */
+    public static final Matrix<N3, N1> stdDevs = VecBuilder.fill(
+      0.02, // Trust down to 2cm in X direction
+      0.02, // Trust down to 2cm in Y direction
+      0.035 // Trust down to 2 degrees rotational
+    );
+
+    // Geometrical transform from robot center to Quest
+    //\left(-0.23854354,0.06445393\right)
+    public static final Transform2d ROBOT_TO_QUEST = new Transform2d(0.06445393, 0.23854354, Rotation2d.kCCW_90deg);
+  }
+
   public static class OperatorConstants {
 
     // Sets whether or not tunable numbers can be changed. If false, only defaults will be used.

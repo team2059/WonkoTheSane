@@ -41,7 +41,7 @@ public class AlignToReef extends SequentialCommandGroup{
     boolean isRight;
     boolean usePathfinder;
 
-    private LoggedTunableNumber reefLeftOffsetInches = new LoggedTunableNumber("AlignToReef/LeftOffsetInches", -7);
+    private LoggedTunableNumber reefLeftOffsetInches = new LoggedTunableNumber("AlignToReef/LeftOffsetInches", -6);
     private LoggedTunableNumber reefRightOffsetInches = new LoggedTunableNumber("AlignToReef/RightOffsetInches", 6);
 
     public AlignToReef (
@@ -116,7 +116,9 @@ public class AlignToReef extends SequentialCommandGroup{
             vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.5 &&
             VisionConstants.redReefTags.contains(vision.inputs.lowerBestTargetID) || VisionConstants.blueReefTags.contains(vision.inputs.lowerBestTargetID)
         ) {
-            
+
+            vision.syncWithOculus();
+
             // Grab pose of tag
             int tagId = vision.inputs.lowerBestTargetID;
             var targetPose = VisionConstants.aprilTagFieldLayout.getTagPose(tagId);

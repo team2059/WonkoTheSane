@@ -4,12 +4,15 @@
 
 package org.team2059.Wonko.subsystems.drive;
 
+import com.ctre.phoenix6.hardware.Pigeon2;
+import gg.questnav.questnav.PoseFrame;
 import org.littletonrobotics.junction.Logger;
 import org.team2059.Wonko.Constants;
 import org.team2059.Wonko.Constants.AutoConstants;
 import org.team2059.Wonko.Constants.DrivetrainConstants;
 import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.routines.DrivetrainRoutine;
+import org.team2059.Wonko.subsystems.oculus.Oculus;
 import org.team2059.Wonko.subsystems.vision.Vision;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -30,6 +33,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import static org.team2059.Wonko.Constants.OculusConstants.ROBOT_TO_QUEST;
+
 public class Drivetrain extends SubsystemBase {
 
   public static boolean fieldRelativeStatus = true;
@@ -39,8 +44,7 @@ public class Drivetrain extends SubsystemBase {
   public final SwerveModule backLeft;
   public final SwerveModule backRight;
 
-  private GyroIO gyro;
-  private GyroIOInputsAutoLogged gyroInputs;
+  public final Oculus oculus;
 
   private SwerveDrivePoseEstimator poseEstimator;
 
@@ -50,7 +54,9 @@ public class Drivetrain extends SubsystemBase {
 
   private Field2d field = new Field2d();
 
-  public Drivetrain(Vision vision, GyroIO gyro) {
+  private Pigeon2 gyro = new Pigeon2(50);
+
+  public Drivetrain(Vision vision, Oculus oculus) {
 
     /*
      * Construct four SwerveModules
@@ -62,9 +68,7 @@ public class Drivetrain extends SubsystemBase {
      * - Cancoder offset in radians
      * - Boolean drive inverter
      * - Boolean rotation inverter
-     * - kS, kV, kA constants for drive feedforward (velocity control)
-     * - kP constant for drive (velocity control)
-     * 
+     *
      * 1 frontLeft
      * 2 frontRight
      * 3 backLeft
@@ -79,11 +83,8 @@ public class Drivetrain extends SubsystemBase {
             DrivetrainConstants.frontLeftCanCoderId,
             DrivetrainConstants.frontLeftOffsetRad,
             false,
-            true,
-            0.18707,
-            1.972,
-            0.2846,
-            0.0));
+            true
+        ));
     frontRight = new SwerveModule(
         2,
         new SwerveModuleIOReal(
@@ -92,11 +93,8 @@ public class Drivetrain extends SubsystemBase {
             DrivetrainConstants.frontRightCanCoderId,
             DrivetrainConstants.frontRightOffsetRad,
             false,
-            true,
-            0.17367,
-            2.0218,
-            0.30097,
-            0.0));
+            true
+        ));
     backLeft = new SwerveModule(
         3,
         new SwerveModuleIOReal(
@@ -105,11 +103,8 @@ public class Drivetrain extends SubsystemBase {
             DrivetrainConstants.backLeftCanCoderId,
             DrivetrainConstants.backLeftOffsetRad,
             false,
-            true,
-            0.1846,
-            1.9744,
-            0.28488,
-            0.0));
+            true
+        ));
     backRight = new SwerveModule(
         4,
         new SwerveModuleIOReal(
@@ -118,25 +113,12 @@ public class Drivetrain extends SubsystemBase {
             DrivetrainConstants.backRightCanCoderId,
             DrivetrainConstants.backRightOffsetRad,
             false,
-            true,
-            0.16226,
-            2.0166,
-            0.27832,
-            0.0));
+            true
+        ));
 
     this.vision = vision;
 
-    // Gyro keeps track of field-relative rotation
-    this.gyro = gyro;
-    gyroInputs = new GyroIOInputsAutoLogged(); // these inputs allow for us to get values from the gyro
-    new Thread(() -> { // gyro may need an extra second to start...
-      try {
-        Thread.sleep(1000);
-        gyro.reset();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }).start();
+    this.oculus = oculus;
 
     // initialize CANcoder offsets
     frontLeft.io.initRotationOffset();
@@ -204,7 +186,7 @@ public class Drivetrain extends SubsystemBase {
   }
 
   /**
-   * Set navX heading to zero
+   * Set heading to zero
    */
   public void zeroHeading() {
     gyro.reset();
@@ -214,7 +196,11 @@ public class Drivetrain extends SubsystemBase {
    * @return Rotation2d of current navX heading
    */
   public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(-gyroInputs.yaw);
+    return gyro.getRotation2d();
+  }
+
+  public void setPose(Pose2d targetPose) {
+    oculus.setRobotPose(targetPose);
   }
 
   /**
@@ -391,43 +377,40 @@ public class Drivetrain extends SubsystemBase {
     backRight.io.setRotationMotorAnglePID(0);
   }
 
-  public void set180GyroRotation(boolean enabled) {
-    gyro.set180Rotation(enabled);
-  }
-
   @Override
   public void periodic() {
-
-    // Update gyro inputs & logging
-    gyro.updateInputs(gyroInputs);
-    Logger.processInputs("Gyro", gyroInputs);
 
     // For safety...
     if (DriverStation.isDisabled()) {
       stopAllMotors();
     }
 
-    // if (!RobotContainer.upperCamSwitch.getAsBoolean()) {
-      var upperOptional = vision.io.getEstimatedUpperGlobalPose();
+    if (oculus.isTracking()) {
+      // Get the latest pose data frames
+      PoseFrame[] questFrames = oculus.getPoseFrames();
 
-      if (upperOptional.isPresent() && vision.io.getUpperCurrentStdDevs() != null) {
+      // Loop over pose data frames and send to pose estimator
+      for (PoseFrame f : questFrames) {
+        // Get quest pose
+        Pose2d questPose = f.questPose();
+
+        // Get timestamp for when data was sent
         poseEstimator.addVisionMeasurement(
-            upperOptional.get().estimatedPose.toPose2d(),
-            upperOptional.get().timestampSeconds,
-            vision.io.getUpperCurrentStdDevs()
+          f.questPose().transformBy(ROBOT_TO_QUEST.inverse()),
+          f.dataTimestamp(),
+          Constants.OculusConstants.stdDevs
         );
       }
-    // }
-    // if (!RobotContainer.lowerCamSwitch.getAsBoolean()) {
-      var lowerOptional = vision.io.getEstimatedLowerGlobalPose();
-      if (lowerOptional.isPresent() && vision.io.getLowerCurrentStdDevs() != null) {
-        poseEstimator.addVisionMeasurement(
-            lowerOptional.get().estimatedPose.toPose2d(),
-            lowerOptional.get().timestampSeconds,
-            vision.io.getLowerCurrentStdDevs()
-        );
-      }
-    // }
+    }
+
+//    var lowerOptional = vision.io.getEstimatedLowerGlobalPose();
+//    if (lowerOptional.isPresent() && vision.io.getLowerCurrentStdDevs() != null) {
+//      poseEstimator.addVisionMeasurement(
+//        lowerOptional.get().estimatedPose.toPose2d(),
+//        lowerOptional.get().timestampSeconds,
+//        vision.io.getLowerCurrentStdDevs()
+//      );
+//    }
 
     // Update pose estimator as if it were simply Odometry
     poseEstimator.update(getHeading(), getModulePositions());
@@ -437,6 +420,7 @@ public class Drivetrain extends SubsystemBase {
     field.setRobotPose(getPose());
     Logger.recordOutput("Field-Relative?", fieldRelativeStatus);
     Logger.recordOutput("Real States", getStates());
-  }
 
+    Logger.recordOutput("PigeonYaw", getHeading());
+  }
 }

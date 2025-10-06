@@ -18,7 +18,6 @@ import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmdXbox;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
-import org.team2059.Wonko.commands.vision.AlignToHumanPlayer;
 import org.team2059.Wonko.commands.vision.AlignToReef;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollectorIOReal;
@@ -27,9 +26,9 @@ import org.team2059.Wonko.subsystems.climber.ClimberIOReal;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollectorIOReal;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
-import org.team2059.Wonko.subsystems.drive.GyroIONavX;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
 import org.team2059.Wonko.subsystems.elevator.ElevatorIOReal;
+import org.team2059.Wonko.subsystems.oculus.Oculus;
 import org.team2059.Wonko.subsystems.vision.Vision;
 import org.team2059.Wonko.subsystems.vision.VisionIOReal;
 
@@ -60,6 +59,7 @@ public class RobotContainer {
   SendableChooser<Command> autoChooser;
 
   public static Vision vision;
+  public static Oculus oculus;
   public static Drivetrain drivetrain;
   public static Elevator elevator;
   public static AlgaeCollector algaeCollector;
@@ -91,7 +91,8 @@ public class RobotContainer {
     /* ========== */
 
     vision = new Vision(new VisionIOReal());
-    drivetrain = new Drivetrain(vision, new GyroIONavX());
+    oculus = new Oculus();
+    drivetrain = new Drivetrain(vision, oculus);
     elevator = new Elevator(new ElevatorIOReal());
     algaeCollector = new AlgaeCollector(new AlgaeCollectorIOReal());
     coralCollector = new CoralCollector(new CoralCollectorIOReal());
@@ -247,8 +248,6 @@ public class RobotContainer {
       new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
         .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
-      new JoystickButton(logitech, 12) // HP ALIGN
-        .whileTrue(new AlignToHumanPlayer(drivetrain, vision, false));
       new JoystickButton(logitech, 2) // LEFT REEF ALIGN
         .whileTrue(new AlignToReef(drivetrain, vision, false, false));
   
@@ -302,11 +301,6 @@ public class RobotContainer {
           new ElevateToSetpointCmd(elevator, ElevatorConstants.processorHeight)
         )
     );
-
-    /* Toggle gyro 180 degree rotation */
-    new JoystickButton(buttonBox, 15)
-      .onTrue(new InstantCommand(() -> drivetrain.set180GyroRotation(true)))
-      .onFalse(new InstantCommand(() -> drivetrain.set180GyroRotation(false)));
 
     // Elevator sysID routine
     // new JoystickButton(buttonBox, 5)
@@ -392,26 +386,13 @@ public class RobotContainer {
     new JoystickButton(buttonBox, 10)
       .whileTrue(climber.climberDownCommand());
 
-    /* ====== */
-    /* Vision */
-    /* ====== */
+    /* ==================== */
+    /* Oculus Sync Commands */
+    /* ==================== */
+    new JoystickButton(logitech, 11)
+      .whileTrue(new InstantCommand(() -> vision.syncWithOculus()));
 
-    // new JoystickButton(logitech, 12) // HP ALIGN
-    //   .whileTrue(new PathfindToHPS(drivetrain, vision));
-    // new JoystickButton(logitech, 2) // LEFT REEF ALIGN
-    //   .whileTrue(new PathfindToReefCmd(drivetrain, vision, false));
-
-    // new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
-    //   .whileTrue(new PathfindToReefCmd(drivetrain, vision, true));
-
-    // upperCamSwitch
-    //   .onTrue(new InstantCommand(() -> vision.inputs.upperIsOn = false))
-    //   .onFalse(new InstantCommand(() -> vision.inputs.upperIsOn = true)); 
-    
-    // lowerCamSwitch
-    //   .onTrue(new InstantCommand(() -> vision.inputs.lowerIsOn = false))
-    //   .onFalse(new InstantCommand(() -> vision.inputs.lowerIsOn = true)); 
-   }
+  }
   
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
