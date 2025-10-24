@@ -55,14 +55,10 @@ public final class Constants {
     // Sets whether or not tunable numbers can be changed. If false, only defaults will be used.
     public static final boolean tuningMode = true;
 
-    // Whether to use XboxController or Joystick
-    public static final boolean useXboxForDriving = false;
-
     /* ===== */
     /* PORTS */
     /* ===== */
 
-    public static final int xboxDriverPort = 3;
     public static final int logitechPort = 0;
     public static final int buttonBoxPort = 1;
     public static final int xboxControllerPort = 2;
@@ -241,20 +237,18 @@ public final class Constants {
       );
 
 
-    /* 
-     * Tags of each reef side. 
+    /*
+     * Tags of each reef side.
      * Starts at the side closest to the driver station
      * Goes clockwise (relative to driver station)
      */
     public static final ArrayList<Integer> redReefTags = new ArrayList<>(Arrays.asList(7, 6, 11, 10, 9, 8));
     public static final ArrayList<Integer> blueReefTags = new ArrayList<>(Arrays.asList(18, 19, 20, 21, 22, 17));
-    public static ArrayList<Integer> reefTags = new ArrayList<>();
 
-    // Tags of human player stations 
+    // Tags of human player stations
     // Starts at left human player station from driver POV
     public static final ArrayList<Integer> redHPTags = new ArrayList<>(Arrays.asList(1, 2));
     public static final ArrayList<Integer> blueHPTags = new ArrayList<>(Arrays.asList(13, 12));
-    public static ArrayList<Integer> HPTags = new ArrayList<>();
 
     // Standard deviations below are from Team Spectrum 3847’s X-Ray robot
 

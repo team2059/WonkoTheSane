@@ -42,7 +42,7 @@ public class AlignToReef extends SequentialCommandGroup{
     boolean usePathfinder;
 
     private LoggedTunableNumber reefLeftOffsetInches = new LoggedTunableNumber("AlignToReef/LeftOffsetInches", -6);
-    private LoggedTunableNumber reefRightOffsetInches = new LoggedTunableNumber("AlignToReef/RightOffsetInches", 6);
+    private LoggedTunableNumber reefRightOffsetInches = new LoggedTunableNumber("AlignToReef/RightOffsetInches", 7);
 
     public AlignToReef (
         Drivetrain drivetrain,

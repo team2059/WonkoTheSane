@@ -104,20 +104,6 @@ public class Robot extends LoggedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
 
-    try {
-      Optional<Alliance> ally = DriverStation.getAlliance();
-      if (ally.isPresent()) {
-        if (ally.get() == Alliance.Red) {
-          RobotContainer.isRed = true;
-        }
-        if (ally.get() == Alliance.Blue) {
-          RobotContainer.isRed = false;
-        }
-      } 
-    } catch (NullPointerException ex) {
-      System.out.println("error");
-    }
-
     CommandScheduler.getInstance().run();
   }
 

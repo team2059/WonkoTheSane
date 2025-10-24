@@ -51,7 +51,7 @@ public final class AutoCommands {
     ) {
 
         /* Timeouts */
-        final double alignToReefTimeout = 1.5;
+        final double alignToReefTimeout = 3;
 
         /* Coral Score */
         NamedCommands.registerCommand(
@@ -68,6 +68,21 @@ public final class AutoCommands {
                     ).withTimeout(0.5)
                 )
                 .andThen(logToConsoleCommand("[auto] L4 SCORE COMPLETE!"))
+        );
+
+        NamedCommands.registerCommand(
+          "ScoreL3",
+          new ElevateToReefLevelCmd(3, coralCollector, elevator)
+            .until(
+              () -> Math.abs(coralCollector.inputs.tiltAbsPosRadians - CoralCollectorConstants.levelCoralTiltAngle[3].in(Radians)) <= 0.05
+            )
+            .andThen(
+              Commands.parallel(
+                new ElevateToReefLevelCmd(3, coralCollector, elevator),
+                coralCollector.outtakeCommand()
+              ).withTimeout(0.5)
+            )
+            .andThen(logToConsoleCommand("[auto] L3 SCORE COMPLETE!"))
         );
 
         /* Coral Intake */
@@ -97,7 +112,7 @@ public final class AutoCommands {
         );
         NamedCommands.registerCommand(
             "AlignToReefRight", 
-            new AlignToReef(drivetrain, vision, false, false)
+            new AlignToReef(drivetrain, vision, true, false)
             .withTimeout(alignToReefTimeout)
             .andThen(logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!"))
         );
