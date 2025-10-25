@@ -1,7 +1,9 @@
 package org.team2059.Wonko.commands.vision;
 
+import java.util.List;
 import java.util.Set;
 
+import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.commands.drive.PIDSwerve;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
@@ -110,17 +112,49 @@ public class AlignToReef extends SequentialCommandGroup{
      * @return the resulting command
      */
     public Command getPathfindCommand() {
-        if (
-            vision.inputs.hasLowerTarget &&
-            vision.inputs.lowerBestTarget != null &&
-            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.5 &&
-            VisionConstants.redReefTags.contains(vision.inputs.lowerBestTargetID) || VisionConstants.blueReefTags.contains(vision.inputs.lowerBestTargetID)
-        ) {
 
+        PhotonTrackedTarget bestTarget = null;
+
+        if (vision.inputs.lowerCameraResult.getTargets().size() > 1) {
+            System.out.println("Multiple Targets Detected");
+
+            List<PhotonTrackedTarget> targetList = vision.inputs.lowerCameraResult.getTargets();
+
+            double lastDifference = 180;
+            for (PhotonTrackedTarget target : targetList) {
+                if (Math.abs(Math.abs(target.bestCameraToTarget.getRotation().getZ() * 2.0 * Math.PI) - 180) < lastDifference) {
+                    lastDifference = Math.abs(Math.abs(target.bestCameraToTarget.getRotation().getZ() * 2.0 * Math.PI) - 180);
+                    bestTarget = target;
+                }
+            }
+        } else {
+            bestTarget = vision.inputs.lowerBestTarget;
+        }
+
+        if (bestTarget == null) {
+            return new InstantCommand(
+              () -> {
+                  System.out.println("Condition Not Met: Lower Target Null");
+              }
+            );
+        } else if (bestTarget.getPoseAmbiguity() > 0.5) {
+            return new InstantCommand(
+              () -> {
+                  System.out.println("Condition Not Met: Pose Ambiguity");
+              }
+            );
+        } else if (!VisionConstants.redReefTags.contains(bestTarget.getFiducialId()) && !VisionConstants.blueReefTags.contains(bestTarget.getFiducialId())) {
+            return new InstantCommand(
+              () -> {
+                  System.out.println("Condition Not Met: Tag is not a valid reef tag");
+              }
+            );
+        } else {
             vision.syncWithOculus();
 
             // Grab pose of tag
-            int tagId = vision.inputs.lowerBestTargetID;
+            int tagId = bestTarget.getFiducialId();
+
             var targetPose = VisionConstants.aprilTagFieldLayout.getTagPose(tagId);
 
             // Calculate end state
@@ -129,29 +163,65 @@ public class AlignToReef extends SequentialCommandGroup{
 
             if (usePathfinder) {
                 return AutoBuilder.pathfindToPose(
-                    goalPose, 
-                    new PathConstraints(
-                        3.5, 
-                        2.5,
-                        Units.degreesToRadians(540),
-                        Units.degreesToRadians(720)
-                    )
+                  goalPose,
+                  new PathConstraints(
+                    4.5,
+                    3,
+                    Units.degreesToRadians(540),
+                    Units.degreesToRadians(720)
+                  )
                 ).andThen(
-                    new PIDSwerve(
-                        drivetrain, 
-                        goalPoseFinal
-                    )
+                  new PIDSwerve(
+                    drivetrain,
+                    goalPoseFinal
+                  )
                 );
             } else {
                 return new PIDSwerve(drivetrain, goalPoseFinal);
             }
-
-        } else {
-            return new InstantCommand(
-                () -> {
-                    System.out.println("Conditions Not Met For Auto Alignment To Reef");
-                }
-            );
         }
+//        if (
+//            vision.inputs.hasLowerTarget &&
+//            vision.inputs.lowerBestTarget != null &&
+//            vision.inputs.lowerBestTarget.getPoseAmbiguity() <= 0.5 &&
+//            VisionConstants.redReefTags.contains(vision.inputs.lowerBestTargetID) || VisionConstants.blueReefTags.contains(vision.inputs.lowerBestTargetID)
+//        ) {
+//
+//            vision.syncWithOculus();
+//
+//            // Grab pose of tag
+//            int tagId = vision.inputs.lowerBestTargetID;
+//            var targetPose = VisionConstants.aprilTagFieldLayout.getTagPose(tagId);
+//
+//            // Calculate end state
+//            var goalPose = targetPose.get().transformBy(tagToGoal).toPose2d();
+//            var goalPoseFinal = targetPose.get().transformBy(tagToGoalFinal).toPose2d();
+//
+//            if (usePathfinder) {
+//                return AutoBuilder.pathfindToPose(
+//                    goalPose,
+//                    new PathConstraints(
+//                        3.5,
+//                        2.5,
+//                        Units.degreesToRadians(540),
+//                        Units.degreesToRadians(720)
+//                    )
+//                ).andThen(
+//                    new PIDSwerve(
+//                        drivetrain,
+//                        goalPoseFinal
+//                    )
+//                );
+//            } else {
+//                return new PIDSwerve(drivetrain, goalPoseFinal);
+//            }
+//
+//        } else {
+//            return new InstantCommand(
+//                () -> {
+//                    System.out.println("Conditions Not Met For Auto Alignment To Reef");
+//                }
+//            );
+//        }
     }
 }

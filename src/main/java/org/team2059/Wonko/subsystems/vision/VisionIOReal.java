@@ -61,11 +61,11 @@ public class VisionIOReal implements VisionIO {
         lowerCameraResults = lowerCamera.getAllUnreadResults();
 
         if (!lowerCameraResults.isEmpty()) {
-            lowerCameraResult = lowerCameraResults.get(lowerCameraResults.size() - 1);
-            inputs.hasLowerTarget = lowerCameraResult.hasTargets();
+            inputs.lowerCameraResult = lowerCameraResults.get(lowerCameraResults.size() - 1);
+            inputs.hasLowerTarget = inputs.lowerCameraResult.hasTargets();
 
             if (inputs.hasLowerTarget) {
-                inputs.lowerBestTarget = lowerCameraResult.getBestTarget();
+                inputs.lowerBestTarget = inputs.lowerCameraResult.getBestTarget();
                 inputs.lowerBestTargetID = inputs.lowerBestTarget.getFiducialId();
             } else {
                 inputs.lowerBestTargetID = -1;
