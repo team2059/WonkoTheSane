@@ -10,6 +10,7 @@ import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
 import org.team2059.Wonko.subsystems.coral.CoralCollector;
 import org.team2059.Wonko.subsystems.drive.Drivetrain;
 import org.team2059.Wonko.subsystems.elevator.Elevator;
+import org.team2059.Wonko.subsystems.oculus.Oculus;
 import org.team2059.Wonko.subsystems.vision.Vision;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -51,7 +52,13 @@ public final class AutoCommands {
     ) {
 
         /* Timeouts */
-        final double alignToReefTimeout = 1.5;
+        final double alignToReefTimeout = 3;
+
+        /* Sync Quest Pose */
+        NamedCommands.registerCommand(
+          "SyncQuestPose",
+          new InstantCommand(() -> vision.syncWithOculus())
+        );
 
         /* Coral Score */
         NamedCommands.registerCommand(
@@ -70,11 +77,25 @@ public final class AutoCommands {
                 .andThen(logToConsoleCommand("[auto] L4 SCORE COMPLETE!"))
         );
 
+        NamedCommands.registerCommand(
+          "ScoreL3",
+          new ElevateToReefLevelCmd(3, coralCollector, elevator)
+            .until(
+              () -> Math.abs(coralCollector.inputs.tiltAbsPosRadians - CoralCollectorConstants.levelCoralTiltAngle[3].in(Radians)) <= 0.05
+            )
+            .andThen(
+              Commands.parallel(
+                new ElevateToReefLevelCmd(3, coralCollector, elevator),
+                coralCollector.outtakeCommand()
+              ).withTimeout(0.5)
+            )
+            .andThen(logToConsoleCommand("[auto] L3 SCORE COMPLETE!"))
+        );
+
         /* Coral Intake */
         NamedCommands.registerCommand(
             "IntakeCoral", 
-            coralCollector.autoIntakeCmd()
-            .withTimeout(1.5)
+            coralCollector.intakeCommand()
             .andThen(logToConsoleCommand("[auto] CORAL INTAKE COMPLETE!"))
         );
 
@@ -91,13 +112,13 @@ public final class AutoCommands {
         /* Align to Reef */
         NamedCommands.registerCommand(
             "AlignToReefLeft", 
-            new AlignToReef(drivetrain, vision, false, false)
+            new AlignToReef(drivetrain, vision, false, true)
             .withTimeout(alignToReefTimeout)
             .andThen(logToConsoleCommand("[auto] LEFT REEF ALIGN COMPLETE!"))
         );
         NamedCommands.registerCommand(
             "AlignToReefRight", 
-            new AlignToReef(drivetrain, vision, false, false)
+            new AlignToReef(drivetrain, vision, true, true)
             .withTimeout(alignToReefTimeout)
             .andThen(logToConsoleCommand("[auto] RIGHT REEF ALIGN COMPLETE!"))
         );

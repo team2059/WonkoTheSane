@@ -12,11 +12,9 @@ import org.team2059.Wonko.Constants.AlgaeCollectorConstants;
 import org.team2059.Wonko.Constants.CoralCollectorConstants;
 import org.team2059.Wonko.Constants.ElevatorConstants;
 import org.team2059.Wonko.Constants.OperatorConstants;
-import org.team2059.Wonko.Constants.VisionConstants;
 import org.team2059.Wonko.commands.AutoCommands;
 import org.team2059.Wonko.commands.ElevateToReefLevelCmd;
 import org.team2059.Wonko.commands.drive.TeleopDriveCmd;
-import org.team2059.Wonko.commands.drive.TeleopDriveCmdXbox;
 import org.team2059.Wonko.commands.elevator.ElevateToSetpointCmd;
 import org.team2059.Wonko.commands.vision.AlignToReef;
 import org.team2059.Wonko.subsystems.algae.AlgaeCollector;
@@ -66,25 +64,12 @@ public class RobotContainer {
   public static CoralCollector coralCollector;
   public static Climber climber;
 
-  public static CommandXboxController xboxDriver;
   public static Joystick logitech;
   public static GenericHID buttonBox;
   public static XboxController xboxController;
-  public static JoystickButton upperCamSwitch;
-  public static JoystickButton lowerCamSwitch;
-
-  public static Supplier<Double> strafe; 
-  public static Supplier<Double> translation; 
-  public static Supplier<Double> rotation; 
-
-  public static boolean isRed = false; 
-
-  public static boolean isSlowMode;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
-    isSlowMode = true;
 
     /* ========== */
     /* SUBSYSTEMS */
@@ -102,34 +87,16 @@ public class RobotContainer {
     /* CONTROLLERS */
     /* =========== */
     
-    xboxDriver = new CommandXboxController(OperatorConstants.xboxDriverPort);
     logitech = new Joystick(OperatorConstants.logitechPort);
     buttonBox = new GenericHID(OperatorConstants.buttonBoxPort);
     xboxController = new XboxController(OperatorConstants.xboxControllerPort);
-
-    // Drive Controls
-    if (OperatorConstants.useXboxForDriving) {
-      translation = xboxDriver::getLeftX;
-      strafe = xboxDriver::getLeftY;
-      rotation = xboxDriver::getRightX;
-    }
 
     /* ================ */
     /* DEFAULT COMMANDS */
     /* ================ */
 
     // Default commands run when the subsystem in question has no scheduled commands requiring it.
-    if (OperatorConstants.useXboxForDriving) {
-      drivetrain.setDefaultCommand(
-      new TeleopDriveCmdXbox(
-        drivetrain, 
-        () -> -strafe.get(), // forwardX
-        () -> -translation.get(), // forwardY
-        () -> -rotation.get(), // rotation
-        () -> isSlowMode
-      )); 
-    } else {
-      drivetrain.setDefaultCommand(
+    drivetrain.setDefaultCommand(
       new TeleopDriveCmd(
         drivetrain, 
         () -> -logitech.getRawAxis(OperatorConstants.JoystickTranslationAxis), // forwardX
@@ -137,10 +104,9 @@ public class RobotContainer {
         () -> -logitech.getRawAxis(OperatorConstants.JoystickRotationAxis), // rotation
         () -> logitech.getRawAxis(OperatorConstants.JoystickSliderAxis), // slider
         () -> logitech.getRawButton(OperatorConstants.JoystickStrafeOnly), // Strafe Only Button
-        () -> logitech.getRawButton(OperatorConstants.JoystickInvertedDrive) // Inverted buytton
+        () -> logitech.getRawButton(OperatorConstants.JoystickInvertedDrive) // Inverted button
       )
-      );
-    }
+    );
     
     elevator.setDefaultCommand(
       Commands.parallel(
@@ -153,14 +119,6 @@ public class RobotContainer {
       algaeCollector.setTiltSetpointCmd(AlgaeCollectorConstants.thruBoreMaximum)
     );
 
-    if (isRed) {
-      VisionConstants.HPTags = VisionConstants.redHPTags; 
-      VisionConstants.reefTags = VisionConstants.redReefTags; 
-    } else {
-      VisionConstants.HPTags = VisionConstants.blueHPTags; 
-      VisionConstants.reefTags = VisionConstants.blueReefTags; 
-    }
-
     /* ========== */
     /* AUTONOMOUS */
     /* ========== */
@@ -170,6 +128,9 @@ public class RobotContainer {
 
     // Build auto chooser - you can also set a default.
     autoChooser = AutoBuilder.buildAutoChooser();
+
+    // Publish auto chooser
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
     /* ======= */
     /* LOGGING */
@@ -204,22 +165,8 @@ public class RobotContainer {
     SmartDashboard.putData(coralCollector);
     SmartDashboard.putData(climber);
 
-    // Publish auto chooser
-    SmartDashboard.putData("Auto Chooser", autoChooser);
-  
-    upperCamSwitch = new JoystickButton(buttonBox, 13);
-    lowerCamSwitch = new JoystickButton(buttonBox, 14);
-
     configureBindings();
 
-  }
-
-  public void slowMode() {
-    if (isSlowMode) {
-      isSlowMode = false;
-    } else {
-      isSlowMode = true;
-    }
   }
 
   /**
@@ -233,27 +180,19 @@ public class RobotContainer {
    */
   private void configureBindings() {
 
-    if (OperatorConstants.useXboxForDriving) {
-      xboxDriver.start().onTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
-      xboxDriver.back().onTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
-      xboxDriver.rightBumper().whileTrue(new InstantCommand(() -> slowMode()));
-      xboxDriver.leftTrigger().whileTrue(new AlignToReef(drivetrain, vision, false, true));
-      xboxDriver.rightTrigger().whileTrue(new AlignToReef(drivetrain, vision, true, true));
-    } else {
-      /* RESET NAVX HEADING */
-      new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
+    /* RESET GYRO HEADING */
+    new JoystickButton(logitech, OperatorConstants.JoystickResetHeading)
         .whileTrue(new InstantCommand(() -> drivetrain.zeroHeading()));
 
-      /* SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
-      new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
+    /* SWITCH FIELD/ROBOT RELATIVITY IN TELEOP */
+    new JoystickButton(logitech, OperatorConstants.JoystickRobotRelative)
         .whileTrue(new InstantCommand(() -> drivetrain.setFieldRelativity()));
 
-      new JoystickButton(logitech, 2) // LEFT REEF ALIGN
+    new JoystickButton(logitech, 2) // LEFT REEF ALIGN
         .whileTrue(new AlignToReef(drivetrain, vision, false, false));
-  
-      new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
+
+    new JoystickButton(logitech, 1) // RIGHT REEF ALIGN
         .whileTrue(new AlignToReef(drivetrain, vision, true, false));
-    }
 
     /* ========== */
     /* Drivetrain */
@@ -284,14 +223,6 @@ public class RobotContainer {
       .whileTrue(new ElevateToReefLevelCmd(3, coralCollector, elevator));
     new JoystickButton(buttonBox, 4) // L4
       .whileTrue(new ElevateToReefLevelCmd(4, coralCollector, elevator));
-    
-    // Human player station (No longer needed due to funnel)
-    // new JoystickButton(buttonBox, 8)
-    //   .whileTrue(Commands.parallel(
-    //     new ElevateToSetpointCmd(elevator, ElevatorConstants.humanPlayerHeight),
-    //     coralCollector.setTiltSetpointCmd(CoralCollectorConstants.humanPlayerAngle),
-    //     coralCollector.intakeCommand()
-    //   ));
 
     // Processor
     new JoystickButton(buttonBox, 7)
@@ -400,6 +331,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    vision.syncWithOculus();
+
     return autoChooser.getSelected();
   }
 }

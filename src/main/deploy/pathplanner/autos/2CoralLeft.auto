@@ -5,15 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Left"
+            "name": "SyncQuestPose"
           }
         },
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "AlignToReefLeft"
+            "pathName": "Left"
           }
         },
         {
@@ -37,13 +37,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AlignToHumanPlayer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeFunnel"
+            "name": "IntakeCoral"
           }
         },
         {
@@ -56,12 +50,6 @@
           "type": "path",
           "data": {
             "pathName": "LeftHPToReef"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AlignToReefLeft"
           }
         },
         {

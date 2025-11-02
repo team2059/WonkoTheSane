@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.Matrix;
@@ -23,6 +24,8 @@ public interface VisionIO {
         public int lowerBestTargetID = -1;
 
         public PhotonTrackedTarget lowerBestTarget = null;
+
+        public PhotonPipelineResult lowerCameraResult = null;
 
         public boolean lowerIsOn = true;
     }

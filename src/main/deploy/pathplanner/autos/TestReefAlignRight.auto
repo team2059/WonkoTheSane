@@ -9,18 +9,6 @@
           "data": {
             "name": "AlignToReefRight"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ScoreL4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ResetElevator"
-          }
         }
       ]
     }
