@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "SyncQuestPose"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Center"
@@ -13,13 +19,13 @@
         {
           "type": "named",
           "data": {
-            "name": "AlignToReefLeft"
+            "name": "ScoreL4"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "ScoreL4"
+            "name": "ResetElevator"
           }
         }
       ]

@@ -24,13 +24,15 @@ public class Vision extends SubsystemBase {
     }
 
     // Sets Oculus to AprilTag pose
-    public void syncWithOculus() {
+    public boolean syncWithOculus() {
         var lowerOptional = io.getEstimatedLowerGlobalPose();
         if (lowerOptional.isPresent()) {
             System.out.println("Syncing PhotonVision with Oculus");
             RobotContainer.oculus.setRobotPose(lowerOptional.get().estimatedPose.toPose2d());
+            return true;
         } else {
             System.out.println("No tag present");
+            return false;
         }
     }
 

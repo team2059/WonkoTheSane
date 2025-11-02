@@ -331,6 +331,8 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    vision.syncWithOculus();
+
     return autoChooser.getSelected();
   }
 }

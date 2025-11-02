@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "SyncQuestPose"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Right"
@@ -43,13 +49,7 @@
         {
           "type": "named",
           "data": {
-            "name": "AlignToHumanPlayer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "IntakeFunnel"
+            "name": "IntakeCoral"
           }
         },
         {
